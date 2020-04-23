@@ -1,20 +1,24 @@
 <template>
     <div class="nav-header">
         <div class="container">
+            <!-- 页面 Logo -->
             <div class="header-logo">
                 <a href="/index"></a>
             </div>
+            <!-- 页面导航栏 -->
             <div class="header-menu">
                 <el-menu :default-active="activeIndex" mode="horizontal" @select="handleSelect" class="menu"  active-text-color="#409EFF" >
                     <el-menu-item index="1" >首页</el-menu-item>
                     <el-menu-item index="2">专栏</el-menu-item>
                 </el-menu>
             </div>
+            <!-- 搜索框 -->
             <div class="header-search">
                 <el-input placeholder="请输入内容" v-model="input" class="input-with-select" size="mini">
                     <el-button slot="append" icon="el-icon-search"></el-button>
                 </el-input>
             </div>
+            <!-- 用户框 -->
             <div class="header-user">
                 <div class="user">
                     <div class="register" v-if="!loginStaus">

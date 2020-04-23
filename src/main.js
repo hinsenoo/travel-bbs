@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import VueLazyLoad from 'vue-lazyload';
-import { Menu,MenuItem,Button,Input,Avatar,Dropdown,DropdownItem,DropdownMenu } from 'element-ui';
+import { Menu,MenuItem,Button,Input,Avatar,Dropdown,DropdownItem,DropdownMenu,Carousel,CarouselItem,Tabs,TabPane } from 'element-ui';
 // 确保引入样式
 import 'element-ui/lib/theme-chalk/index.css';
 import router from './router';
@@ -15,6 +15,10 @@ Vue.use(Avatar);
 Vue.use(Dropdown);
 Vue.use(DropdownItem);
 Vue.use(DropdownMenu);
+Vue.use(Carousel);
+Vue.use(CarouselItem);
+Vue.use(Tabs);
+Vue.use(TabPane);
 
 // 懒加载插件
 Vue.use(VueLazyLoad,{
