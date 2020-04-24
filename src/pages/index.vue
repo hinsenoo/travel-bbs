@@ -28,7 +28,10 @@
             </div>
             <!-- 右侧内容 -->
             <div class="right">
-                <div class="right-app">app介绍栏</div>
+                <div class="right-app">
+                    <div class="appCode"><img src="/imgs/QRCode.jpg" alt=""></div>
+                    <div class="word">扫码下载车车互联App<i class="el-icon-download"></i><div>最好的旅行方式是和一群志同道合的人。</div></div>
+                </div>
                 <div class="user">用户信息栏</div>
             </div>
         </div>
@@ -90,13 +93,39 @@
             .right{
                 flex: 1;
                 padding-left: 10px;
-                div{
-                    margin-bottom: 20px;
-                }
                 .right-app{
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
                     width: 100%;
                     height: 100px;
+                    margin-bottom: 20px;
                     background-color: white;
+                    .appCode{
+                        width: 50px;
+                        height: 50px;
+                        margin-right: 5px;
+                        img{
+                            width: 100%;
+                            height: 100%;
+                            object-fit: cover;
+                        }
+                    }
+                    .word{
+                        color: black;
+                        font-size: 15px;
+                        font-weight: bold;
+                        i{
+                            font-size: inherit;
+                        }
+                        div{
+                            width: 150px;
+                            margin-top: 4px;
+                            font-weight: 300;
+                            color: #999;
+                            font-size: 13px;
+                        }
+                    }
                 }
                 .user{
                     width: 100%;
