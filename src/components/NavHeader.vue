@@ -35,7 +35,7 @@
                             <el-avatar size="small" :src="circleUrl"></el-avatar>
                             <el-dropdown-menu slot="dropdown">
                                 <el-dropdown-item class="avatar-icon"><i class="el-icon-user-solid"></i>个人中心</el-dropdown-item>
-                                <el-dropdown-item><i class="el-icon-star-on"></i>收藏夹</el-dropdown-item>
+                                <el-dropdown-item><i class="el-icon-s-management"></i>收藏夹</el-dropdown-item>
                                 <el-dropdown-item><i class="el-icon-s-tools"></i>设置</el-dropdown-item>
                                 <el-dropdown-item divided><i class="el-icon-switch-button"></i>退出</el-dropdown-item>
                             </el-dropdown-menu>
@@ -55,7 +55,7 @@
                 activeIndex: '1',
                 input: '', 
                 circleUrl: "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png",
-                loginStaus: false, // 登录状态
+                loginStaus: true, // 登录状态
             }
         },
         methods: {
@@ -147,6 +147,7 @@
                     }
                     .avatar{
                         position: relative;
+                        cursor: pointer;
                         span{
                             display: block;
                         }

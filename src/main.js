@@ -22,7 +22,7 @@ Vue.use(TabPane);
 
 // 懒加载插件
 Vue.use(VueLazyLoad,{
-  loading: '/loading/loading-spinning-bubbles.svg',
+  loading: '/loading/loading-bubbles.svg',
   error: 'https://cube.elemecdn.com/e/fd/0fc7d20532fdaf769a25683617711png.png'
 });
 
