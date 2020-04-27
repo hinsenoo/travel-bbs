@@ -1,0 +1,27 @@
+.modal{
+    @include position(fixed);
+    z-index: 10;
+    transition: all 0.5s;
+    .mask{
+        @include position(fixed);
+        background-color: #000000;
+        opacity: 0.5;
+    }
+    // 过渡动画
+    &.slide-enter-active{
+        top: 0;
+    }
+    &.slide-leave-active{
+        top: -100%;
+    }
+    &.slide-enter{
+        top: -100%;
+    }
+    .modal-box{
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        background-color: #F5F5F5;
+        transform: translate(-50%,-50%);
+    }
+}

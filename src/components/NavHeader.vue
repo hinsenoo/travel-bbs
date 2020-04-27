@@ -24,9 +24,9 @@
                     <div class="register" v-if="!loginStaus">
                         <a href=""><i class="el-icon-edit-outline"></i>发帖子</a>
                         <i>|</i>
-                        <a href="">登录</a>
+                        <a href="javascript:;" @click="$emit('modalShow','login')">登录</a>
                         ·
-                        <a href="">注册</a>
+                        <a href="javascript:;" @click="$emit('modalShow','register')">注册</a>
                     </div>
                     <div class="person" v-if="loginStaus">
                         <el-button type="primary" size="mini" icon="el-icon-edit-outline">发帖子</el-button>
@@ -55,7 +55,7 @@
                 activeIndex: '1',
                 input: '', 
                 circleUrl: "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png",
-                loginStaus: true, // 登录状态
+                loginStaus: false, // 登录状态
             }
         },
         methods: {

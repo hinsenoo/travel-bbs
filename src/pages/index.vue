@@ -259,14 +259,56 @@
                 </div>
             </div>
         </div>
+        <modal
+            :showModal="showModal"
+        >
+            <template v-slot:body>
+                <div class="modal-index">
+                    <img src="/imgs/icons/login-logo.png" alt="">
+                    <div class="header">
+                        <h2>{{modalType=='login'? '登录' : '注册' }}</h2>
+                        <a @click="$emit('closeModal')" href="javscript:;" class="el-icon-close"></a>
+                    </div>
+                    <div class="content">
+                        <div class="content-login" v-show="modalType=='login'">
+                            <el-input v-model="username" placeholder="请输入用户名"></el-input>
+                            <el-input placeholder="请输入密码" v-model="password" show-password></el-input>
+                            <el-button @click="login" type="primary">登录</el-button>
+                            <div class="other">没有账号？<span @click="modalType='register'">注册</span></div>
+                        </div>
+                        <div class="content-login" v-show="modalType!='login'">
+                            <el-input v-model="registerName" placeholder="请输入用户名"></el-input>
+                            <el-input v-model="registerEmail" placeholder="请输入邮箱"></el-input>
+                            <el-input placeholder="请输入密码（不少于6位）" v-model="registerPw" show-password></el-input>
+                            <el-input placeholder="再次输入密码" v-model="registerPw2" show-password></el-input>
+                            <el-button @click="register" type="success">注册</el-button>
+                            <div class="other">已有账号？<span @click="modalType='login'">登录</span></div>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </modal>
+        <div @click="showModal=true">12312</div>
     </div>
 </template>
 <script>
+    import Modal from './../components/Modal';
     export default {
         // 组件名称
         name: 'index',
+        components: {
+            Modal
+        },
         data() {
             return {
+                showModal: false, // 登录注册框显示
+                modalType: 'login',
+                username: '',
+                password: '',
+                registerName: '',
+                registerEmail: '',
+                registerPw: '',
+                registerPw2: '',
                 activeName: 'hot',
                 // 轮播图
                 slideshowList: ['/imgs/slideshow/1.jpg',
@@ -277,12 +319,60 @@
                                 '/imgs/slideshow/7.jpg',],
                 photoUrl: '/imgs/demo/3.jpg', // 文章图片
                 circleUrl: "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png", // 信息头像
-
             }
         },
         methods: {
+            // 文章导航栏
             handleClick(tab, event) {
                 console.log(tab, event);
+            },
+            // 登录
+            login(){
+                let errMsg = '';
+                // 判断错误类型
+                if(!this.username){
+                    errMsg = '请输入用户名';
+                }else if(!this.password){
+                    errMsg = '请输入密码';
+                }
+                if(errMsg){
+                    this.$message.error(errMsg);
+                    return;
+                }
+            },
+            // 注册
+            register(){
+                console.log(this.registerPw.length);
+                console.log(this.registerPw.length < 6, !this.registerPw);
+                let errMsg = '';
+                // 判断错误类型
+                if(!this.registerName){
+                    errMsg = '请输入用户名';
+                }else if(!/^\w+((.\w+)|(-\w+))@[A-Za-z0-9]+((.|-)[A-Za-z0-9]+).[A-Za-z0-9]+$/.test(this.registerEmail)){
+                    errMsg = '请输入正确格式的邮箱';
+                }else if(!this.registerPw || this.registerPw.length < 6){
+                    errMsg = '请输入不少于6位的密码';
+                }else if(this.registerPw !== this.registerPw2){
+                    errMsg = '两次密码输入不一致';
+                }
+                if(errMsg){
+                    this.$message.error(errMsg);
+                    return;
+                }
+            },
+
+        },
+        props: {
+            changeModal: Object,
+        },
+        watch: {
+            // 改变登录弹框状态
+            changeModal: {
+                handler(newV){
+                    this.showModal = newV.showModal;
+                    this.modalType = newV.modalType;
+                },
+                deep: true
             }
         }
     }
@@ -540,6 +630,55 @@
                                 }
                             }
                         }
+                    }
+                }
+            }
+        }
+        .modal-index{
+            width: 320px;
+            padding: 25px;
+            background-color: #fff;
+            border-radius: 2px;
+            box-sizing: border-box;
+            img{
+                position: absolute;
+                width: 100px;
+                height: auto;
+                top: -90px;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+            .header{
+                margin-bottom: 24px;
+                h2{
+                    display: inline-block;
+                }
+                a{
+                    position: absolute;
+                    font-size: 23px;
+                    right: 25px;
+                    transition: transform 0.3s;
+                    color: #cccccc;
+                    &:hover{
+                        transform: scale(1.5);
+                        color: #409EFF;
+                    }
+                }
+            }
+            .content{
+                input{
+                    margin-bottom: 10px;
+                }
+                button{
+                    width: 100%;
+                    margin: 10px 0;
+                }
+                .other{
+                    color: #999999;
+                    font-size: 14px;
+                    span{
+                        color: #409EFF;
+                        cursor: pointer;
                     }
                 }
             }
