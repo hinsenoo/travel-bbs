@@ -234,7 +234,7 @@
                 <div class="user">
                     <div class="message">
                         <div class="avator">
-                            <a href="javascript:;">
+                            <a href="javascript:;" @click="toPersonal">
                                 <el-avatar :size="80" :src="circleUrl"></el-avatar>
                                 <div class="userName">
                                     <div>Hinsenoo</div>
@@ -321,6 +321,9 @@
                 circleUrl: "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png", // 信息头像
             }
         },
+        mounted(){
+            this.$emit('index',1);
+        },
         methods: {
             // 文章导航栏
             handleClick(tab, event) {
@@ -360,7 +363,12 @@
                     return;
                 }
             },
-
+            // 跳转到个人主页
+            toPersonal(){
+                this.$emit('index',0);
+                this.$router.push('/personal/1');
+                
+            }
         },
         props: {
             changeModal: Object,
@@ -379,7 +387,7 @@
 </script>
 <style lang="scss">
     .index{
-        padding-top: 40px;
+        padding-top: 20px;
         background-color: #F5F5F5;
         .container{
             display: flex;

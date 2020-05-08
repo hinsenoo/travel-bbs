@@ -1,5 +1,5 @@
 <template>
-    <div class="nav-header">
+    <div class="nav-header" :class="{'is_fixed': isFixed}">
         <div class="container">
             <!-- 页面 Logo -->
             <div class="header-logo">
@@ -52,13 +52,18 @@
         name: 'nav-header',
         data() {
             return {
-                activeIndex: '1',
                 input: '', 
                 circleUrl: "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png",
                 loginStaus: false, // 登录状态
+                isFixed: false, // 吸顶状态
             }
         },
+        mounted(){
+            // 注册滚动事件
+            window.addEventListener('scroll',this.initHeight);
+        },
         methods: {
+            // 导航栏触发事件
             handleSelect(key) {
                 if(key == 1){
                     // 判断跳转地址于当前地址不同
@@ -66,7 +71,20 @@
                         this.$router.push('/index');
                     }
                 }
+            },
+            initHeight(){
+                // 页面 Y 轴偏移量 兼容 IE
+                let scrollTop = window.pageYOffset || document.scrollTop || document.body.scrollTop;
+                this.isFixed = scrollTop > 80 ? true : false;
             }
+
+        },
+        destroyed(){
+            // 通过第三个参数设置 事件冒泡 来销毁事件
+            window.removeEventListener('scroll',this.initHeight,false);
+        },
+        props: {
+            activeIndex: String
         }
     }
 </script>
@@ -75,6 +93,13 @@
 @import '../assets/scss/config.scss';
 .nav-header{
     box-shadow: 0 1px 3px rgba(26,26,26,.1);
+    background-color: white;
+    z-index: 10;
+    &.is_fixed{
+        position: fixed;
+        top: 0;
+        width: 100%;
+    }
     .container{
         position: relative;
         height: 60px;

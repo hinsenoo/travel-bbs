@@ -1,8 +1,8 @@
 <template>
     <div>
         <!-- 复用头部 尾部 -->
-        <nav-header @modalShow="modalShow"></nav-header>
-        <router-view @closeModal="closeModal" :changeModal="changeModal" ></router-view>
+        <nav-header @modalShow="modalShow" :activeIndex="activeIndex"></nav-header>
+        <router-view @closeModal="closeModal" :changeModal="changeModal" @index="index"></router-view>
 
     </div>
 </template>
@@ -20,7 +20,8 @@
                 changeModal: {
                     showModal: false,
                     modalType: ''
-                }
+                },
+                activeIndex: '0'
             }
         },
         methods: {
@@ -31,6 +32,10 @@
             closeModal(){
                 this.changeModal.modalType = '';
                 this.changeModal.showModal = false;
+            },
+            // 设置导航栏活动索引
+            index(type){
+                this.activeIndex = type + '';
             }
         }
     }
