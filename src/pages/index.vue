@@ -411,7 +411,7 @@
                     .el-tab-pane{
                         .content-list{
                             width: 97%;
-                            height: 1000px;
+                            // height: 1000px;
                             // border: 1px solid black;
                             .content-listNews{
                                 padding: 18px 0px;

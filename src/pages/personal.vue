@@ -97,8 +97,11 @@
             // 编辑资料
             toSetting(){
                 this.$emit('index',0);
-                this.$router.push('/setting/1');
+                this.$router.push('/setting');
             },
+            handleClick(){
+                
+            }
         }
     }
 </script>

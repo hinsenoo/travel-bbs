@@ -36,7 +36,7 @@ export default new Router({
                 },
                 {
                     // 个人页面
-                    path: '/setting/:id',
+                    path: '/setting',
                     name: 'setting',
                     component: () => import('./pages/setting.vue')
                 }
