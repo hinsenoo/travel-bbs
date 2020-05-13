@@ -2,7 +2,7 @@
     <div id="wangeditor">
         <div ref="editorElem" style="text-align:left"></div>
         <div ref="editorElemBox" class="text">
-            <p>请输入内容</p>
+            <slot name="word"></slot>
         </div>
     </div>
 </template>
@@ -31,6 +31,8 @@
             // 若通过 JS 修改 html 内容，则通过 editor.change() 来手动触发 
             this.editor.customConfig.onchange = (html) => {
                 this.editorContent = html;
+                // 把这个html通过catchData的方法传入父组件
+                this.catchData(this.editorContent);
             }
 
             // 编辑区域的z-index

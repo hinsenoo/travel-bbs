@@ -22,14 +22,14 @@
                         <span>选择标题图片</span>
                     </div>
                     <input @change="onUpload" ref="uploadImg" type="file" accept="image/*" value="" />
-                    <img v-show="uploadImgShow" :src="uploadImgUrl" alt="标题图片">
+                    <img v-show="uploadImgShow" :src="titleImgUrl" alt="标题图片">
                 </div>
                 <div class="title">
                     <el-input v-model="title" placeholder="请输入文章标题"></el-input>
                     <div class="other">
                         <div class="left">
                             <span>分类：</span>
-                            <el-select v-model="value" placeholder="文章分类">
+                            <el-select v-model="category" placeholder="文章分类">
                                 <el-option
                                 v-for="item in options"
                                 :key="item.value"
@@ -45,7 +45,11 @@
                     </div>
                 </div>
                 <div class="content-editor">
-                    <editor></editor>
+                    <editor :catchData="catchData">
+                        <template v-slot:word>
+                            <p>在这留下你最美好的回忆。。。。。。</p>
+                        </template>
+                    </editor>
                 </div>
             </div>
         </div>
@@ -58,32 +62,39 @@ import editor from '../components/Editor'
         name: 'edit',
         data(){
             return {
+                // 文章id
+                articleId: '',
+                // 作者 id
+                userId: '',
                 // 文章标题
                 title: '',
                 // 分类列表
-                value: '',
+                category: '',
                 // 位置
                 place: '',
+                // 文章内容 HTML 格式
+                articleHTML: '',
                 options: [
                     {
-                        value: '选择1',
+                        value: '游记',
                         label: '写游记'
                     }, 
                     {
-                        value: '选择2',
+                        value: '攻略',
                         label: '记攻略'
                     }, 
                     {
-                        value: '选择3',
+                        value: '讨论',
                         label: '讨论贴'
                     }
                 ],
                 // 标题图片显示
                 uploadImgShow: false,
                 // 标题图片地址
-                uploadImgUrl: 'http://47.106.215.69:8080/images/avatar/b8317f0a-2d5c-4cb4-8b44-6342d4df2464.jpg',
+                titleImgUrl: '',
                 // 上传标签节点
                 inputNode: '',
+                
             }
         },
         components: {
@@ -111,10 +122,14 @@ import editor from '../components/Editor'
                     headers:{'Content-Type':'multipart/form-data'}
                 };
                 this.axios.post("/api/tourism/user/upload/", data, config).then(res => {
-                    this.uploadImgUrl = res.data;
+                    this.titleImgUrl = res.data;
                     this.uploadImgShow = true;
                     this.$refs.photo.style = "height: auto";
                 })
+            },
+            // 获取编辑器内的数据
+            catchData(html){
+                this.articleHTML = html;
             }
         }
 
@@ -192,7 +207,7 @@ import editor from '../components/Editor'
             padding: 100px;
             .photo{
                 width: 650px;
-                height: 200px;
+                height: 300px;
                 background: rgb(194, 194, 194);
                 margin: 0 auto;
                 font-size: 40px;
@@ -202,7 +217,7 @@ import editor from '../components/Editor'
                 justify-content: center;
                 align-items: center;
                 transition: all 1s;
-                margin-bottom: 10px;
+                margin-bottom: 20px;
                 .mask{
                     position: absolute;
                     display: flex;
