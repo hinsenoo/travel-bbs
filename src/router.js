@@ -42,5 +42,11 @@ export default new Router({
                 }
             ]
         },
+        {
+            // 编辑页面
+            path: '/edit/:id',
+            name: 'edit',
+            component: () => import('./pages/edit.vue')
+        }
     ]
 });

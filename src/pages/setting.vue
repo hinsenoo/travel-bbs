@@ -33,7 +33,28 @@
                             </ul>
                         </div>
                     </el-tab-pane>
-                    <el-tab-pane label="修改密码" name="second">修改密码</el-tab-pane>
+                    <el-tab-pane label="修改密码" name="second">
+                        <div class="box">
+                            <ul>
+                                <li><h1>修改密码</h1></li>
+                                <li>
+                                    <span>旧密码</span>
+                                    <input type="text" v-model="oldPassword" placeholder="请输入原密码">
+                                </li>
+                                <li>
+                                    <span>新密码</span>
+                                    <input type="text" v-model="newPassword" placeholder="请输入新密码">
+                                </li>
+                                <li>
+                                    <span>确认新密码</span>
+                                    <input type="text" v-model="newPassword2" placeholder="确认新密码">
+                                </li>
+                                <li class="sureButton">
+                                    <el-button type="primary" round>保存修改</el-button>
+                                </li>
+                            </ul>
+                        </div>
+                    </el-tab-pane>
                 </el-tabs>
             </div>
         </div>
@@ -51,7 +72,10 @@
                 nickName: '',
                 userWork: '',
                 userIntroduce: '',
-                userEmail: ''
+                userEmail: '',
+                oldPassword: '',
+                newPassword: '',
+                newPassword2: ''
             };
         },
         methods: {
