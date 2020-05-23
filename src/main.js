@@ -2,7 +2,7 @@ import Vue from 'vue';
 import VueLazyLoad from 'vue-lazyload';
 import axios from 'axios';
 import VueAxios from 'vue-axios'
-import { Menu,MenuItem,Button,Input,Avatar,Dropdown,DropdownItem,DropdownMenu,Carousel,CarouselItem,Tabs,TabPane,Message,Upload,Select,Option } from 'element-ui';
+import { Menu,MenuItem,Button,Input,Avatar,Dropdown,DropdownItem,DropdownMenu,Carousel,CarouselItem,Tabs,TabPane,Message,Upload,Select,Option,Backtop } from 'element-ui';
 // 确保引入样式
 import 'element-ui/lib/theme-chalk/index.css';
 import router from './router';
@@ -24,6 +24,7 @@ Vue.use(TabPane);
 Vue.use(Upload);
 Vue.use(Select);
 Vue.use(Option);
+Vue.use(Backtop);
 Vue.component(Message.name, Message);
 // 挂载的 vue 实例的原型
 Vue.prototype.$message = Message;

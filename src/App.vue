@@ -3,6 +3,7 @@
     <!-- 所有的路由视图 -->
     <router-view></router-view>
   </div>
+  
 </template>
 
 <script>

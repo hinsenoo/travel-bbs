@@ -1,5 +1,21 @@
 <template>
     <div class="edit">
+        <el-backtop>
+            <div
+            style="{
+                height: 100%;
+                width: 100%;
+                background-color: #f2f5f6;
+                box-shadow: 0 0 6px rgba(0,0,0, .12);
+                text-align: center;
+                line-height: 40px;
+                color: #1989fa;
+                border-radius: 40px;
+            }"
+            >
+                <i class="el-icon-caret-top"></i>
+            </div>
+        </el-backtop>
         <div class="edit-header">
             <div class="container">
                 <div class="header-logo">
@@ -9,7 +25,7 @@
                     写文章
                 </div>
                 <div class="header-button">
-                    <el-button type="primary" round>发布<i class="el-icon-tickets"></i></el-button>
+                    <el-button type="primary" round @click="publish">发布<i class="el-icon-tickets"></i></el-button>
                     <i class="el-icon-more icon"></i>
                 </div>
             </div>
@@ -44,6 +60,7 @@
                         </div>
                     </div>
                 </div>
+                <div class="rule"></div>
                 <div class="content-editor">
                     <editor :catchData="catchData">
                         <template v-slot:word>
@@ -130,6 +147,9 @@ import editor from '../components/Editor'
             // 获取编辑器内的数据
             catchData(html){
                 this.articleHTML = html;
+            },
+            publish(){
+                console.log(this.articleHTML);
             }
         }
 
@@ -285,6 +305,12 @@ import editor from '../components/Editor'
                         }
                     }
                 }
+            }
+            .rule{
+                border: 1px solid #ccc;
+                width: 650px;
+                margin: 0 auto;
+                margin-bottom: 20px;
             }
             .content-editor{
                 width: 650px;

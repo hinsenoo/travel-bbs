@@ -29,7 +29,7 @@
                                     <div class="news">
                                         <div class="word">
                                             <div class="title">
-                                                <a href="javascript:;">人生恰似一场永不停止的远足——珠峰东坡大环线</a>
+                                                <a href="javascript:;" @click="toArticle">人生恰似一场永不停止的远足——珠峰东坡大环线</a>
                                             </div>
                                             <div class="fragment">
                                                 原本2019年计划先墨脱雨林徒步再走珠峰东坡，因为十一这个黄金期要参加闺蜜的婚礼，所以就只能完成其中一个了，刚好看到6月徒步珠峰东坡的贴还蛮多的（刚好看杜鹃花的时候），通过8264，还有qq找了几个同伴......
@@ -257,8 +257,47 @@
                         </div>
                     </div>
                 </div>
+                <div class="right-recommend">
+                    <h3>推荐文章</h3>
+                    <a href="javascript:;" class="recommend">
+                        <div class="title">人生恰似一场永不停止的远足——珠峰东坡大环线</div>
+                        <div class="icon">
+                            <span><img src="/imgs/icons/good-article.png" alt="">32</span>
+                            <span><img class="comment" src="/imgs/icons/comment-article.png" alt="">11</span>
+                        </div>
+                    </a>
+                    <a href="javascript:;" class="recommend">
+                        <div class="title">人生恰似一场永不停止的远足——珠峰东坡大环线</div>
+                        <div class="icon">
+                            <span><img src="/imgs/icons/good-article.png" alt="">32</span>
+                            <span><img class="comment" src="/imgs/icons/comment-article.png" alt="">11</span>
+                        </div>
+                    </a>
+                    <a href="javascript:;" class="recommend">
+                        <div class="title">人生恰似一场永不停止的远足——珠峰东坡大环线</div>
+                        <div class="icon">
+                            <span><img src="/imgs/icons/good-article.png" alt="">32</span>
+                            <span><img class="comment" src="/imgs/icons/comment-article.png" alt="">11</span>
+                        </div>
+                    </a>
+                    <a href="javascript:;" class="recommend">
+                        <div class="title">人生恰似一场永不停止的远足——珠峰东坡大环线</div>
+                        <div class="icon">
+                            <span><img src="/imgs/icons/good-article.png" alt="">32</span>
+                            <span><img class="comment" src="/imgs/icons/comment-article.png" alt="">11</span>
+                        </div>
+                    </a>
+                    <a href="javascript:;" class="recommend">
+                        <div class="title">人生恰似一场永不停止的远足——珠峰东坡大环线</div>
+                        <div class="icon">
+                            <span><img src="/imgs/icons/good-article.png" alt="">32</span>
+                            <span><img class="comment" src="/imgs/icons/comment-article.png" alt="">11</span>
+                        </div>
+                    </a>
+                </div>
             </div>
         </div>
+        <!-- 登录注册弹框 -->
         <modal
             :showModal="showModal"
         >
@@ -288,7 +327,6 @@
                 </div>
             </template>
         </modal>
-        <div @click="showModal=true">12312</div>
     </div>
 </template>
 <script>
@@ -368,6 +406,10 @@
                 this.$emit('index',0);
                 this.$router.push('/personal/1');
                 
+            },
+            toArticle(){
+                this.$emit('index',0);
+                this.$router.push('/article/1');
             }
         },
         props: {
@@ -396,7 +438,7 @@
                 .slideshow{
                     width: 100%;
                     height: 300px;
-                    background: #fff;
+                    // background: #fff;
                     margin-bottom: 20px;
                     img{
                         width: 100%;
@@ -501,6 +543,7 @@
                                     div{
                                         display: inline-block;
                                         a{
+                                            display: flex;
                                             // height: 3px;
                                             border: 1px solid #edeeef;
                                             border-radius: 1px;
@@ -568,6 +611,7 @@
                     background-color: white;
                     // border: 1px solid #d7d7d7;
                     padding: 10px;
+                    margin-bottom: 20px;
                     .message{
                         width: 100%;
                         .avator{
@@ -637,6 +681,46 @@
                                     }
                                 }
                             }
+                        }
+                    }
+                }
+                .right-recommend{
+                    width: 100%;
+                    background: white;
+                    margin-bottom: 20px;
+                    h3{
+                        font-size: 14px;
+                        padding: 12px 15px;
+                        font-weight: 500;
+                        border-bottom: 1px solid hsla(0,0%,58.8%,.1);
+                    }
+                    .recommend{
+                        display: block;
+                        font-size: 14px;
+                        padding: 12px 15px;
+                        color: black;
+                        .title{
+                            margin-bottom: 10px;
+                        }
+                        .icon{
+                            span{
+                                display: inline-block;
+                                color: #bfbfbf;
+                                margin-right: 20px;
+                                img{
+                                    width: 16px;
+                                    height: 16px;
+                                    margin-right: 5px;
+                                }
+                                .comment{
+                                    box-sizing: border-box;
+                                    position: relative;
+                                    top: 2px;
+                                }
+                            }
+                        }
+                        &:hover{
+                            background: #F5F5F5;
                         }
                     }
                 }

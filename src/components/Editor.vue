@@ -109,5 +109,6 @@
         .w-e-text-container{
             height: 300px !important;
         }
+        font-size: 15px;
     }
 </style>

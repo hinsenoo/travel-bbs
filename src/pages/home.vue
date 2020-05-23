@@ -1,9 +1,25 @@
 <template>
-    <div>
+    <div class="home">
+        <el-backtop>
+            <div
+            style="{
+                height: 100%;
+                width: 100%;
+                background-color: #f2f5f6;
+                box-shadow: 0 0 6px rgba(0,0,0, .12);
+                text-align: center;
+                line-height: 40px;
+                color: #1989fa;
+                border-radius: 40px;
+            }"
+            >
+             <i class="el-icon-caret-top"></i>
+            </div>
+        </el-backtop>
         <!-- 复用头部 尾部 -->
         <nav-header @modalShow="modalShow" :activeIndex="activeIndex"></nav-header>
         <router-view @closeModal="closeModal" :changeModal="changeModal" @index="index"></router-view>
-
+        <!-- 回到顶部 -->
     </div>
 </template>
 <script>
@@ -13,7 +29,7 @@
         name: 'home',
         // 加载多个组件
         components: {
-            NavHeader
+            NavHeader,
         },
         data() {
             return {
