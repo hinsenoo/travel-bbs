@@ -2,9 +2,12 @@ import Vue from 'vue';
 import VueLazyLoad from 'vue-lazyload';
 import axios from 'axios';
 import VueAxios from 'vue-axios'
+import md5 from 'js-md5'
+import VueCookie from 'vue-cookie'
 import { Menu,MenuItem,Button,Input,Avatar,Dropdown,DropdownItem,DropdownMenu,Carousel,CarouselItem,Tabs,TabPane,Message,Upload,Select,Option,Backtop } from 'element-ui';
 // 确保引入样式
 import 'element-ui/lib/theme-chalk/index.css';
+import store from './store'
 import router from './router';
 import App from './App.vue';
 
@@ -28,8 +31,13 @@ Vue.use(Backtop);
 Vue.component(Message.name, Message);
 // 挂载的 vue 实例的原型
 Vue.prototype.$message = Message;
+// 挂载 md5
+Vue.prototype.$md5 = md5;
 // 挂载 axios
 Vue.use(VueAxios,axios);
+// 加载 Cookie
+Vue.use(VueCookie);
+
 
 // 懒加载插件
 Vue.use(VueLazyLoad,{
@@ -64,6 +72,8 @@ axios.interceptors.response.use(function (response){
 Vue.config.productionTip = false
 
 new Vue({
+  // vuex
+  store,
   router,
   render: h => h(App),
 }).$mount('#app')

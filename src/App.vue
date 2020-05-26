@@ -8,7 +8,12 @@
 
 <script>
 export default {
-  name: 'App'
+  name: 'App',
+  mounted(){
+    if(this.$cookie.get('userId')){
+      // TODO：获取用户信息存储到 Vuex 中
+    }
+  },
 }
 </script>
 

@@ -4,13 +4,13 @@
             <div class="left">
                 <div class="content">
                     <div class="article-user">
-                        <div class="message">
+                        <a href="javascript:;" class="message">
                             <el-avatar :size="40" :src="circleUrl"></el-avatar>
                             <div class="box">
                                 <div class="user-name">Hinsenoo</div>
                                 <div class="create-time">2020年05月19日 <span>阅读 13608</span></div>
                             </div>
-                        </div>
+                        </a>
                         <el-button type="primary" size="small">+ 关注</el-button>
                     </div>
                     <div class="article-title">
@@ -567,7 +567,7 @@
                                 color: black;
                                 font-size: 16px;
                                 font-weight: bold;
-                                margin-bottom: 10px;
+                                margin-bottom: 7px;
                             }
                         }
                     }

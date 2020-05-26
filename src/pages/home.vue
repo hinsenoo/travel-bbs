@@ -13,12 +13,12 @@
                 border-radius: 40px;
             }"
             >
-             <i class="el-icon-caret-top"></i>
+            <i class="el-icon-caret-top"></i>
             </div>
         </el-backtop>
         <!-- 复用头部 尾部 -->
-        <nav-header @modalShow="modalShow" :activeIndex="activeIndex"></nav-header>
-        <router-view @closeModal="closeModal" :changeModal="changeModal" @index="index"></router-view>
+        <nav-header @showMessage="showMessage=true" @modalShow="modalShow" @index="index" :activeIndex="activeIndex"></nav-header>
+        <router-view :showMessage="showMessage" @closeModal="closeModal" :changeModal="changeModal" @index="index"></router-view>
         <!-- 回到顶部 -->
     </div>
 </template>
@@ -37,7 +37,8 @@
                     showModal: false,
                     modalType: ''
                 },
-                activeIndex: '0'
+                activeIndex: '0',
+                showMessage: false
             }
         },
         methods: {

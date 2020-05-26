@@ -21,42 +21,97 @@
             <!-- 用户框 -->
             <div class="header-user">
                 <div class="user">
-                    <div class="register" v-if="!loginStaus">
-                        <a href=""><i class="el-icon-edit-outline"></i>发帖子</a>
+                    <div class="register" v-if="!loginStatus">
+                        <a href="javascript:;" @click="modalShow('login')"><i class="el-icon-edit-outline"></i>发帖子</a>
                         <i>|</i>
-                        <a href="javascript:;" @click="$emit('modalShow','login')">登录</a>
+                        <a href="javascript:;" @click="modalShow('login')">登录</a>
                         ·
-                        <a href="javascript:;" @click="$emit('modalShow','register')">注册</a>
+                        <a href="javascript:;" @click="modalShow('register')">注册</a>
                     </div>
-                    <div class="person" v-if="loginStaus">
-                        <el-button type="primary" size="mini" icon="el-icon-edit-outline">发帖子</el-button>
-                        <a href="" class="el-icon-message-solid icon"></a>
-                        <el-dropdown class="avatar" trigger="click">
-                            <el-avatar size="small" :src="circleUrl"></el-avatar>
+                    <div class="person" v-if="loginStatus">
+                        <el-button type="primary" size="mini" icon="el-icon-edit-outline" @click="$router.push('/edit/wirte')">发帖子</el-button>
+                        <a href="javascript:;" class="el-icon-message-solid icon"></a>
+                        <el-dropdown class="avatar" trigger="click" @command="handleCommand">
+                            <el-avatar size="small" :src="userAvatar"></el-avatar>
                             <el-dropdown-menu slot="dropdown">
-                                <el-dropdown-item class="avatar-icon"><i class="el-icon-user-solid"></i>个人中心</el-dropdown-item>
-                                <el-dropdown-item><i class="el-icon-s-management"></i>收藏夹</el-dropdown-item>
-                                <el-dropdown-item><i class="el-icon-s-tools"></i>设置</el-dropdown-item>
-                                <el-dropdown-item divided><i class="el-icon-switch-button"></i>退出</el-dropdown-item>
+                                <el-dropdown-item class="avatar-icon" command="personal"><i class="el-icon-user-solid"></i>个人中心</el-dropdown-item>
+                                <el-dropdown-item command="collect"><i class="el-icon-s-management"></i>收藏夹</el-dropdown-item>
+                                <el-dropdown-item command="setting"><i class="el-icon-s-tools"></i>设置</el-dropdown-item>
+                                <el-dropdown-item divided command="exit"><i class="el-icon-switch-button"></i>退出</el-dropdown-item>
                             </el-dropdown-menu>
                         </el-dropdown>
                     </div>
                 </div>
             </div>
         </div>
+        <!-- 登录注册弹框 -->
+        <modal
+            :showModal="showModal"
+        >
+            <template v-slot:body>
+                <div class="modal-index">
+                    <img src="/imgs/icons/login-logo.png" alt="">
+                    <div class="header">
+                        <h2>{{modalType=='login'? '登录' : '注册' }}</h2>
+                        <a @click="closeModal" href="javscript:;" class="el-icon-close"></a>
+                    </div>
+                    <div class="content">
+                        <div class="content-login" v-show="modalType=='login'">
+                            <el-input v-model="username" placeholder="请输入用户名"></el-input>
+                            <el-input placeholder="请输入密码" v-model="password" show-password></el-input>
+                            <el-button @click="login" type="primary" :loading="waitRequest">登录</el-button>
+                            <div class="other">没有账号？<span @click="modalType='register'">注册</span></div>
+                        </div>
+                        <div class="content-login" v-show="modalType=='register'">
+                            <el-input v-model="registerName" placeholder="请输入用户名"></el-input>
+                            <el-input v-model="registerEmail" placeholder="请输入邮箱"></el-input>
+                            <el-input placeholder="请输入密码（不少于6位）" v-model="registerPw" show-password></el-input>
+                            <el-input placeholder="再次输入密码" v-model="registerPw2" show-password></el-input>
+                            <el-button @click="register" type="success" :loading="waitRequest">注册</el-button>
+                            <div class="other">已有账号？<span @click="modalType='login'">登录</span></div>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </modal>
     </div>
 </template>
 
 <script>
+    import Modal from './../components/Modal';
     export default {
         name: 'nav-header',
+        components: {
+            Modal
+        },
         data() {
             return {
                 input: '', 
-                circleUrl: "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png",
-                loginStaus: false, // 登录状态
                 isFixed: false, // 吸顶状态
+                showModal: false, // 弹框显示
+                modalType: 'login', // 弹框类型
+                waitRequest: false,
+                username: '',
+                password: '',
+                registerName: '',
+                registerEmail: '',
+                registerPw: '',
+                registerPw2: '',
             }
+        },
+        computed: {
+            // 用户头像
+            userAvatar(){
+                return this.$store.state.userMessage.userAvatar;
+            },
+            // 登录状态
+            loginStatus(){
+                return this.$store.state.loginStatus;
+            },
+            // cartCount(){
+            //     return this.$store.state.cartCount;
+            // }, 
+            // ...mapState(['username','cartCount'])
         },
         mounted(){
             // 注册滚动事件
@@ -72,12 +127,118 @@
                     }
                 }
             },
+            // 头像下拉框触发事件
+            handleCommand(command) {
+                console.log(command);
+                switch (command) {
+                    case 'personal':
+                        this.$router.push(`/personal/${this.$cookie.get('userId')}`);
+                        break;
+                    case 'collect':
+                        this.$router.push(`/personal/${this.$cookie.get('userId')}`);
+                        break;
+                    case 'setting':
+                        this.$router.push(`/personal/${this.$cookie.get('userId')}`);
+                        break;
+                    case 'exit':
+                        this.$router.push(`/personal/${this.$cookie.get('userId')}`);
+                        break;
+                    default:
+                        break;
+                }
+                this.$emit('index',0);
+            },
             initHeight(){
                 // 页面 Y 轴偏移量 兼容 IE
                 let scrollTop = window.pageYOffset || document.scrollTop || document.body.scrollTop;
                 this.isFixed = scrollTop > 80 ? true : false;
-            }
-
+            },
+            // 登录
+            login(){
+                let errMsg = '';
+                // 判断错误类型
+                if(!this.username){
+                    errMsg = '请输入用户名';
+                }else if(!this.password || this.password.length < 6){
+                    errMsg = '请输入不少于6位的密码';
+                }
+                if(errMsg){
+                    this.$message.error(errMsg);
+                    return;
+                }
+                let params = {
+                    username: this.username,
+                    password: this.$md5(this.password)
+                }
+                // 等待请求完成，才能点击按钮
+                this.waitRequest = true;
+                this.axios.post('/api/user/login',params)
+                .then((res)=>{
+                    if(res.status == 0){
+                        this.$message.success('登录成功');
+                        // 存储用户 id 到 cookie，会话级别 
+                        this.$cookie.set('userId',res.data.userId,{expires: 'Session'});
+                        // 保存到 Vuex 里面
+                        this.$store.dispatch('saveUserMessage', res.data);
+                        this.$store.dispatch('saveLoginStatus', true);
+                        this.$emit('showMessage');
+                    }else if(res.status == 1){
+                        this.$message.error(res.msg);
+                    }
+                    this.waitRequest = false;
+                    this.closeModal();
+                });
+            },
+            // 注册
+            register(){
+                let errMsg = '';
+                // 判断错误类型
+                if(!this.registerName){
+                    errMsg = '请输入用户名';
+                }else if(!/^\w+((.\w+)|(-\w+))@[A-Za-z0-9]+((.|-)[A-Za-z0-9]+).[A-Za-z0-9]+$/.test(this.registerEmail)){
+                    errMsg = '请输入正确格式的邮箱';
+                }else if(!this.registerPw || this.registerPw.length < 6){
+                    errMsg = '请输入不少于6位的密码';
+                }else if(this.registerPw !== this.registerPw2){
+                    errMsg = '两次密码输入不一致';
+                }
+                if(errMsg){
+                    this.$message.error(errMsg);
+                    return;
+                }
+                let params = {
+                    username: this.registerName,
+                    password: this.$md5(this.registerPw),
+                    email: this.registerEmail,
+                    createTime: 1590326420906,
+                    // createTime: new Date().getTime()
+                    nickName: this.registerName,
+                }
+                // 等待请求完成
+                this.waitRequest = true;
+                this.axios.post('/api/user/register',params)
+                .then((res)=>{
+                    if(res.status == 0){
+                        this.$message.success('注册成功，请登录');
+                        this.modalType='login';
+                    }else if(res.status == 1){
+                        this.$message.error(res.msg);
+                    }
+                    this.waitRequest = false;
+                });
+            },
+            // 显示弹框
+            modalShow(type){
+                this.modalType = type;
+                this.showModal = true;
+            },
+            // 关闭弹框
+            closeModal(){
+                this.modalType = '';
+                this.showModal = false;
+                this.waitRequest = false;
+            },
+            // 跳转到个人主页
         },
         destroyed(){
             // 通过第三个参数设置 事件冒泡 来销毁事件
@@ -183,6 +344,55 @@
         }
         
     }
+    .modal-index{
+            width: 320px;
+            padding: 25px;
+            background-color: #fff;
+            border-radius: 2px;
+            box-sizing: border-box;
+            img{
+                position: absolute;
+                width: 100px;
+                height: auto;
+                top: -90px;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+            .header{
+                margin-bottom: 24px;
+                h2{
+                    display: inline-block;
+                }
+                a{
+                    position: absolute;
+                    font-size: 23px;
+                    right: 25px;
+                    transition: transform 0.3s;
+                    color: #cccccc;
+                    &:hover{
+                        transform: scale(1.5);
+                        color: #409EFF;
+                    }
+                }
+            }
+            .content{
+                input{
+                    margin-bottom: 10px;
+                }
+                button{
+                    width: 100%;
+                    margin: 10px 0;
+                }
+                .other{
+                    color: #999999;
+                    font-size: 14px;
+                    span{
+                        color: #409EFF;
+                        cursor: pointer;
+                    }
+                }
+            }
+        }
 }
 
 </style>

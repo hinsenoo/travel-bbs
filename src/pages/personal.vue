@@ -4,15 +4,16 @@
             <div class="left">
                 <div class="personalShow">
                     <div class="avatar">
-                        <el-avatar :size="90" :src="circleUrl"></el-avatar>
+                        <el-avatar :size="90" :src="authorAvator"></el-avatar>
                     </div>
                     <div class="message">
-                        <h1>Hinsenoo</h1>
-                        <p><i class="el-icon-user"></i>学生</p>
-                        <p><i class="el-icon-edit"></i>个人介绍：</p> 
+                        <h1>{{authorName}}</h1>
+                        <p><i class="el-icon-user"></i>{{authorWork}}</p>
+                        <p><i class="el-icon-edit"></i>{{authorIntroduce}}</p> 
                     </div>
                     <div class="other">
-                        <el-button @click="toSetting">编辑个人资料</el-button>
+                        <el-button v-if="isSelf" @click="toSetting">编辑个人资料</el-button>
+                        <el-button class="focus-button" v-if="!isSelf">+ 关注</el-button>
                     </div>
                 </div>
                 <div class="content">
@@ -60,24 +61,24 @@
                 <div class="honor">
                     <h2>个人成就</h2>
                     <div>
-                        <p><i><img src="/imgs/icons/good-blue.png" alt=""></i>获得点赞<span>10</span></p>
-                        <p><i><img src="/imgs/icons/read.png" alt=""></i>文章被阅读<span>999</span></p>
-                        <p><i><img src="/imgs/icons/write.png" alt=""></i>已写文章<span>999</span></p>
+                        <p><i><img src="/imgs/icons/good-blue.png" alt=""></i>获得点赞<span>{{goodCount}}</span></p>
+                        <p><i><img src="/imgs/icons/read.png" alt=""></i>文章被阅读<span>{{readCount}}</span></p>
+                        <p><i><img src="/imgs/icons/write.png" alt=""></i>已写文章<span>{{articleCount}}</span></p>
                     </div>
                 </div>
                 <div class="focus">
                     <div class="first">
                         关注了
-                        <span>20</span>
+                        <span>{{focus}}</span>
                     </div>
                     <div>
                         关注者
-                        <span>99</span>
+                        <span>{{follower}}</span>
                     </div>
                 </div>
                 <ul>
-                    <li>已收藏<span>8</span></li>
-                    <li>加入于<span>2020-01-01</span></li>
+                    <li>已收藏<span>{{collectCount}}</span></li>
+                    <li>加入于<span>{{creatTime}}</span></li>
                 </ul>
             </div>
         </div>
@@ -85,12 +86,47 @@
 </template>
 
 <script>
+    import {formatDayTime} from '../util';
     export default {
         name: 'personal',
         data() {
             return {
                 activeName: 'news',
-                circleUrl: "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png", // 信息头像
+                isSelf: false, // 是否为用户本人
+                authorName: '',
+                authorWork: '',
+                authorIntroduce: '',
+                authorAvator: '',
+                collectCount: 0,
+                goodCount: 0,
+                readCount: 0,
+                articleCount: 0,
+                focus: 0,
+                follower: 0,
+                creatTime: 0,
+            }
+        },
+        mounted(){
+            // 确定是否为用户本人
+            if(this.$route.params.id == this.$cookie.get('userId')){
+                this.isSelf = true;
+                let userMessage = this.$store.state.userMessage;
+                // 检测 Vuex 是否存在数据，否则报错
+                if(Object.hasOwnProperty.call(userMessage,'collect')){
+                    this.authorName = userMessage.nickName;
+                    this.authorWork = userMessage.userWork;
+                    this.authorIntroduce = userMessage.userIntroduce;
+                    this.authorAvator = userMessage.userAvatar;
+                    this.collectCount = userMessage.collect.length;
+                    this.goodCount = userMessage.goodCount;
+                    this.readCount = userMessage.readCount;
+                    this.articleCount = userMessage.article.length;
+                    this.focus = userMessage.focus.length;
+                    this.follower = userMessage.follower.length;
+                    this.creatTime = formatDayTime(userMessage.createTime);
+                }else{
+                    this.$message.error('获取用户数据失败');
+                }
             }
         },
         methods:{
@@ -140,7 +176,7 @@
                                 // color: black;
                                 font-size: 16px;
                                 font-weight: bold;
-                                margin-right: 5px;
+                                margin-right: 10px;
                             }
                         }
                     }
@@ -148,11 +184,16 @@
                         flex: 1;
                         display: flex;
                         align-items: center;
+                        flex-direction: row-reverse;
                         .el-button{
                             padding: 10px 10px;
                             border: 1px solid #409EFF;
                             font-size: 16px;
                             color: #409EFF;
+                        }
+                        .focus-button{
+                            border: 1px solid #67c23a;
+                            color: #67c23a;
                         }
                     }
                 }

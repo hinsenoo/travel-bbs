@@ -1,24 +1,23 @@
-# travel-bbs
+# travel-bbs 旅游论坛
 
-## Project setup
+### 项目安装
+
 ```
 npm install
 ```
 
-### Compiles and hot-reloads for development
+### 编译并且运行项目
 ```
 npm run serve
 ```
 
-### Compiles and minifies for production
+### 项目打包
 ```
 npm run build
 ```
 
-### Lints and fixes files
+### 修复项目
 ```
 npm run lint
 ```
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
