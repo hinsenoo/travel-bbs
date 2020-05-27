@@ -22,7 +22,7 @@
          props: ['catchData', 'content'],    // 接收父组件的方法
         watch: {
             content () {
-            this.editor.txt.html(this.content)
+                this.editor.txt.html(this.content)
             }
         },
         mounted(){
@@ -36,7 +36,7 @@
             }
 
             // 编辑区域的z-index
-            this.editor.customConfig.zIndex = 10;
+            this.editor.customConfig.zIndex = 3;
 
             // 图片上传接口
             this.editor.customConfig.uploadImgServer = 'http://47.106.215.69:8080/tourism/user/upload/';
@@ -104,10 +104,10 @@
     #wangeditor{
         // width: 100%;
         .text{
-            min-height: 500px;
+            // min-height: 500px;
         }
         .w-e-text-container{
-            height: 300px !important;
+            // height: 300px !important;
         }
         font-size: 15px;
     }

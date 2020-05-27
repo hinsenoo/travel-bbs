@@ -4,7 +4,7 @@ import axios from 'axios';
 import VueAxios from 'vue-axios'
 import md5 from 'js-md5'
 import VueCookie from 'vue-cookie'
-import { Menu,MenuItem,Button,Input,Avatar,Dropdown,DropdownItem,DropdownMenu,Carousel,CarouselItem,Tabs,TabPane,Message,Upload,Select,Option,Backtop } from 'element-ui';
+import { Menu,MenuItem,Button,Input,Avatar,Dropdown,DropdownItem,DropdownMenu,Carousel,CarouselItem,Tabs,TabPane,Message,Upload,Select,Option,Backtop,Progress,Loading  } from 'element-ui';
 // 确保引入样式
 import 'element-ui/lib/theme-chalk/index.css';
 import store from './store'
@@ -28,6 +28,8 @@ Vue.use(Upload);
 Vue.use(Select);
 Vue.use(Option);
 Vue.use(Backtop);
+Vue.use(Progress);
+Vue.use(Loading);
 Vue.component(Message.name, Message);
 // 挂载的 vue 实例的原型
 Vue.prototype.$message = Message;

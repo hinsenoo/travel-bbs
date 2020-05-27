@@ -29,7 +29,7 @@
                         <a href="javascript:;" @click="modalShow('register')">注册</a>
                     </div>
                     <div class="person" v-if="loginStatus">
-                        <el-button type="primary" size="mini" icon="el-icon-edit-outline" @click="$router.push('/edit/wirte')">发帖子</el-button>
+                        <el-button type="primary" size="mini" icon="el-icon-edit-outline" @click="$router.push('/edit/write')">发帖子</el-button>
                         <a href="javascript:;" class="el-icon-message-solid icon"></a>
                         <el-dropdown class="avatar" trigger="click" @command="handleCommand">
                             <el-avatar size="small" :src="userAvatar"></el-avatar>
@@ -129,7 +129,6 @@
             },
             // 头像下拉框触发事件
             handleCommand(command) {
-                console.log(command);
                 switch (command) {
                     case 'personal':
                         this.$router.push(`/personal/${this.$cookie.get('userId')}`);
@@ -138,10 +137,22 @@
                         this.$router.push(`/personal/${this.$cookie.get('userId')}`);
                         break;
                     case 'setting':
-                        this.$router.push(`/personal/${this.$cookie.get('userId')}`);
+                        this.$router.push(`/setting/${this.$cookie.get('userId')}`);
                         break;
                     case 'exit':
-                        this.$router.push(`/personal/${this.$cookie.get('userId')}`);
+                        this.axios.post('/api/user/logout')
+                        .then((res)=>{
+                            if(Object.hasOwnProperty.call(res,'status') && res.status == 0){
+                                this.$message.success(res.msg);
+                                // 使 cookie 过期
+                                this.$cookie.set('userId','',{expires: '-1'});
+                                // 清空 vuex 的数据
+                                this.$store.dispatch('saveUserMessage',{});
+                                this.$store.dispatch('saveLoginStatus',false);
+                            }else{
+                                this.$message.error('网络异常');
+                            }
+                        })
                         break;
                     default:
                         break;
@@ -181,7 +192,6 @@
                         // 保存到 Vuex 里面
                         this.$store.dispatch('saveUserMessage', res.data);
                         this.$store.dispatch('saveLoginStatus', true);
-                        this.$emit('showMessage');
                     }else if(res.status == 1){
                         this.$message.error(res.msg);
                     }
@@ -210,8 +220,7 @@
                     username: this.registerName,
                     password: this.$md5(this.registerPw),
                     email: this.registerEmail,
-                    createTime: 1590326420906,
-                    // createTime: new Date().getTime()
+                    createTime: new Date().getTime(),
                     nickName: this.registerName,
                 }
                 // 等待请求完成

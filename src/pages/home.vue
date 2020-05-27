@@ -17,8 +17,8 @@
             </div>
         </el-backtop>
         <!-- 复用头部 尾部 -->
-        <nav-header @showMessage="showMessage=true" @modalShow="modalShow" @index="index" :activeIndex="activeIndex"></nav-header>
-        <router-view :showMessage="showMessage" @closeModal="closeModal" :changeModal="changeModal" @index="index"></router-view>
+        <nav-header @modalShow="modalShow" @index="index" :activeIndex="activeIndex"></nav-header>
+        <router-view @closeModal="closeModal" :changeModal="changeModal" @index="index"></router-view>
         <!-- 回到顶部 -->
     </div>
 </template>
@@ -38,7 +38,6 @@
                     modalType: ''
                 },
                 activeIndex: '0',
-                showMessage: false
             }
         },
         methods: {

@@ -14,74 +14,77 @@
                         <el-button type="primary" size="small">+ 关注</el-button>
                     </div>
                     <div class="article-title">
-                        <img src="/imgs/slideshow/head06.jpg" alt="">
+                        <img v-lazy="'/imgs/slideshow/head06.jpg'" alt="">
                         <h1>人生恰似一场永不停止的远足——珠峰东坡大环线</h1>
                     </div>
                     <div class="article-content">
                         <div><p>9月15日，由临渭区文物旅游局、渭南文化旅游产业发展有限责任公司主办的2017临渭旅游推介活动在西安曲江盛美利亚酒店隆重举行。本次活动主要以宣传渭南临渭区“四大宜游园区一基地”和五大旅游板块为基础进行宣传。<br></p><div>
                         <div>
                         <div></div>
-                        <div><img src="//upload-images.jianshu.io/upload_images/5737127-14154ae21275ec31.jpeg?imageMogr2/auto-orient/strip|imageView2/2/w/1200/format/webp"></div>
+                        <div><img v-lazy="'/imgs/demo/a1.jpg'"></div>
                         </div>
                         <div></div>
                         </div><p>本次推介会在具有地域文化特色的非物质遗产—雄浑磅礴的渭南老腔表演中拉开序幕，让来宾深刻地感受到了渭南这座城市历久弥新的文化内涵和人文魅力；渭南首家本土曲艺文化品牌渭曲社，展示了结合本地人文历史特色的原创相声。同时，会场内播放的渭南、临渭旅游宣传视频，吸引了现场媒体镜头的关注，不仅现场让大家深入了解了渭南及临渭的旅游、人文、历史资源，同时也借助新媒体平台进行了推广。</p><div>
                         <div>
                         <div></div>
-                        <div><img src="//upload-images.jianshu.io/upload_images/5737127-5687da28c82726b2.jpeg?imageMogr2/auto-orient/strip|imageView2/2/w/1200/format/webp"></div>
+                        <div><img v-lazy="'/imgs/demo/a2.jpg'"></div>
                         </div>
                         <div></div>
                         </div><div>
                         <div>
                         <div></div>
-                        <div><img src="//upload-images.jianshu.io/upload_images/5737127-1c9d3493042fbe4c.jpeg?imageMogr2/auto-orient/strip|imageView2/2/w/1200/format/webp"></div>
+                        <div><img v-lazy="'/imgs/demo/a3.jpg'"></div>
                         </div>
                         <div></div>
                         </div><p>近年来，临渭区高度重视旅游业发展，适时提出“宜居宜游·富美临渭”为城市发展总目标，同时以创建陕西省旅游示范区暨国家全域旅游示范区为契机，推动临渭旅游业由“景区旅游”向“全域旅游”发展模式转变，渭南文旅公司为积极贯彻落实区委区政府部署要求，充分发挥渭南龙头旅游企业的带动作用，累计投资13亿元建设“四园区一基地”（即渭南葡萄产业园、渭南航天生态园、渭南军事博览园、渭南桃花源民俗文化园、渭南花卉苗木基地），拓展了五大旅游板块功能（生态休闲游、历史人文游、古城文化游、红色爱国游、特色乡村游），营造出“品质化、休闲化、人性化、特色化”的旅游环境，切实强化“旅游兴区”实施战略，从而形成临渭区“政府主导、市场运作、部门联动、社会参与”的全域化旅游发展格局。</p><div>
                         <div>
                         <div></div>
-                        <div><img src="//upload-images.jianshu.io/upload_images/5737127-67b33eaf780ded2a.jpeg?imageMogr2/auto-orient/strip|imageView2/2/w/1200/format/webp"></div>
+                        <div><img v-lazy="'/imgs/demo/a4.jpg'"></div>
                         </div>
                         <div></div>
                         </div><div>
                         <div>
                         <div></div>
-                        <div><img src="//upload-images.jianshu.io/upload_images/5737127-319cb05756d7227d.jpeg?imageMogr2/auto-orient/strip|imageView2/2/w/1200/format/webp"></div>
+                        <div><img v-lazy="'/imgs/demo/a5.jpg'"></div>
                         </div>
                         <div></div>
                         </div><div>
                         <div>
                         <div></div>
-                        <div><img src="//upload-images.jianshu.io/upload_images/5737127-d59585805d76f6c9.jpeg?imageMogr2/auto-orient/strip|imageView2/2/w/800/format/webp"></div>
+                        <div><img v-lazy="'/imgs/demo/a6.jpg'"></div>
                         </div>
                         <div></div>
                         </div><div>
                         <div>
                         <div></div>
-                        <div><img src="//upload-images.jianshu.io/upload_images/5737127-68bf2cc089aea5f5.jpeg?imageMogr2/auto-orient/strip|imageView2/2/w/800/format/webp"></div>
+                        <div><img v-lazy="'/imgs/demo/a7.jpg'"></div>
                         </div>
                         <div></div>
                         </div><div>
                         <div>
                         <div></div>
-                        <div><img src="//upload-images.jianshu.io/upload_images/5737127-1d6afe3efc317c7a.jpeg?imageMogr2/auto-orient/strip|imageView2/2/w/800/format/webp"></div>
+                        <div><img v-lazy="'/imgs/demo/a8.jpg'"></div>
                         </div>
                         <div></div>
                         </div><p>为了更好的服务游客，服务供应商及投资商，渭南文旅公司表示将严格按照旅游景区建设标准，丰富旅游+农业，旅游+红色、旅游+生态、旅游+体育、旅游+教育、旅游+互联网、旅游+科技等旅游元素，完善“吃住行游购娱”及“商养学闲奇情”旅游要素，提升旅游特色化、品质化服务，为各地游客提供一个舒心满意的旅游环境及氛围，同时借助兵马俑、华山两个国际性景区强大的客源资源，差异化弥补中间地带旅游空白，从而打造陕西东线旅游新线路，增加陕西东线旅游产品多样性。</p><div>
                         <div>
                         <div></div>
-                        <div><img src="//upload-images.jianshu.io/upload_images/5737127-58d206819d34330c.jpeg?imageMogr2/auto-orient/strip|imageView2/2/w/800/format/webp"></div>
+
                         </div>
                         <div></div>
                         </div><div>
                         <div>
                         <div></div>
-                        <div><img src="//upload-images.jianshu.io/upload_images/5737127-4f4b740e12adb6a8.jpeg?imageMogr2/auto-orient/strip|imageView2/2/w/800/format/webp"></div>
+    
                         </div>
                         <div></div>
                         </div><div>
                         <div>
                         <div></div>
-                        <div><img src="//upload-images.jianshu.io/upload_images/5737127-fd57980ff31c6186.jpeg?imageMogr2/auto-orient/strip|imageView2/2/w/800/format/webp"></div></div></div></div><br>
+                        </div>
+                        </div>
+                        </div>
+                        <br>
                     </div>
                     <div class="article-good">
                         <div class="good">

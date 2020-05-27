@@ -9,9 +9,16 @@
 <script>
 export default {
   name: 'App',
-  mounted(){
-    if(this.$cookie.get('userId')){
+  created(){
+    let userId = Number(this.$cookie.get('userId'));
+    if(userId){
+      // console.log(111);
       // TODO：获取用户信息存储到 Vuex 中
+      this.axios.post('/api/user',{ userId })
+      .then((res)=>{
+        this.$store.dispatch('saveUserMessage', res.data);
+        this.$store.dispatch('saveLoginStatus', true);
+      })
     }
   },
 }

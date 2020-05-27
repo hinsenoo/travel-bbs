@@ -231,7 +231,7 @@
                     <div class="appCode"><img src="/imgs/QRCode.jpg" alt=""></div>
                     <div class="word">扫码下载车车互联App<i class="el-icon-download"></i><div>最好的旅行方式是和一群志同道合的人。</div></div>
                 </div>
-                <div class="user" v-if="showMessage">
+                <div class="user" v-if="loginStatus">
                     <div class="message">
                         <div class="avator">
                             <a href="javascript:;" @click="toPersonal">
@@ -250,7 +250,7 @@
                         </div>
                         <div class="news">
                             <ul>
-                                <li><a href="javascript:;">我的全部帖子<span>{{articleCount}}</span></a></li>
+                                <li><a href="javascript:;">我的全部文章<span>{{articleCount}}</span></a></li>
                                 <li><a href="javascript:;">我的收藏夹<span>{{collectCount}}</span></a></li>
                                 <li><a href="javascript:;">我的关注<span>{{focusCount}}</span></a></li>
                             </ul>
@@ -345,6 +345,10 @@
             registerTime(){
                 return formatYear(this.$store.state.userMessage.createTime);
             },
+            // 登录状态
+            loginStatus(){
+                return this.$store.state.loginStatus;
+            },
             // cartCount(){
             //     return this.$store.state.cartCount;
             // }, 
@@ -368,9 +372,6 @@
                 this.$router.push('/article/1');
             }
         },
-        props: {
-            showMessage: Boolean,
-        }
     }
 </script>
 <style lang="scss">
