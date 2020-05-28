@@ -7,9 +7,6 @@
             <div class="modal-box">
                 <slot name="body"></slot>
             </div>
-            <div class="progress-box">
-                <slot name="progress"></slot>
-            </div>
         </div>
     </transition>
 </template>

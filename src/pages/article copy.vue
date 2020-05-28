@@ -5,26 +5,91 @@
                 <div class="content">
                     <div class="article-user">
                         <a href="javascript:;" class="message">
-                            <el-avatar :size="40" :src="userAvatar"></el-avatar>
+                            <el-avatar :size="40" :src="circleUrl"></el-avatar>
                             <div class="box">
-                                <div class="user-name">{{nickName}}</div>
-                                <div class="create-time">{{articleCreateTime}} <span>阅读 {{articleReadCount}}</span></div>
+                                <div class="user-name">Hinsenoo</div>
+                                <div class="create-time">2020年05月19日 <span>阅读 13608</span></div>
                             </div>
                         </a>
-                        <el-button v-if="!isSelf" type="primary" size="small">+ 关注</el-button>
-                        <el-button v-if="isSelf" @click="$router.push(`/edit/${articleId}`)" type="success" size="small">编辑</el-button>
+                        <el-button type="primary" size="small">+ 关注</el-button>
                     </div>
                     <div class="article-title">
-                        <img v-lazy="titleImgUrl" alt="">
-                        <h1>{{title}}</h1>
+                        <img v-lazy="'/imgs/slideshow/head06.jpg'" alt="">
+                        <h1>人生恰似一场永不停止的远足——珠峰东坡大环线</h1>
                     </div>
-                    <div class="article-content" ref="content" v-html="articleHTML">
-                        
+                    <div class="article-content">
+                        <div><p>9月15日，由临渭区文物旅游局、渭南文化旅游产业发展有限责任公司主办的2017临渭旅游推介活动在西安曲江盛美利亚酒店隆重举行。本次活动主要以宣传渭南临渭区“四大宜游园区一基地”和五大旅游板块为基础进行宣传。<br></p><div>
+                        <div>
+                        <div></div>
+                        <div><img v-lazy="'/imgs/demo/a1.jpg'"></div>
+                        </div>
+                        <div></div>
+                        </div><p>本次推介会在具有地域文化特色的非物质遗产—雄浑磅礴的渭南老腔表演中拉开序幕，让来宾深刻地感受到了渭南这座城市历久弥新的文化内涵和人文魅力；渭南首家本土曲艺文化品牌渭曲社，展示了结合本地人文历史特色的原创相声。同时，会场内播放的渭南、临渭旅游宣传视频，吸引了现场媒体镜头的关注，不仅现场让大家深入了解了渭南及临渭的旅游、人文、历史资源，同时也借助新媒体平台进行了推广。</p><div>
+                        <div>
+                        <div></div>
+                        <div><img v-lazy="'/imgs/demo/a2.jpg'"></div>
+                        </div>
+                        <div></div>
+                        </div><div>
+                        <div>
+                        <div></div>
+                        <div><img v-lazy="'/imgs/demo/a3.jpg'"></div>
+                        </div>
+                        <div></div>
+                        </div><p>近年来，临渭区高度重视旅游业发展，适时提出“宜居宜游·富美临渭”为城市发展总目标，同时以创建陕西省旅游示范区暨国家全域旅游示范区为契机，推动临渭旅游业由“景区旅游”向“全域旅游”发展模式转变，渭南文旅公司为积极贯彻落实区委区政府部署要求，充分发挥渭南龙头旅游企业的带动作用，累计投资13亿元建设“四园区一基地”（即渭南葡萄产业园、渭南航天生态园、渭南军事博览园、渭南桃花源民俗文化园、渭南花卉苗木基地），拓展了五大旅游板块功能（生态休闲游、历史人文游、古城文化游、红色爱国游、特色乡村游），营造出“品质化、休闲化、人性化、特色化”的旅游环境，切实强化“旅游兴区”实施战略，从而形成临渭区“政府主导、市场运作、部门联动、社会参与”的全域化旅游发展格局。</p><div>
+                        <div>
+                        <div></div>
+                        <div><img v-lazy="'/imgs/demo/a4.jpg'"></div>
+                        </div>
+                        <div></div>
+                        </div><div>
+                        <div>
+                        <div></div>
+                        <div><img v-lazy="'/imgs/demo/a5.jpg'"></div>
+                        </div>
+                        <div></div>
+                        </div><div>
+                        <div>
+                        <div></div>
+                        <div><img v-lazy="'/imgs/demo/a6.jpg'"></div>
+                        </div>
+                        <div></div>
+                        </div><div>
+                        <div>
+                        <div></div>
+                        <div><img v-lazy="'/imgs/demo/a7.jpg'"></div>
+                        </div>
+                        <div></div>
+                        </div><div>
+                        <div>
+                        <div></div>
+                        <div><img v-lazy="'/imgs/demo/a8.jpg'"></div>
+                        </div>
+                        <div></div>
+                        </div><p>为了更好的服务游客，服务供应商及投资商，渭南文旅公司表示将严格按照旅游景区建设标准，丰富旅游+农业，旅游+红色、旅游+生态、旅游+体育、旅游+教育、旅游+互联网、旅游+科技等旅游元素，完善“吃住行游购娱”及“商养学闲奇情”旅游要素，提升旅游特色化、品质化服务，为各地游客提供一个舒心满意的旅游环境及氛围，同时借助兵马俑、华山两个国际性景区强大的客源资源，差异化弥补中间地带旅游空白，从而打造陕西东线旅游新线路，增加陕西东线旅游产品多样性。</p><div>
+                        <div>
+                        <div></div>
+
+                        </div>
+                        <div></div>
+                        </div><div>
+                        <div>
+                        <div></div>
+    
+                        </div>
+                        <div></div>
+                        </div><div>
+                        <div>
+                        <div></div>
+                        </div>
+                        </div>
+                        </div>
+                        <br>
                     </div>
                     <div class="article-good">
                         <div class="good">
                             <div class="icon"><img src="/imgs/icons/good-article.png" alt=""></div>
-                            <span>{{articleGoodCount}} 人点赞</span>
+                            <span>x 人点赞</span>
                         </div>
                         <div class="good">
                             <div class="icon"><img src="/imgs/icons/collect-article.png" alt=""></div>
@@ -32,20 +97,19 @@
                         </div>
                         <div class="good">
                             <div class="icon"><img src="/imgs/icons/gps.png" alt=""></div>
-                            <span>{{place}}</span>
+                            <span>广西</span>
                         </div>
                         
                     </div>
                     <div class="article-userAgain">
                         <div class="message">
-                            <el-avatar size="large" :src="userAvatar"></el-avatar>
+                            <el-avatar size="large" :src="circleUrl"></el-avatar>
                             <div class="box">
-                                <div class="user-name">{{nickName}}</div>
-                                <div class="create-time">发布了 {{userArticleCount}} 篇文章 · 获得点赞 {{userGoodCount}} · 获得阅读 {{userReadCount}}</div>
+                                <div class="user-name">Hinsenoo</div>
+                                <div class="create-time">发布了 1 篇文章 · 获得点赞 999 · 获得阅读 999</div>
                             </div>
                         </div>
-                        <el-button v-if="!isSelf" type="primary" size="small">+ 关注</el-button>
-                        <el-button v-if="isSelf" @click="$router.push(`/setting/${userId}`)" type="success" size="small">编辑</el-button>
+                        <el-button type="primary" size="small">+关注</el-button>
                     </div>
                 </div>
                 <div class="article-comment" id="comment">
@@ -167,9 +231,9 @@
             <div class="right">
                 <!-- 作者信息 -->
                 <div class="right-user">
-                    <span class="span-box">关于作者</span>
+                    <span>关于作者</span>
                     <a href="javascript:;" class="user">
-                        <el-avatar :size="50" :src="userAvatar"></el-avatar>
+                        <el-avatar :size="50" :src="circleUrl"></el-avatar>
                         <div class="box">
                             <div class="user-name">Hinsenoo</div>
                             自由职业者
@@ -177,8 +241,8 @@
                     </a>
                     <div class="honor">
                         <div>
-                            <p><i><img src="/imgs/icons/good-blue.png" alt=""></i>获得点赞<span class="span-box">{{userGoodCount}}</span></p>
-                            <p><i><img src="/imgs/icons/read.png" alt=""></i>文章被阅读<span class="span-box">{{userReadCount}}</span></p>
+                            <p><i><img src="/imgs/icons/good-blue.png" alt=""></i>获得点赞<span>10</span></p>
+                            <p><i><img src="/imgs/icons/read.png" alt=""></i>文章被阅读<span>999</span></p>
                         </div>
                     </div>
                 </div>
@@ -230,15 +294,15 @@
             <div class="fixed">
                 <div class="icon" @click="goodShow=!goodShow">
                     <a v-show="!goodShow" class="icon-good" href="javascript:;">
-                        <span>{{articleGoodCount}}</span>
+                        <span>12</span>
                     </a>
                     <a v-show="goodShow" class="icon-goodClick" href="javascript:;">
-                        <span>{{articleGoodCount}}</span>
+                        <span>12</span>
                     </a>
                 </div>
                 <div class="icon">
                     <a class="icon-comment" href="#comment">
-                        <span>{{commentCount}}</span>
+                        <span>0</span>
                     </a>
                 </div>
                 <div class="icon" @click="collectShow=!collectShow">
@@ -251,7 +315,6 @@
 </template>
 
 <script>
-    import {formatDayTime} from '../util';
     export default {
         name: 'user-article',
         data(){
@@ -262,98 +325,14 @@
                 collectShow: false,
                 // 评论框
                 commentInput: '',
-                // 用户信息
-                userId: 0,
-                nickName: '',
-                userWork: '',
-                userAvatar: '',
-                userGoodCount: 0,
-                userReadCount: 0,
-                userArticleCount: 0, 
-                // 文章信息
-                articleId: 123,
-                title: '',
-                titleImgUrl: '',
-                category: '',
-                place: '',
-                articleHTML: '',
-                articleCreateTime: 1479048325000,
-                editTime: 1479048325000,
-                articleReadCount: 0,
-                articleGoodCount: 0,
-                commentCount: 0,
-                // 是否为本人
-                isSelf: false,
             }
-        },
-        beforeCreate(){
-            this.articleId = Number(this.$route.params.id);
-            this.axios.get(`/api/article/${this.articleId}`)
-            .then((res)=>{
-                console.log(res);
-                if(res.status == 0){
-                    let data = res.data;
-                    this.userId = Number(data.userId);
-
-                    // TODO : 若为本人则可编辑
-                    // 确定是否为用户本人
-                    if(this.userId == this.$cookie.get('userId')){
-                        // 是则为可编辑
-                        this.isSelf = true;
-                        if(Object.hasOwnProperty.call(this.$store.state.userMessage,'collect')){
-                            this.messageShow(this.$store.state.userMessage);
-                        }else{
-                            this.$message.error('网络异常');
-                        }
-                    }else{
-                        // 获取用户数据
-                        this.axios.post('/api/user',{ userId: this.userId })
-                        .then((res)=>{
-                            if(Object.hasOwnProperty.call(res,'status') && res.status == 0){
-                                // 渲染用户数据
-                                this.messageShow(res.data);
-                            }else{
-                                this.$message.error('网络异常');
-                            }
-                        })
-                    }
-                
-
-                    // 渲染文章数据
-                    this.title = data.title;
-                    this.titleImgUrl = data.titleImgUrl;
-                    this.category = data.category;
-                    this.place = data.place;
-                    this.articleHTML = this.$Base64.decode(data.articleHTML);
-                    // 修改html内容
-                    // this.$refs.content.innerHTML = this.articleHTML;
-                    this.articleCreateTime = formatDayTime(data.createTime).first;
-                    this.editTime = formatDayTime(data.editTime).first;
-                    this.articleReadCount = data.read;
-                    this.articleGoodCount = data.good.length;
-                    this.commentCount = data.comment.length;
-                }else{
-                    this.$message.error('文章获取失败，请重试');
-                }
-            })
-
         },
         methods:{
-            messageShow(data){
-                // 渲染用户数据
-                this.nickName = data.nickName;
-                this.userWork = data.userWork;
-                this.userAvatar = data.userAvatar;
-                this.userGoodCount = data.goodCount;
-                this.userReadCount = data.readCount;
-                // this.userCreateTime = formatDayTime(res.data.createTime).first;
-                this.userArticleCount = data.article.length;
-            }
         }
     }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
     .user-article{
         position: relative;
         img{
@@ -410,8 +389,10 @@
                         p{
                             margin-bottom: 20px;
                         }
+                        img{
+                            margin-bottom: 20px;
+                        }
                     }
-        
                     .article-good{
                         width: 100%;
                         border-bottom: 1px solid #ccc;
@@ -572,7 +553,7 @@
                 .right-user{
                     background: #fff;
                     margin-bottom: 20px;
-                    .span-box{
+                    span{
                         display: block;
                         font-size: 14px;
                         padding: 12px 15px;

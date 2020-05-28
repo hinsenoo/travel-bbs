@@ -148,7 +148,7 @@
                     this.articleCount = userMessage.article.length;
                     this.focus = userMessage.focus.length;
                     this.follower = userMessage.follower.length;
-                    this.creatTime = formatDayTime(userMessage.createTime);
+                    this.creatTime = formatDayTime(userMessage.createTime).second;
                 }else{
                     this.$message.error('获取用户数据失败');
                     return;

@@ -11,6 +11,10 @@ import store from './store'
 import router from './router';
 import App from './App.vue';
 
+// 对html标签进行转码
+let Base64 = require('js-base64').Base64;
+Vue.prototype.$Base64 = Base64;
+
 // 按需引入 element 组件
 Vue.use(Menu);
 Vue.use(MenuItem);
