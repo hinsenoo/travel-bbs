@@ -17,7 +17,7 @@
                     </div>
                 </div>
                 <div class="content">
-                    <el-tabs v-model="activeName" @tab-click="handleClick">
+                    <el-tabs v-model="messageName" @tab-click="handleClick">
                         <el-tab-pane label="文章" name="news">
                             <div class="content-list">
                                 <div class="content-listNews">
@@ -50,8 +50,33 @@
                                 </div>
                             </div>
                         </el-tab-pane>
-                        <el-tab-pane label="关注" name="focus">
-
+                        <el-tab-pane label="关注" name="focusList">
+                            <el-tabs v-model="focusName" tab-position="left" style="min-height: 200px;">
+                                <el-tab-pane label="关注了" name="focus">
+                                    <div class="focusMessage" v-for="(item,index) in focusList" :key="index">
+                                        <a href="javascript:;" @click="$router.push(`/personal/${item.userId}`)" class="message">
+                                            <el-avatar :size="40" :src="item.userAvatar"></el-avatar>
+                                            <div class="box">
+                                                <div class="user-name">{{item.nickName}}</div>
+                                                <p><i class="el-icon-user"></i>{{item.userWork}}</p>
+                                            </div>
+                                        </a>
+                                        <el-button type="success" size="small">+ 关注</el-button>
+                                    </div>
+                                </el-tab-pane>
+                                <el-tab-pane label="关注者" name="follower">
+                                    <div class="focusMessage" v-for="(item,index) in followerList" :key="index">
+                                        <a href="javascript:;" @click="$router.push(`/personal/${item.userId}`)" class="message">
+                                            <el-avatar :size="40" :src="item.userAvatar"></el-avatar>
+                                            <div class="box">
+                                                <div class="user-name">{{item.nickName}}</div>
+                                                <p><i class="el-icon-user"></i>{{item.userWork}}</p>
+                                            </div>
+                                        </a>
+                                        <el-button type="primary" size="small">+ 关注</el-button>
+                                    </div>
+                                </el-tab-pane>
+                            </el-tabs>
                         </el-tab-pane>
                         <el-tab-pane label="最新" name="newest">
                         </el-tab-pane>
@@ -68,11 +93,11 @@
                     </div>
                 </div>
                 <div class="focus">
-                    <div class="first">
+                    <div class="first" @click="messageName='focusList';focusName='focus';">
                         关注了
                         <span>{{focus}}</span>
                     </div>
-                    <div>
+                    <div @click="messageName='focusList';focusName='follower';">
                         关注者
                         <span>{{follower}}</span>
                     </div>
@@ -92,7 +117,8 @@
         name: 'personal',
         data() {
             return {
-                activeName: 'news',
+                messageName: 'news',
+                focusName: 'focus',
                 isSelf: false, // 是否为用户本人
                 authorName: '',
                 authorWork: '',
@@ -106,6 +132,8 @@
                 follower: 0,
                 creatTime: 0,
                 focusList: [],  // 关注列表
+                followerList: [],  // 关注者列表
+                collectList: [],  // 收藏列表
             }
         },
         mounted(){
@@ -151,6 +179,9 @@
                     this.readCount = userMessage.articleCount;
                     this.articleCount = userMessage.articleCount;
                     this.focus = userMessage.focus.length;
+                    this.focusList = userMessage.focus;
+                    this.followerList = userMessage.follower;
+                    this.collectList = userMessage.collect;
                     this.follower = userMessage.follower.length;
                     this.creatTime = formatDayTime(userMessage.createTime).second;
                 }else{
@@ -236,7 +267,7 @@
                     .el-tab-pane{
                         .content-list{
                             width: 97%;
-                            min-height: 500px;
+                            // min-height: 500px;
                             // border: 1px solid black;
                             .content-listNews{
                                 padding: 18px 0px;
@@ -347,6 +378,41 @@
                                 }
                             }
                         }
+                        .focusMessage{
+                            border-bottom: 1px #e5e5e5 solid;/*  */
+                            padding: 15px;
+                            margin-right: 15px;
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                            &:hover{
+                                background: #F5F5F5;
+                            }
+                            .message{
+                                width: 100%;
+                                display: flex;
+                                align-items: center;
+                                .box{
+                                    margin-left: 20px;
+                                    .user-name{
+                                        font-weight: 700;
+                                        color: #333;
+                                        font-size: 18px;
+                                        font-weight: 700;
+                                        margin-bottom: 5px;
+                                    }
+                                    p{
+                                        font-size: 12px;
+                                        letter-spacing: 1px;
+                                        color: #999999;
+                                    }
+                                }
+                            }
+                        }
+                        .el-tab-pane{
+                            // border-top: 1px #e5e5e5 solid;
+                            padding-bottom: 20px;
+                        }
                     }
                 }
             }
@@ -399,7 +465,7 @@
                     }
                     div{
                         flex:1;
-                        
+                        cursor: pointer;
                         span{
                             padding-top: 10px;
                             font-weight: bold;;
