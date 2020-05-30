@@ -51,6 +51,7 @@
                             </div>
                         </el-tab-pane>
                         <el-tab-pane label="关注" name="focus">
+
                         </el-tab-pane>
                         <el-tab-pane label="最新" name="newest">
                         </el-tab-pane>
@@ -104,6 +105,7 @@
                 focus: 0,
                 follower: 0,
                 creatTime: 0,
+                focusList: [],  // 关注列表
             }
         },
         mounted(){
@@ -113,6 +115,7 @@
                 if(this.$route.params.id == this.$cookie.get('userId')){
                     // 是则为可编辑
                     this.isSelf = true;
+                    console.log(Object.hasOwnProperty.call(this.$store.state.userMessage,'userId'));
                     if(Object.hasOwnProperty.call(this.$store.state.userMessage,'collect')){
                         this.dataShow(this.$store.state.userMessage);
                     }else{
@@ -131,8 +134,9 @@
                 this.$emit('index',0);
                 this.$router.push(`/setting/${this.$cookie.get('userId')}`);
             },
-            handleClick(){
-                
+            // 选项卡切换触发
+            handleClick(tab, event) {
+                console.log(tab, event);
             },
             // 数据渲染
             dataShow(userMessage){
@@ -143,9 +147,9 @@
                     this.authorIntroduce = userMessage.userIntroduce;
                     this.authorAvator = userMessage.userAvatar;
                     this.collectCount = userMessage.collect.length;
-                    this.goodCount = userMessage.goodCount;
-                    this.readCount = userMessage.readCount;
-                    this.articleCount = userMessage.article.length;
+                    this.goodCount = userMessage.goodCount || 0;
+                    this.readCount = userMessage.articleCount;
+                    this.articleCount = userMessage.articleCount;
                     this.focus = userMessage.focus.length;
                     this.follower = userMessage.follower.length;
                     this.creatTime = formatDayTime(userMessage.createTime).second;
@@ -156,7 +160,7 @@
             },
             // 请求用户信息
             messageRequest(userId){
-                this.axios.post('/api/user',{ userId })
+                this.axios.get(`/api/user/${userId}`)
                 .then((res)=>{
                     if(Object.hasOwnProperty.call(res,'status') && res.status == 0){
                         this.dataShow(res.data);

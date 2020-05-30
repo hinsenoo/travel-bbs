@@ -11,8 +11,8 @@
                                 <div class="create-time">{{articleCreateTime}} <span>阅读 {{articleReadCount}}</span></div>
                             </div>
                         </a>
-                        <el-button v-if="!isSelf" type="primary" size="small">+ 关注</el-button>
-                        <el-button v-if="isSelf" @click="$router.push(`/edit/${articleId}`)" type="success" size="small">编辑</el-button>
+                        <el-button v-if="!isSelf" type="primary" size="medium">+ 关注</el-button>
+                        <el-button v-if="isSelf" @click="$router.push(`/edit/${articleId}`)" type="primary" size="medium" plain>编辑</el-button>
                     </div>
                     <div class="article-title">
                         <img v-lazy="titleImgUrl" alt="">
@@ -45,14 +45,14 @@
                             </div>
                         </div>
                         <el-button v-if="!isSelf" type="primary" size="small">+ 关注</el-button>
-                        <el-button v-if="isSelf" @click="$router.push(`/setting/${userId}`)" type="success" size="small">编辑</el-button>
+                        <el-button v-if="isSelf" @click="$router.push(`/setting/${userId}`)" type="success" size="small" plain>编辑</el-button>
                     </div>
                 </div>
                 <div class="article-comment" id="comment">
                     <div class="title">评论</div>
                     <div class="comment">
                         <div class="commentInput">
-                            <el-avatar :size="40" :src="circleUrl"></el-avatar>
+                            <el-avatar :size="40" :src="userAvatar"></el-avatar>
                             <el-input v-model="commentInput" 
                             type="textarea"
                             :rows="2"
@@ -64,104 +64,67 @@
                             <el-button @click="$refs.commentButton.style.height = '0'" size="small" round>取消</el-button>
                         </div>
                     </div>
-                    <!-- 评论 -->
-                    <div class="commentBox">
+                    <!-- 一级评论 -->
+                    <div class="commentBox" v-for="(item,index) in comment" :key="index">
                         <a href="javascript:;">
-                            <el-avatar :size="40" :src="circleUrl"></el-avatar>
+                            <el-avatar :size="40" :src="item.commentAvatar"></el-avatar>
                         </a>
                         <div class="commentMessage">
-                            <a href="javascript:;">钱塘风华</a>
-                            <p>金銮湾的沙子细软柔滑得如同温柔的梦，退潮后的海滩平滑如镜，天空与大海，镜面与沙滩，让你真切感受到“天空之镜”的绮丽。</p>
+                            <a href="javascript:;" @click="$router.push(`/personal/${item.commentId}`)">{{item.commentName}}</a>
+                            <p>{{item.commentContent}}</p>
                             <div class="date">
-                                <span class="time">1天前</span>
+                                <span class="time">{{toTime(item.commentTime)}}</span>
                                 <a href="javascript:;"><img src="/imgs/icons/good-article.png" alt=""> 0</a>
-                                <a href="javascript:;"><img src="/imgs/icons/comment-article.png" alt=""> 回复</a>
+                                <a href="javascript:;" @click="showReplyBox('reply',index,true)"><img src="/imgs/icons/comment-article.png" alt=""> 回复</a>
                             </div>
-                            <!-- 评论内回复 -->
-                            <div class="commentBox inside">
+                            <!-- 一级评论内回复框 -->
+                            <div class="reply" ref="reply">
+                                <div class="reply-comment">
+                                    <el-input v-model="commentInput" 
+                                    type="textarea"
+                                    :rows="2"
+                                    placeholder="输入评论..."
+                                    ></el-input>
+                                </div>
+                                <div class="reply-button">
+                                    <el-button size="small" type="primary" round>发布</el-button>
+                                    <el-button @click="showReplyBox('reply',index,false)" size="small" round>取消</el-button>
+                                </div>
+                            </div>
+                            <!-- 二级评论 -->
+                            <div class="commentBox inside"  v-for="(replyItem,replyIndex) in item.reply" :key="replyIndex">
                                 <a href="javascript:;">
-                                    <el-avatar :size="40" :src="circleUrl"></el-avatar>
+                                    <el-avatar :size="40" :src="replyItem.replyAvatar"></el-avatar>
                                 </a>
                                 <div class="commentMessage">
-                                    <a href="javascript:;">Hinsenoo</a>
+                                    <a href="javascript:;" @click="$router.push(`/personal/${replyItem.replyId}`)">{{replyItem.replyName}}</a>
                                     <p>
                                         回复 
-                                        <a href="javascript:;">钱塘风华</a>:
-                                        金銮湾的沙子细软柔滑得如同温柔的梦，退潮后的海滩平滑如镜，天空与大海，镜面与沙滩，让你真切感受到“天空之镜”的绮丽。</p>
+                                        <a href="javascript:;"  @click="$router.push(`/personal/${replyItem.toId}`)">{{replyItem.toName}}</a>:
+                                        {{replyItem.replyContent}}</p>
                                     <div class="date">
-                                        <span class="time">1天前</span>
+                                        <span class="time">{{toTime(replyItem.replyTime)}}</span>
                                         <a href="javascript:;"><img src="/imgs/icons/good-article.png" alt=""> 0</a>
-                                        <a href="javascript:;"><img src="/imgs/icons/comment-article.png" alt=""> 回复</a>
+                                        <a href="javascript:;" @click="showReplyBox('replyInside',index+''+replyIndex,true)"><img src="/imgs/icons/comment-article.png" alt=""> 回复</a>
+                                    </div>
+                                    <!-- 评论内回复框 -->
+                                    <div class="reply" :ref="'replyInside' + index + replyIndex">
+                                        <div class="reply-comment">
+                                            <el-input v-model="commentInput" 
+                                            type="textarea"
+                                            :rows="2"
+                                            placeholder="输入评论..."
+                                            ></el-input>
+                                        </div>
+                                        <div class="reply-button">
+                                            <el-button size="small" type="primary" round>发布</el-button>
+                                            <el-button @click="showReplyBox('replyInside',index+''+replyIndex,false)" size="small" round>取消</el-button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="commentBox">
-                        <a href="javascript:;">
-                            <el-avatar :size="40" :src="circleUrl"></el-avatar>
-                        </a>
-                        <div class="commentMessage">
-                            <a href="javascript:;">钱塘风华</a>
-                            <p>金銮湾的沙子细软柔滑得如同温柔的梦，退潮后的海滩平滑如镜，天空与大海，镜面与沙滩，让你真切感受到“天空之镜”的绮丽。</p>
-                            <div class="date">
-                                <span class="time">1天前</span>
-                                <a href="javascript:;"><img src="/imgs/icons/good-article.png" alt=""> 0</a>
-                                <a href="javascript:;"><img src="/imgs/icons/comment-article.png" alt=""> 回复</a>
-                            </div>
-                            <!-- 评论内回复 -->
-                            <div class="commentBox inside">
-                                <a href="javascript:;">
-                                    <el-avatar :size="40" :src="circleUrl"></el-avatar>
-                                </a>
-                                <div class="commentMessage">
-                                    <a href="javascript:;">Hinsenoo</a>
-                                    <p>
-                                        回复 
-                                        <a href="javascript:;">钱塘风华</a>:
-                                        金銮湾的沙子细软柔滑得如同温柔的梦，退潮后的海滩平滑如镜，天空与大海，镜面与沙滩，让你真切感受到“天空之镜”的绮丽。</p>
-                                    <div class="date">
-                                        <span class="time">1天前</span>
-                                        <a href="javascript:;"><img src="/imgs/icons/good-article.png" alt=""> 0</a>
-                                        <a href="javascript:;"><img src="/imgs/icons/comment-article.png" alt=""> 回复</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="commentBox">
-                        <a href="javascript:;">
-                            <el-avatar :size="40" :src="circleUrl"></el-avatar>
-                        </a>
-                        <div class="commentMessage">
-                            <a href="javascript:;">钱塘风华</a>
-                            <p>金銮湾的沙子细软柔滑得如同温柔的梦，退潮后的海滩平滑如镜，天空与大海，镜面与沙滩，让你真切感受到“天空之镜”的绮丽。</p>
-                            <div class="date">
-                                <span class="time">1天前</span>
-                                <a href="javascript:;"><img src="/imgs/icons/good-article.png" alt=""> 0</a>
-                                <a href="javascript:;"><img src="/imgs/icons/comment-article.png" alt=""> 回复</a>
-                            </div>
-                            <!-- 评论内回复 -->
-                            <div class="commentBox inside">
-                                <a href="javascript:;">
-                                    <el-avatar :size="40" :src="circleUrl"></el-avatar>
-                                </a>
-                                <div class="commentMessage">
-                                    <a href="javascript:;">Hinsenoo</a>
-                                    <p>
-                                        回复 
-                                        <a href="javascript:;">钱塘风华</a>:
-                                        金銮湾的沙子细软柔滑得如同温柔的梦，退潮后的海滩平滑如镜，天空与大海，镜面与沙滩，让你真切感受到“天空之镜”的绮丽。</p>
-                                    <div class="date">
-                                        <span class="time">1天前</span>
-                                        <a href="javascript:;"><img src="/imgs/icons/good-article.png" alt=""> 0</a>
-                                        <a href="javascript:;"><img src="/imgs/icons/comment-article.png" alt=""> 回复</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
                 </div>
             </div>
             <div class="right">
@@ -238,7 +201,7 @@
                 </div>
                 <div class="icon">
                     <a class="icon-comment" href="#comment">
-                        <span>{{commentCount}}</span>
+                        <span>{{comment.length || 0}}</span>
                     </a>
                 </div>
                 <div class="icon" @click="collectShow=!collectShow">
@@ -251,7 +214,7 @@
 </template>
 
 <script>
-    import {formatDayTime} from '../util';
+    import {formatDayTime,timestampToTime} from '../util';
     export default {
         name: 'user-article',
         data(){
@@ -281,12 +244,12 @@
                 editTime: 1479048325000,
                 articleReadCount: 0,
                 articleGoodCount: 0,
-                commentCount: 0,
+                comment: [],
                 // 是否为本人
                 isSelf: false,
             }
         },
-        beforeCreate(){
+        mounted(){
             this.articleId = Number(this.$route.params.id);
             this.axios.get(`/api/article/${this.articleId}`)
             .then((res)=>{
@@ -331,12 +294,11 @@
                     this.editTime = formatDayTime(data.editTime).first;
                     this.articleReadCount = data.read;
                     this.articleGoodCount = data.good.length;
-                    this.commentCount = data.comment.length;
+                    this.comment = data.comment;
                 }else{
                     this.$message.error('文章获取失败，请重试');
                 }
             })
-
         },
         methods:{
             messageShow(data){
@@ -348,6 +310,25 @@
                 this.userReadCount = data.readCount;
                 // this.userCreateTime = formatDayTime(res.data.createTime).first;
                 this.userArticleCount = data.article.length;
+            },
+            toTime(timestamp) {
+                return timestampToTime(timestamp);
+            },
+            showReplyBox(id,index,show){
+                if(id == 'reply'){
+                    // 一级回复显示
+                    if(show){
+                        this.$refs.reply[index].style.height = '100px';
+                    }else{
+                        this.$refs.reply[index].style.height = '0';
+                    }
+                }else{
+                    if(show){
+                        this.$refs['replyInside' + index][0].style.height = '100px';
+                    }else{
+                        this.$refs['replyInside' + index][0].style.height = '0';
+                    }
+                }
             }
         }
     }
@@ -514,6 +495,7 @@
                             }
                         }
                         .commentMessage{
+                            width: 100%;
                             font-size: 14px;
                             border-bottom: 1px solid #e5e5e5;
                             padding-bottom: 20px;
@@ -545,6 +527,21 @@
                                     text-align: left;
                                 }
                             }
+                            // 评论内的回复框
+                            .reply{
+                                box-sizing: border-box;
+                                height: 0;
+                                padding-right: 25px;
+                                margin-bottom: 10px;
+                                overflow: hidden;
+                                transition: all 0.5s;
+                                .reply-comment{
+                                    margin-bottom: 10px;
+                                }
+                                .reply-button{
+                                    text-align: right;
+                                }
+                            }
                             // 评论内回复
                             .inside{
                                 margin: 0;
@@ -560,6 +557,7 @@
                                     }
                                     .date{
                                         margin: 0;
+                                        margin-bottom: 10px;
                                     }
                                 }
                             }

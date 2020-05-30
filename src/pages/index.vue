@@ -29,7 +29,7 @@
                                     <div class="news">
                                         <div class="word">
                                             <div class="title">
-                                                <a href="javascript:;" @click="toArticle">人生恰似一场永不停止的远足——珠峰东坡大环线</a>
+                                                <a href="javascript:;" @click="toArticle(item.articleId)">{{item.title}}</a>
                                             </div>
                                             <div class="fragment">
                                                 {{item.articleHTML}}
@@ -361,7 +361,7 @@
             },
             // 文章数
             articleCount(){
-                return this.$store.state.userMessage.article.length || 0;
+                return this.$store.state.userMessage.articleCount || 0;
             },
             // 收藏数
             collectCount(){
@@ -397,6 +397,9 @@
                     this.$message.error('网络异常');
                 }
             })
+            .catch(()=>{
+                this.$message.error('网络异常');
+            })
         },
         methods: {
             // 文章导航栏
@@ -408,9 +411,9 @@
                 this.$emit('index',0);
                 this.$router.push(`/personal/${this.$cookie.get('userId')}`);
             },
-            toArticle(){
+            toArticle(id){
                 this.$emit('index',0);
-                this.$router.push('/article/1');
+                this.$router.push(`/article/${id}`);
             }
         },
     }
@@ -644,7 +647,7 @@
                         }
                         .news{
                             border-top: 1px solid #d7d7d7;
-                            padding: 20px;
+                            padding: 15px 15px 10px 15px;
                             ul{
                                 li{
                                     a{

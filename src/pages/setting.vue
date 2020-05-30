@@ -102,7 +102,7 @@
             let userId = Number(this.$cookie.get('userId'));
             if(userId && userId == this.$route.params.id){
                 // 请求用户信息
-                this.axios.post('/api/user',{ userId })
+                this.axios.get(`/api/user/${userId}`)
                 .then((res)=>{
                     this.articleImgUrl = res.data.userAvatar;
                     this.nickName = res.data.nickName;
@@ -162,7 +162,10 @@
                 this.axios.post('/api/user/update',params)
                 .then((res)=>{
                     if(Object.hasOwnProperty.call(res,'status') && res.status == 0){
-                        this.$message.success(res.msg);
+                        this.axios.get(`/api/user/${Number(this.$cookie.get('userId'))}`)
+                        .then((res)=>{
+                            this.$store.dispatch('saveUserMessage', res.data);
+                        })
                     }else{
                         this.$message.error('网络异常');
                     }
@@ -185,18 +188,19 @@
                 }
 
                 let data = new FormData();
-                data.append('userId', 16);
+                data.append('userId', Number(this.$cookie.get('userId')));
                 data.append('oldPassword', this.$md5(this.oldPassword));
                 data.append('newPassword', this.$md5(this.newPassword));
 
                 let config = {
                     headers:{'Content-Type': 'application/x-www-form-urlencoded'}
                 };
-                this.axios.post('http://47.106.215.69:8080/tourism/user/password',data,config).then((res)=>{
+                this.axios.post('/api/user/password',data,{config}).then((res)=>{
+                    console.log(res);
                     if(Object.hasOwnProperty.call(res,'status') && res.status == 0){
                         this.$message.success(res.msg);
                     }else if(res.status == 1){
-                        this.$message.error(res.message);
+                        this.$message.error(res.msg);
                     }
                 })
             }

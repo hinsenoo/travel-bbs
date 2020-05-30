@@ -117,6 +117,14 @@
             // 注册滚动事件
             window.addEventListener('scroll',this.initHeight);
         },
+        watch: {
+            $route(to, from) {
+                // 对路由变化作出响应...
+                if(to.name == from.name){
+                    this.$router.go(0);
+                }
+            }
+        },
         methods: {
             // 导航栏触发事件
             handleSelect(key) {
@@ -131,7 +139,9 @@
             handleCommand(command) {
                 switch (command) {
                     case 'personal':
-                        this.$router.push(`/personal/${this.$cookie.get('userId')}`);
+                        // this.$router.push(`/personal/${this.$cookie.get('userId')}`).catch(err => {err})
+                        
+                        this.$router.replace({ name: 'personal', params: { id: this.$cookie.get('userId') }});
                         break;
                     case 'collect':
                         this.$router.push(`/personal/${this.$cookie.get('userId')}`);
@@ -140,19 +150,13 @@
                         this.$router.push(`/setting/${this.$cookie.get('userId')}`);
                         break;
                     case 'exit':
-                        this.axios.post('/api/user/logout')
-                        .then((res)=>{
-                            if(Object.hasOwnProperty.call(res,'status') && res.status == 0){
-                                this.$message.success(res.msg);
-                                // 使 cookie 过期
-                                this.$cookie.set('userId','',{expires: '-1'});
-                                // 清空 vuex 的数据
-                                this.$store.dispatch('saveUserMessage',{});
-                                this.$store.dispatch('saveLoginStatus',false);
-                            }else{
-                                this.$message.error('网络异常');
-                            }
-                        })
+                        // 退出登录
+                        // 使 cookie 过期
+                        this.$cookie.set('userId','',{expires: '-1'});
+                        // 清空 vuex 的数据
+                        this.$store.dispatch('saveUserMessage',{});
+                        this.$store.dispatch('saveLoginStatus',false);
+                        this.$message.success('退出登录成功');
                         break;
                     default:
                         break;
@@ -194,6 +198,8 @@
                         this.$store.dispatch('saveLoginStatus', true);
                     }else if(res.status == 1){
                         this.$message.error(res.msg);
+                        this.waitRequest = false;
+                        return;
                     }
                     this.waitRequest = false;
                     this.closeModal();
@@ -219,9 +225,7 @@
                 let params = {
                     username: this.registerName,
                     password: this.$md5(this.registerPw),
-                    email: this.registerEmail,
-                    createTime: new Date().getTime(),
-                    nickName: this.registerName,
+                    email: this.registerEmail
                 }
                 // 等待请求完成
                 this.waitRequest = true;

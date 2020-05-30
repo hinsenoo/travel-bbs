@@ -12,7 +12,7 @@ export default {
   created(){
     let userId = Number(this.$cookie.get('userId'));
     if(userId){
-      this.axios.post('/api/user',{ userId })
+      this.axios.get(`/api/user/${ userId }`)
       .then((res)=>{
         this.$store.dispatch('saveUserMessage', res.data);
         this.$store.dispatch('saveLoginStatus', true);

@@ -38,6 +38,25 @@ function formatDayTime(val) {
     }
 }
 
+// js时间戳转时间（年-月-日 时:分:秒）
+function timestampToTime(timestamp) {
+    var date = new Date(timestamp * 1000); //时间戳为10位需*1000，时间戳为13位的话不需乘1000
+    let Y = date.getFullYear() + '-';
+    let M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-';
+    let D = change(date.getDate()) + ' ';
+    let h = change(date.getHours()) + ':';
+    let m = change(date.getMinutes()) + '';
+    // let s = change(date.getSeconds());
+    return Y + M + D + h + m;
+}
+function change(t) {
+    if (t < 10) {
+        return "0" + t;
+    } else {
+        return t;
+    }
+}
+
 /*1.用浏览器内部转换器实现html转码*/
 function htmlEncode(html){
     //1.首先动态创建一个容器标签元素，如DIV
@@ -73,4 +92,4 @@ function getPText(p){
     return div.innerText;
 }
 
-export {formatDuring,formatYear,formatDayTime,htmlEncode,htmlDecode,getPText}
+export {formatDuring,formatYear,formatDayTime,timestampToTime,htmlEncode,htmlDecode,getPText}
