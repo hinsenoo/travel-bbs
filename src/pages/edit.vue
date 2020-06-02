@@ -132,12 +132,16 @@ import editor from '../components/Editor'
             editor
         },
         mounted(){
+            // 若无登录 则跳转到首页
+            if(!this.$store.state.loginStatus){
+                console.log(11);
+                this.$router.push(`/`);
+            }
             this.pageType = this.$route.params.id;
             if(this.pageType !== 'write'){
                 // 拉取文章信息渲染
                 this.axios.get(`/api/article/${Number(this.pageType)}`)
                 .then((res)=>{
-                    console.log(res);
                     if(res.status == 0){
                         this.title = res.data.title;
                         this.titleImgUrl = res.data.titleImgUrl;
@@ -211,24 +215,26 @@ import editor from '../components/Editor'
                     this.$message.error(errMsg);
                     // return;
                 }
-                // let data = {
-                //     userId: 19,
-                //     title: "走四方，百公里骑行北太湖",
-                //     titleImgUrl: "http://47.106.215.69:8080/images/avatar/af89b8bd-b9c2-4680-b884-04af2de227d1.jfif",
-                //     category: "游记",
-                //     place: "安徽",
-                //     articleHTML: `<p data-v-59a318e4="" data-v-e18b6dc6="">今天我休息，爱好户外的人经常休而不息。望着窗外黑黢黢的天空，听着空中呼呼作响的风声，心中忐忑不定，预定的计划还能成行吗?真是“山雨欲来风满楼”。&nbsp;</p><p data-v-59a318e4="" data-v-e18b6dc6=""><img src="http://image1.8264.com/wen/public/20200527/1590559216549jpg" style="max-width: 100%;"></p><p data-v-59a318e4="" data-v-e18b6dc6="">&nbsp;想起阿杰兄弟，跑马拉松的，挑战自我，成绩一年比一年提高，42公里用时3小时40分钟。难道说我二个轮子比不过二条腿吗?说滚就滚，启动百公里骑行北太湖的行程，出发。<br></p><p data-v-59a318e4="" data-v-e18b6dc6=""><img src="http://image1.8264.com/wen/public/20200527/1590559218226jpg" style="max-width:100%;"><br></p><p data-v-59a318e4="" data-v-e18b6dc6="">说起这条线路，小伙伴们一定不会陌生:炎炎烈日下，我们一行6人冒着35度的高温，从沙墩港大桥开始徒步，到苏州湿地公园终止，用双脚丈量了北太湖大道30公里。当时，道路正在修缮中，路边是裸露的土地，大型机械正在隆隆施工。这么些年过去了，旧地重游，究竟发生了哪些变化呢?&nbsp;</p><p data-v-59a318e4="" data-v-e18b6dc6=""><img src="http://image1.8264.com/wen/public/20200527/1590559219793jpg" style="max-width: 100%;">&nbsp;<br></p>`,
-                //     editTime: new Date().getTime()
-                // }
+                let str = `<p data-v-59a318e4="" data-v-e18b6dc6="">今天我休息，爱好户外的人经常休而不息。望着窗外黑黢黢的天空，听着空中呼呼作响的风声，心中忐忑不定，预定的计划还能成行吗?真是“山雨欲来风满楼”。&nbsp;</p><p data-v-59a318e4="" data-v-e18b6dc6=""><img src="http://image1.8264.com/wen/public/20200527/1590559216549jpg" style="max-width: 100%;"></p><p data-v-59a318e4="" data-v-e18b6dc6="">&nbsp;想起阿杰兄弟，跑马拉松的，挑战自我，成绩一年比一年提高，42公里用时3小时40分钟。难道说我二个轮子比不过二条腿吗?说滚就滚，启动百公里骑行北太湖的行程，出发。<br></p><p data-v-59a318e4="" data-v-e18b6dc6=""><img src="http://image1.8264.com/wen/public/20200527/1590559218226jpg" style="max-width:100%;"><br></p><p data-v-59a318e4="" data-v-e18b6dc6="">说起这条线路，小伙伴们一定不会陌生:炎炎烈日下，我们一行6人冒着35度的高温，从沙墩港大桥开始徒步，到苏州湿地公园终止，用双脚丈量了北太湖大道30公里。当时，道路正在修缮中，路边是裸露的土地，大型机械正在隆隆施工。这么些年过去了，旧地重游，究竟发生了哪些变化呢?&nbsp;</p><p data-v-59a318e4="" data-v-e18b6dc6=""><img src="http://image1.8264.com/wen/public/20200527/1590559219793jpg" style="max-width: 100%;">&nbsp;<br></p>`;
+
                 let data = {
-                    userId: Number(this.$cookie.get('userId')),
-                    title: this.title,
-                    titleImgUrl: this.titleImgUrl,
-                    category: this.category,
-                    place: this.place,
-                    articleHTML: this.$Base64.encode(this.articleHTML),
+                    userId: 19,
+                    title: "走四方，百公里骑行北太湖",
+                    titleImgUrl: "http://47.106.215.69:8080/images/avatar/af89b8bd-b9c2-4680-b884-04af2de227d1.jfif",
+                    category: "游记",
+                    place: "安徽",
+                    articleHTML: this.$Base64.encode(str),
                     editTime: new Date().getTime()
                 }
+                // let data = {
+                //     userId: Number(this.$Base64.decode(this.$cookie.get('userId'))),
+                //     title: this.title,
+                //     titleImgUrl: this.titleImgUrl,
+                //     category: this.category,
+                //     place: this.place,
+                //     articleHTML: this.$Base64.encode(this.articleHTML),
+                //     editTime: new Date().getTime()
+                // }
 
                 // 发布文章
                 if(this.pageType == 'write'){
@@ -240,7 +246,9 @@ import editor from '../components/Editor'
                             this.$message.success('文章上传成功');
                             // TODO: 跳转到文章展示页面
                             // 等待页面
+                            this.$router.push(`/article/${res.data}`);
                         }else{
+                            this.fullscreenLoading = false;
                             this.$message.error('文章上传失败，请重试');
                         }
                     })
@@ -253,8 +261,8 @@ import editor from '../components/Editor'
                         titleImgUrl: this.titleImgUrl,
                         category: this.category,
                         place: this.place,
-                        articleHTML: this.articleHTML,
-                        editTime: 1479048325000
+                        articleHTML: this.$Base64.encode(this.articleHTML),
+                        editTime: new Date().getTime()
                         // editTime: new Date().getTime()
                     })
                     .then((res)=>{
@@ -263,6 +271,7 @@ import editor from '../components/Editor'
                             this.$message.success('文章编辑成功');
                             // TODO: 跳转到文章展示页面
                             // 等待页面
+                            this.$router.push(`/article/${this.pageType}`);
                         }else{
                             this.fullscreenLoading = false;
                             this.$message.error('文章编辑失败，请重试');
@@ -274,13 +283,13 @@ import editor from '../components/Editor'
             handleCommand(command) {
                 switch (command) {
                     case 'personal':
-                        this.$router.push(`/personal/${this.$cookie.get('userId')}`);
+                        this.$router.push(`/personal/${this.$Base64.decode(this.$cookie.get('userId'))}`);
                         break;
                     case 'collect':
-                        this.$router.push(`/personal/${this.$cookie.get('userId')}`);
+                        this.$router.push(`/personal/${this.$Base64.decode(this.$cookie.get('userId'))}`);
                         break;
                     case 'setting':
-                        this.$router.push(`/setting/${this.$cookie.get('userId')}`);
+                        this.$router.push(`/setting/${this.$Base64.decode(this.$cookie.get('userId'))}`);
                         break;
                     default:
                         break;

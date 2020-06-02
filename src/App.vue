@@ -10,12 +10,17 @@
 export default {
   name: 'App',
   created(){
-    let userId = Number(this.$cookie.get('userId'));
+    let userId = Number(this.$Base64.decode(this.$cookie.get('userId')));
     if(userId){
       this.axios.get(`/api/user/${ userId }`)
       .then((res)=>{
         this.$store.dispatch('saveUserMessage', res.data);
         this.$store.dispatch('saveLoginStatus', true);
+        let focusObj = {};
+        res.data.focus.forEach((item)=>{
+          focusObj[String(item.userId)] = true;
+        })
+        this.$store.dispatch('saveFocusStatusList', focusObj);
       })
     }
   },

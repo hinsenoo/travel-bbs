@@ -15,8 +15,8 @@
                 <div class="content">
                     <el-tabs v-model="activeName" @tab-click="handleClick">
                         <el-tab-pane label="热门" name="hot">
-                            <div class="content-list" v-for="(item, index) in hotList" :key="index">
-                                <div class="content-listNews">
+                            <div class="content-list">
+                                <div class="content-listNews"  v-for="(item, index) in hotList" :key="index">
                                     <div>
                                         <ul class="meta">
                                             <li class="categroy"><a href="javascript:;">{{item.category}}</a></li>
@@ -42,90 +42,6 @@
                                     <div class="other">
                                         <div><a href="javascript:;"><img src="/imgs/icons/good2.png" alt="点赞">{{item.good.length}}</a></div>
                                         <div><a href="javascript:;"><img src="/imgs/icons/remark2.png" alt="评论">{{item.comment.length}}</a></div>
-                                    </div>
-                                </div>
-                                <div class="content-listNews">
-                                    <div>
-                                        <ul class="meta">
-                                            <li class="categroy"><a href="javascript:;">游记</a></li>
-                                            <li class="author"><a href="javascript:;">不爱拍照的_腊肉</a></li>
-                                            <li>1000人浏览</li>
-                                            <li class="area">西藏</li>
-                                        </ul>
-                                    </div>
-                                    <!-- 主体内容 -->
-                                    <div class="news">
-                                        <div class="word">
-                                            <div class="title">
-                                                <a href="javascript:;">人生恰似一场永不停止的远足——珠峰东坡大环线</a>
-                                            </div>
-                                            <div class="fragment">
-                                                原本2019年计划先墨脱雨林徒步再走珠峰东坡，因为十一这个黄金期要参加闺蜜的婚礼，所以就只能完成其中一个了，刚好看到6月徒步珠峰东坡的贴还蛮多的（刚好看杜鹃花的时候），通过8264，还有qq找了几个同伴......
-                                            </div>
-                                        </div>
-                                        <div class="photo">
-                                            <img v-lazy="photoUrl" alt="">
-                                        </div>
-                                    </div>
-                                    <div class="other">
-                                        <div><a href="javascript:;"><img src="/imgs/icons/good2.png" alt="点赞">3</a></div>
-                                        <div><a href="javascript:;"><img src="/imgs/icons/remark.png" alt="评论">6</a></div>
-                                    </div>
-                                </div>
-                                <div class="content-listNews">
-                                    <div>
-                                        <ul class="meta">
-                                            <li class="categroy"><a href="javascript:;">游记</a></li>
-                                            <li class="author"><a href="javascript:;">不爱拍照的_腊肉</a></li>
-                                            <li>1000人浏览</li>
-                                            <li class="area">西藏</li>
-                                        </ul>
-                                    </div>
-                                    <!-- 主体内容 -->
-                                    <div class="news">
-                                        <div class="word">
-                                            <div class="title">
-                                                <a href="javascript:;">人生恰似一场永不停止的远足——珠峰东坡大环线</a>
-                                            </div>
-                                            <div class="fragment">
-                                                原本2019年计划先墨脱雨林徒步再走珠峰东坡，因为十一这个黄金期要参加闺蜜的婚礼，所以就只能完成其中一个了，刚好看到6月徒步珠峰东坡的贴还蛮多的（刚好看杜鹃花的时候），通过8264，还有qq找了几个同伴......
-                                            </div>
-                                        </div>
-                                        <div class="photo">
-                                            <img src="/imgs/demo/3.jpg" alt="">
-                                        </div>
-                                    </div>
-                                    <div class="other">
-                                        <div><a href="javascript:;"><img src="/imgs/icons/good.png" alt="点赞">3</a></div>
-                                        <div><a href="javascript:;"><img src="/imgs/icons/remark.png" alt="评论">6</a></div>
-                                    </div>
-                                </div>
-                                <div class="content-listNews">
-                                    <div>
-                                        <ul class="meta">
-                                            <li class="categroy"><a href="javascript:;">游记</a></li>
-                                            <li class="author"><a href="javascript:;">不爱拍照的_腊肉</a></li>
-                                            <li>1000人浏览</li>
-                                            <li class="area">西藏</li>
-                                        </ul>
-                                    </div>
-                                    <!-- 主体内容 -->
-                                    <div class="news">
-                                        <div class="word">
-                                            <div class="title">
-                                                <a href="javascript:;">人生恰似一场永不停止的远足——珠峰东坡大环线</a>
-                                            </div>
-                                            <div class="fragment">
-                                                原本2019年计划先墨脱雨林徒步再走珠峰东坡，因为十一这个黄金期要参加闺蜜的婚礼，所以就只能完成其中一个了，刚好看到6月徒步珠峰东坡的贴还蛮多的（刚好看杜鹃花的时候），通过8264，还有qq找了几个同伴......
-                                            </div>
-                                        </div>
-                                        <div class="photo">
-                                            <img src="/imgs/demo/3.jpg" alt="">
-                                        </div>
-                                    </div>
-                                    <div class="other">
-                                        <div><a href="javascript:;"><img src="/imgs/icons/good.png" alt="点赞">3</a></div>
-                                        <div><a href="javascript:;"><img src="/imgs/icons/remark.png" alt="评论">6</a></div>
                                     </div>
                                 </div>
                             </div>
@@ -409,7 +325,7 @@
             // 跳转到个人主页
             toPersonal(){
                 this.$emit('index',0);
-                this.$router.push(`/personal/${this.$cookie.get('userId')}`);
+                this.$router.push(`/personal/${this.$Base64.decode(this.$cookie.get('userId'))}`);
             },
             toArticle(id){
                 this.$emit('index',0);

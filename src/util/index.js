@@ -17,6 +17,7 @@ function formatYear(oldTime){
 // xxxx-xx-xx
 function formatDayTime(val) {
     if(val) {
+        val = Number(val);
         let date = new Date(val)
         let Y = date.getFullYear();
         let M = date.getMonth() + 1;

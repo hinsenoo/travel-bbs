@@ -97,6 +97,7 @@
                 registerEmail: '',
                 registerPw: '',
                 registerPw2: '',
+                userId: 0,
             }
         },
         computed: {
@@ -116,6 +117,10 @@
         mounted(){
             // 注册滚动事件
             window.addEventListener('scroll',this.initHeight);
+            if(this.$cookie.get('userId')){
+
+                this.userId = this.$Base64.decode(this.$cookie.get('userId'));
+            }
         },
         watch: {
             $route(to, from) {
@@ -139,15 +144,14 @@
             handleCommand(command) {
                 switch (command) {
                     case 'personal':
-                        // this.$router.push(`/personal/${this.$cookie.get('userId')}`).catch(err => {err})
-                        
-                        this.$router.replace({ name: 'personal', params: { id: this.$cookie.get('userId') }});
+                        // this.$router.push(`/personal/${this.$Base64.decode(this.$cookie.get('userId'))}`).catch(err => {err})
+                        this.$router.replace({ name: 'personal', params: { id: this.userId }});
                         break;
                     case 'collect':
-                        this.$router.push(`/personal/${this.$cookie.get('userId')}`);
+                        this.$router.push(`/personal/${this.userId}?type=collect`);
                         break;
                     case 'setting':
-                        this.$router.push(`/setting/${this.$cookie.get('userId')}`);
+                        this.$router.push(`/setting/${this.userId}`);
                         break;
                     case 'exit':
                         // 退出登录
@@ -192,7 +196,8 @@
                     if(res.status == 0){
                         this.$message.success('登录成功');
                         // 存储用户 id 到 cookie，会话级别 
-                        this.$cookie.set('userId',res.data.userId,{expires: 'Session'});
+                        this.userId = res.data.userId;
+                        this.$cookie.set('userId',this.$Base64.encode(res.data.userId),{expires: 'Session'});
                         // 保存到 Vuex 里面
                         this.$store.dispatch('saveUserMessage', res.data);
                         this.$store.dispatch('saveLoginStatus', true);

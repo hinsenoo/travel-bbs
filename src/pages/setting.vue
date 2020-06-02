@@ -99,7 +99,7 @@
             };
         },
         mounted(){
-            let userId = Number(this.$cookie.get('userId'));
+            let userId = Number(this.$Base64.decode(this.$cookie.get('userId')));
             if(userId && userId == this.$route.params.id){
                 // 请求用户信息
                 this.axios.get(`/api/user/${userId}`)
@@ -147,7 +147,7 @@
             // 信息上传
             messageUpload(){
                 let params = {
-                    userId: Number(this.$cookie.get('userId')),
+                    userId: Number(this.$Base64.decode(this.$cookie.get('userId'))),
                     userAvatar: this.articleImgUrl,
                     nickName: this.nickName,
                     userWork: this.userWork,
@@ -162,9 +162,10 @@
                 this.axios.post('/api/user/update',params)
                 .then((res)=>{
                     if(Object.hasOwnProperty.call(res,'status') && res.status == 0){
-                        this.axios.get(`/api/user/${Number(this.$cookie.get('userId'))}`)
+                        this.axios.get(`/api/user/${Number(this.$Base64.decode(this.$cookie.get('userId')))}`)
                         .then((res)=>{
                             this.$store.dispatch('saveUserMessage', res.data);
+                            this.$message.success('修改信息成功！');
                         })
                     }else{
                         this.$message.error('网络异常');
@@ -188,7 +189,7 @@
                 }
 
                 let data = new FormData();
-                data.append('userId', Number(this.$cookie.get('userId')));
+                data.append('userId', Number(this.$Base64.decode(this.$cookie.get('userId'))));
                 data.append('oldPassword', this.$md5(this.oldPassword));
                 data.append('newPassword', this.$md5(this.newPassword));
 
@@ -196,7 +197,6 @@
                     headers:{'Content-Type': 'application/x-www-form-urlencoded'}
                 };
                 this.axios.post('/api/user/password',data,{config}).then((res)=>{
-                    console.log(res);
                     if(Object.hasOwnProperty.call(res,'status') && res.status == 0){
                         this.$message.success(res.msg);
                     }else if(res.status == 1){

@@ -10,6 +10,7 @@ const state ={
     // 用户信息
     userMessage: {},
     loginStatus: false,
+    focusStatusList: {}
 }
 export default new Vuex.Store({
     state,

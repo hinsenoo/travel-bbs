@@ -12,8 +12,9 @@
                         <p><i class="el-icon-edit"></i>{{authorIntroduce}}</p> 
                     </div>
                     <div class="other">
-                        <el-button v-if="isSelf" @click="toSetting">编辑个人资料</el-button>
-                        <el-button class="focus-button" v-if="!isSelf">+ 关注</el-button>
+                        <el-button v-if="isSelf" @click="toSetting" type="primary" plain>编辑个人资料</el-button>
+                        <el-button v-if="!isSelf && !focusStatusList[authorId]" @click="focusClick(authorId)" type="success" plain>+ 关注</el-button>
+                        <el-button v-if="!isSelf && focusStatusList[authorId]" @click="focusClick(authorId)" type="success" size="small">已关注</el-button>
                     </div>
                 </div>
                 <div class="content">
@@ -61,7 +62,8 @@
                                                 <p><i class="el-icon-user"></i>{{item.userWork}}</p>
                                             </div>
                                         </a>
-                                        <el-button type="success" size="small">+ 关注</el-button>
+                                        <el-button v-if="focusStatusList[item.userId] && userId != item.userId" type="success" size="small" @click="focusClick(item.userId)">已关注</el-button>
+                                        <el-button v-if="!focusStatusList[item.userId] && userId != item.userId" type="success" size="small" @click="focusClick(item.userId)" plain>+ 关注</el-button>
                                     </div>
                                 </el-tab-pane>
                                 <el-tab-pane label="关注者" name="follower">
@@ -73,12 +75,43 @@
                                                 <p><i class="el-icon-user"></i>{{item.userWork}}</p>
                                             </div>
                                         </a>
-                                        <el-button type="primary" size="small">+ 关注</el-button>
+                                        <el-button v-if="focusStatusList[item.userId] && userId != item.userId " type="success" size="small" @click="focusClick(item.userId)" >已关注</el-button>
+                                        <el-button v-if="!focusStatusList[item.userId] && userId != item.userId" type="success" size="small" @click="focusClick(item.userId)" plain>+ 关注</el-button>
                                     </div>
                                 </el-tab-pane>
                             </el-tabs>
                         </el-tab-pane>
-                        <el-tab-pane label="最新" name="newest">
+                        <el-tab-pane v-loading="collectLoading" label="收藏夹" name="collectList">
+                            <div class="content-list">
+                                <div class="content-listNews"  v-for="(item, index) in collect" :key="index">
+                                    <div>
+                                        <ul class="meta">
+                                            <li class="categroy"><a href="javascript:;">{{item.category}}</a></li>
+                                            <li class="author"><a href="javascript:;" @click="$router.push(`/personal/${item.userId}`)">{{item.nickName}}</a></li>
+                                            <li>{{item.articleRead}}人阅读</li>
+                                            <li class="area">{{item.place}}</li>
+                                        </ul>
+                                    </div>
+                                    <!-- 主体内容 -->
+                                    <div class="news">
+                                        <div class="word">
+                                            <div class="title">
+                                                <a href="javascript:;" @click="toArticle(item.articleId)">{{item.title}}</a>
+                                            </div>
+                                            <div class="fragment">
+                                                {{item.articleHTML}}
+                                            </div>
+                                        </div>
+                                        <div class="photo">
+                                            <img :src="item.titleImgUrl" alt="">
+                                        </div>
+                                    </div>
+                                    <div class="other">
+                                        <div><a href="javascript:;"><img src="/imgs/icons/good2.png" alt="点赞">{{item.good.length}}</a></div>
+                                        <div><a href="javascript:;"><img src="/imgs/icons/remark2.png" alt="评论">{{item.comment.length}}</a></div>
+                                    </div>
+                                </div>
+                            </div>
                         </el-tab-pane>
                     </el-tabs>
                 </div>
@@ -103,7 +136,7 @@
                     </div>
                 </div>
                 <ul>
-                    <li>已收藏<span>{{collectCount}}</span></li>
+                    <li class="collectLi" @click="toCollect">已收藏<span>{{collectCount}}</span></li>
                     <li>加入于<span>{{creatTime}}</span></li>
                 </ul>
             </div>
@@ -112,7 +145,7 @@
 </template>
 
 <script>
-    import {formatDayTime} from '../util';
+    import {formatDayTime,getPText} from '../util';
     export default {
         name: 'personal',
         data() {
@@ -120,6 +153,7 @@
                 messageName: 'news',
                 focusName: 'focus',
                 isSelf: false, // 是否为用户本人
+                authorId: 0, // 访问的作者
                 authorName: '',
                 authorWork: '',
                 authorIntroduce: '',
@@ -134,37 +168,53 @@
                 focusList: [],  // 关注列表
                 followerList: [],  // 关注者列表
                 collectList: [],  // 收藏列表
+                collect: [],
+                collectLoading: false,
+                focusStatus: true, // 关注状态
+                userId: 0,
+                
+            }
+        },
+        computed:{
+            focusStatusList(){
+                return this.$store.state.focusStatusList;
             }
         },
         mounted(){
+            console.log(this.$route);
             this.$nextTick(()=>{
-                let authorId = Number(this.$route.params.id);
+                this.userId = this.$Base64.decode(this.$cookie.get('userId'));
+                this.authorId = Number(this.$route.params.id);
                 // 确定是否为用户本人
-                if(this.$route.params.id == this.$cookie.get('userId')){
+                if(this.authorId == this.userId){
                     // 是则为可编辑
                     this.isSelf = true;
-                    console.log(Object.hasOwnProperty.call(this.$store.state.userMessage,'userId'));
                     if(Object.hasOwnProperty.call(this.$store.state.userMessage,'collect')){
                         this.dataShow(this.$store.state.userMessage);
                     }else{
-                        this.messageRequest(authorId);
+                        this.messageRequest(this.authorId);
                     }
-    
                 }else{
-                    this.messageRequest(authorId);
+                    this.messageRequest(this.authorId);
+                }
+                if(this.$route.query.type == 'collect'){
+                    this.toCollect();
                 }
             })
-
         },
         methods:{
             // 编辑资料
             toSetting(){
                 this.$emit('index',0);
-                this.$router.push(`/setting/${this.$cookie.get('userId')}`);
+                this.$router.push(`/setting/${this.userId}`);
             },
             // 选项卡切换触发
-            handleClick(tab, event) {
-                console.log(tab, event);
+            handleClick(tab) {
+                console.log(111);
+                // 收藏夹拉取
+                if(tab.index == 2){
+                    this.toCollect();
+                }
             },
             // 数据渲染
             dataShow(userMessage){
@@ -199,6 +249,80 @@
                         this.$message.error('网络异常');
                     }
                 })
+            },
+            // 查询是否已关注
+            // checkFocus(personId,focusList){
+            //     console.log(personId,focusList);
+            //     if(!focusList.length){
+            //         return false;
+            //     }
+            //     var focusStatus = focusList.some((item) => {
+                    
+            //         return item.userId == personId;
+            //     })
+            //     return focusStatus;
+            // },
+            // 关注/取关事件
+            focusClick(focusId){
+                // 检测是否登录
+                if(!this.userId){
+                    this.$message.warning('请先登录');
+                    return;
+                }
+                this.axios.post('/api/util/focus/', {
+                    uid: this.userId,
+                    fuid: focusId
+                })
+                .then((res)=>{
+                    // 取关
+                    let focusObj = this.focusStatusList;
+                    if(res.status == 1){
+                        this.$message.success('取关成功');
+                        delete focusObj[focusId];
+                        this.$store.dispatch('saveFocusStatusList', focusObj);
+                    }else if(res.status == 0){
+                        this.$message.success('关注成功');
+                        focusObj[focusId] = true;
+                        this.$store.dispatch('saveFocusStatusList', focusObj);
+                    }else{
+                        this.$message.error('网络异常');
+                    }
+                })
+
+            },
+            // 收藏夹跳转
+            toCollect(){
+                this.messageName = 'collectList';
+                this.collect = [];
+                this.collectLoading = true;
+                // 收藏夹无内容则直接跳过
+                if(this.collectList.length == 0){
+                    setTimeout(()=>{
+                        this.collectLoading = false;
+                    }, 1000)
+                    return;
+                }
+                this.collectList.forEach((item)=>{
+                    this.axios.get(`/api/article/${item}`)
+                    .then((res)=>{
+                        if(res.status == 0){
+                            let p = this.$Base64.decode(res.data.articleHTML);
+                            // 匹配第一个 p 标签的内容，转换为 HTML 。使用 innerText 提取文字内容。并截取省略
+                            res.data.articleHTML = getPText(p);
+                            this.collect.push(res.data);
+                            this.collectLoading = false;
+                        }else{
+                            this.$message.error('网络异常');
+                        }
+                    })
+                    .catch(()=>{
+                        this.$message.error('网络异常');
+                    })
+                })
+            },
+            toArticle(id){
+                this.$emit('index',0);
+                this.$router.push(`/article/${id}`);
             }
         }
     }
@@ -249,13 +373,7 @@
                         flex-direction: row-reverse;
                         .el-button{
                             padding: 10px 10px;
-                            border: 1px solid #409EFF;
                             font-size: 16px;
-                            color: #409EFF;
-                        }
-                        .focus-button{
-                            border: 1px solid #67c23a;
-                            color: #67c23a;
                         }
                     }
                 }
@@ -267,7 +385,7 @@
                     .el-tab-pane{
                         .content-list{
                             width: 97%;
-                            // min-height: 500px;
+                            min-height: 400px;
                             // border: 1px solid black;
                             .content-listNews{
                                 padding: 18px 0px;
@@ -484,6 +602,13 @@
                             float: right;
                         }
                     }
+                    .collectLi{
+                        cursor: pointer;
+                        &:hover{
+                            color: #5f5f5f;
+                        }
+                    }
+                    
                 }
             }
         }
