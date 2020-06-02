@@ -199,6 +199,9 @@
                 }
                 if(this.$route.query.type == 'collect'){
                     this.toCollect();
+                }else if(this.$route.query.type == 'focus'){
+                    this.messageName='focusList';
+                    this.focusName='focus';
                 }
             })
         },

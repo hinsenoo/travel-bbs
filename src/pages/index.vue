@@ -194,9 +194,9 @@
                         </div>
                         <div class="news">
                             <ul>
-                                <li><a href="javascript:;">我的全部文章<span>{{articleCount}}</span></a></li>
-                                <li><a href="javascript:;">我的收藏夹<span>{{collectCount}}</span></a></li>
-                                <li><a href="javascript:;">我的关注<span>{{focusCount}}</span></a></li>
+                                <li><a href="javascript:;" @click="$router.replace({ name: 'personal', params: { id: userId }});">我的全部文章<span>{{articleCount}}</span></a></li>
+                                <li><a href="javascript:;" @click="$router.push(`/personal/${userId}?type=collect`);">我的收藏夹<span>{{collectCount}}</span></a></li>
+                                <li><a href="javascript:;" @click="$router.push(`/personal/${userId}?type=focus`);">我的关注<span>{{focusCount}}</span></a></li>
                             </ul>
                         </div>
                     </div>
@@ -260,6 +260,7 @@
                                 '/imgs/slideshow/7.jpg',],
                 photoUrl: '/imgs/demo/3.jpg', // 文章图片
                 hotList: [],    // 热门文章列表
+                userId: 0
             }
         },
         computed: {
@@ -300,6 +301,7 @@
             // ...mapState(['username','cartCount'])
         },
         mounted(){
+            this.userId = this.$Base64.decode(this.$cookie.get('userId'));
             this.$emit('index',1);
             // 拉取热门文章，暂时用获取文章接口
             this.axios.get(`/api/article/123`)

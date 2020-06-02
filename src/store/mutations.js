@@ -17,4 +17,9 @@ export default {
         // 改变状态，state 中的数据
         state.focusStatusList = newObject;
     },
+    saveCollectList(state,collectList){
+        // 改变状态，state 中的数据
+        state.focusStatusList.collect = collectList;
+    },
+
 }

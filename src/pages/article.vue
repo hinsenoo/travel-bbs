@@ -25,7 +25,7 @@
                     <div class="article-good">
                         <div class="good">
                             <div class="icon"><img src="/imgs/icons/good-article.png" alt=""></div>
-                            <span>{{articleGoodCount}} 人点赞</span>
+                            <span>{{articleGood.length}} 人点赞</span>
                         </div>
                         <div class="good">
                             <div class="icon"><img src="/imgs/icons/collect-article.png" alt=""></div>
@@ -193,12 +193,12 @@
             </div>
             <!-- 悬浮按钮 -->
             <div class="fixed">
-                <div class="icon" @click="goodShow=!goodShow">
-                    <a v-show="!goodShow" class="icon-good" href="javascript:;">
-                        <span>{{articleGoodCount}}</span>
+                <div class="icon" @click="goodClick">
+                    <a v-show="!goodStatus" class="icon-good" href="javascript:;">
+                        <span>{{articleGood.length}}</span>
                     </a>
-                    <a v-show="goodShow" class="icon-goodClick" href="javascript:;">
-                        <span>{{articleGoodCount}}</span>
+                    <a v-show="goodStatus" class="icon-goodClick" href="javascript:;">
+                        <span>{{articleGood.length}}</span>
                     </a>
                 </div>
                 <div class="icon">
@@ -223,7 +223,7 @@
             return {
                 circleUrl: "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png",
                 // 是否已点赞
-                goodShow: false,
+                goodStatus: false,
                 // 收藏状态
                 collectStatus: false,
                 // 评论框
@@ -247,7 +247,7 @@
                 articleCreateTime: 0,
                 editTime: 0,
                 articleReadCount: 0,
-                articleGoodCount: 0,
+                articleGood: 0,
                 comment: [],
                 // 是否为本人
                 isSelf: false,
@@ -261,7 +261,7 @@
         mounted(){
             this.articleId = Number(this.$route.params.id);
             this.userId = this.$Base64.decode(this.$cookie.get('userId'));
-            this.axios.get(`/api/article/${this.articleId}`)
+            this.axios.get(`http://mock-api.com/9n6qEdgV.mock/article/${this.articleId}`)
             .then((res)=>{
                 if(res.status == 0){
                     let data = res.data;
@@ -279,7 +279,7 @@
                         }
                     }else{
                         // 获取用户数据
-                        this.axios.get(`/api/user/${this.authorId}`)
+                        this.axios.get(`http://mock-api.com/9n6qEdgV.mock/user/${this.authorId}`)
                         .then((res)=>{
                             if(Object.hasOwnProperty.call(res,'status') && res.status == 0){
                                 // 渲染用户数据
@@ -290,12 +290,6 @@
                         })
                     }
                 
-                    // 匹配用户是否收藏
-                    if(this.$store.state.loginStatus){
-                        if(this.$store.state.userMessage.collect.indexOf(this.articleId) > -1){
-                            this.collectStatus = true;
-                        }
-                    }
 
                     // 渲染文章数据
                     this.title = data.title;
@@ -308,8 +302,38 @@
                     this.articleCreateTime = formatDayTime(data.editTime).first;
                     this.editTime = formatDayTime(data.editTime).first;
                     this.articleReadCount = data.articleRead;
-                    this.articleGoodCount = data.good;
-                    this.comment = data.comment;
+                    this.articleGood = data.good;
+
+                    // 评论拼接
+                    data.comment.forEach(item => {
+                        this.axios.post('http://mock-api.com/9n6qEdgV.mock/article/queryReply',{
+                            userId: 19,
+                            commentId: 1
+                        })
+                        .then((res)=>{
+                            if(res.status == 0){
+                                item['reply'] = res.data;
+                                
+                            }
+                            this.comment = data.comment;
+                        })
+                    });
+
+
+                    // 匹配用户是否收藏
+                    if(this.$store.state.loginStatus){
+                        if(this.$store.state.userMessage.collect.indexOf(this.articleId) > -1){
+                            this.collectStatus = true;
+                        }
+                    }
+
+                    // 匹配用户是否点赞
+                    if(this.$store.state.loginStatus){
+                        console.log(this.articleGood);
+                        if(this.articleGood.indexOf(this.articleId) > -1){
+                            this.goodStatus = true;
+                        }
+                    }
                 }else{
                     this.$message.error('文章获取失败，请重试');
                 }
@@ -327,19 +351,20 @@
                 this.userArticleCount = data.articleCount;
             },
             toTime(timestamp) {
+                console.log(timestamp);
                 return timestampToTime(timestamp);
             },
             showReplyBox(id,index,show){
                 if(id == 'reply'){
                     // 一级回复显示
                     if(show){
-                        this.$refs.reply[index].style.height = '100px';
+                        this.$refs.reply[index].style.height = '110px';
                     }else{
                         this.$refs.reply[index].style.height = '0';
                     }
                 }else{
                     if(show){
-                        this.$refs['replyInside' + index][0].style.height = '100px';
+                        this.$refs['replyInside' + index][0].style.height = '110px';
                     }else{
                         this.$refs['replyInside' + index][0].style.height = '0';
                     }
@@ -380,17 +405,51 @@
                     this.$message.warning('请先登录');
                     return;
                 }
+                let collect = this.$store.state.userMessage.collect;
                 this.axios.post('/api/util/collect', {
                     uid: this.userId,
                     aid: this.articleId
                 })
                 .then((res)=>{
                     if(res.status == 0){
-                        this.$message.success('收藏成功');
+                        // this.$message.success('收藏成功');
+                        collect.push(this.articleId);
                         this.collectStatus = true;
                     }else if(res.status == 1){
-                        this.$message.success('取消收藏成功');
+                        // this.$message.success('取消收藏成功');
+                        let index = collect.indexOf(this.articleId); 
+                        if (index > -1) { 
+                            collect.splice(index, 1); 
+                        } 
                         this.collectStatus = false;
+                    }else{
+                        this.$message.error('网络异常');
+                    }
+                    this.$store.dispatch('saveCollectList',collect);
+                })
+            },
+            goodClick(){
+                // 检测是否登录
+                if(!this.userId){
+                    this.$message.warning('请先登录');
+                    return;
+                }
+                this.axios.post('/api/util/good', {
+                    uid: this.userId,
+                    arid: this.articleId
+                })
+                .then((res)=>{
+                    if(res.status == 0){
+                        // this.$message.success('点赞成功');
+                        this.articleGood.push(this.articleId);
+                        this.goodStatus = true;
+                    }else if(res.status == 1){
+                        // this.$message.success('取消点赞成功');
+                        let index = this.articleGood.indexOf(this.articleId); 
+                        if (index > -1) { 
+                            this.articleGood.splice(index, 1); 
+                        } 
+                        this.goodStatus = false;
                     }else{
                         this.$message.error('网络异常');
                     }
@@ -551,7 +610,7 @@
                     }
                     // 评论
                     .commentBox{
-                        margin: 10px 19px 0 58px;
+                        margin: 15px 19px 0 58px;
                         display: flex;
                         a{
                             color: black;
@@ -564,7 +623,7 @@
                             width: 100%;
                             font-size: 14px;
                             border-bottom: 1px solid #e5e5e5;
-                            padding-bottom: 20px;
+                            // padding-bottom: 10px;
                             p{
                                 margin: 8px 0 13px 0;
                             }
@@ -598,10 +657,10 @@
                                 box-sizing: border-box;
                                 height: 0;
                                 padding-right: 25px;
-                                margin-bottom: 10px;
                                 overflow: hidden;
                                 transition: all 0.5s;
                                 .reply-comment{
+                                    // margin-top: 10px;
                                     margin-bottom: 10px;
                                 }
                                 .reply-button{
@@ -613,6 +672,7 @@
                                 margin: 0;
                                 padding: 15px 15px;
                                 background-color: #fafbfc;
+                                margin-bottom: 10px;
                                 .commentMessage{
                                     border-bottom: 0;
                                     padding-bottom: 0;
@@ -623,7 +683,7 @@
                                     }
                                     .date{
                                         margin: 0;
-                                        margin-bottom: 10px;
+                                        // margin-bottom: 10px;
                                     }
                                 }
                             }

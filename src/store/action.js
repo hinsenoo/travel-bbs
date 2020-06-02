@@ -20,5 +20,11 @@ export default {
         // 一个与 store 实例具有相同方法和属性的 context
         // 传递给 mutations
         context.commit('saveFocusStatusList',focusStatusList);
+    },
+    // 更新收藏状态
+    saveCollectList(context,collectList){
+        // 一个与 store 实例具有相同方法和属性的 context
+        // 传递给 mutations
+        context.commit('saveCollectList',collectList);
     }
 }

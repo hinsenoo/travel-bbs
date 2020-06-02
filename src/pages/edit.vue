@@ -283,10 +283,10 @@ import editor from '../components/Editor'
             handleCommand(command) {
                 switch (command) {
                     case 'personal':
-                        this.$router.push(`/personal/${this.$Base64.decode(this.$cookie.get('userId'))}`);
+                        this.$router.replace({ name: 'personal', params: { id: this.userId }});
                         break;
                     case 'collect':
-                        this.$router.push(`/personal/${this.$Base64.decode(this.$cookie.get('userId'))}`);
+                        this.$router.push(`/personal/${this.userId}?type=collect`);
                         break;
                     case 'setting':
                         this.$router.push(`/setting/${this.$Base64.decode(this.$cookie.get('userId'))}`);
