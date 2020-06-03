@@ -22,11 +22,11 @@
             <div class="header-user">
                 <div class="user">
                     <div class="register" v-if="!loginStatus">
-                        <a href="javascript:;" @click="modalShow('login')"><i class="el-icon-edit-outline"></i>发帖子</a>
+                        <a href="javascript:;" @click="modalShow(1)"><i class="el-icon-edit-outline"></i>发帖子</a>
                         <i>|</i>
-                        <a href="javascript:;" @click="modalShow('login')">登录</a>
+                        <a href="javascript:;" @click="modalShow(1)">登录</a>
                         ·
-                        <a href="javascript:;" @click="modalShow('register')">注册</a>
+                        <a href="javascript:;" @click="modalShow(2)">注册</a>
                     </div>
                     <div class="person" v-if="loginStatus">
                         <el-button type="primary" size="mini" icon="el-icon-edit-outline" @click="$router.push('/edit/write')">发帖子</el-button>
@@ -60,7 +60,7 @@
                             <el-input v-model="username" placeholder="请输入用户名"></el-input>
                             <el-input placeholder="请输入密码" v-model="password" show-password></el-input>
                             <el-button @click="login" type="primary" :loading="waitRequest">登录</el-button>
-                            <div class="other">没有账号？<span @click="modalType='register'">注册</span></div>
+                            <div class="other">没有账号？<span @click="$store.dispatch('saveLoginModal', 2);">注册</span></div>
                         </div>
                         <div class="content-login" v-show="modalType=='register'">
                             <el-input v-model="registerName" placeholder="请输入用户名"></el-input>
@@ -68,7 +68,7 @@
                             <el-input placeholder="请输入密码（不少于6位）" v-model="registerPw" show-password></el-input>
                             <el-input placeholder="再次输入密码" v-model="registerPw2" show-password></el-input>
                             <el-button @click="register" type="success" :loading="waitRequest">注册</el-button>
-                            <div class="other">已有账号？<span @click="modalType='login'">登录</span></div>
+                            <div class="other">已有账号？<span @click="$store.dispatch('saveLoginModal', 1)">登录</span></div>
                         </div>
                     </div>
                 </div>
@@ -88,8 +88,8 @@
             return {
                 input: '', 
                 isFixed: false, // 吸顶状态
-                showModal: false, // 弹框显示
-                modalType: 'login', // 弹框类型
+                // showModal: false, // 弹框显示
+                // modalType: 'login', // 弹框类型
                 waitRequest: false,
                 username: '',
                 password: '',
@@ -109,6 +109,17 @@
             loginStatus(){
                 return this.$store.state.loginStatus;
             },
+            // 登录状态
+            showModal(){
+                return this.$store.state.loginModal == 0 ? false : true;
+            },
+            modalType(){
+                if(this.$store.state.loginModal == 1){
+                    return 'login';
+                }else {
+                    return this.$store.state.loginModal == 0 ? ' ' : 'register';
+                }
+            }
             // cartCount(){
             //     return this.$store.state.cartCount;
             // }, 
@@ -238,7 +249,7 @@
                 .then((res)=>{
                     if(res.status == 0){
                         this.$message.success('注册成功，请登录');
-                        this.modalType='login';
+                        this.$store.dispatch('saveLoginModal', 1);
                     }else if(res.status == 1){
                         this.$message.error(res.msg);
                     }
@@ -247,13 +258,13 @@
             },
             // 显示弹框
             modalShow(type){
-                this.modalType = type;
-                this.showModal = true;
+                // this.modalType = type;
+                this.$store.dispatch('saveLoginModal', type);
             },
             // 关闭弹框
             closeModal(){
-                this.modalType = '';
-                this.showModal = false;
+                // this.modalType = '';
+                this.$store.dispatch('saveLoginModal', 0);
                 this.waitRequest = false;
             },
             // 跳转到个人主页

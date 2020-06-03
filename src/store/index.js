@@ -10,10 +10,11 @@ const state ={
     // 用户信息
     userMessage: {},
     loginStatus: false,
-    focusStatusList: {}
+    focusStatusList: {},
+    loginModal: '0'
 }
 export default new Vuex.Store({
     state,
-    mutations,
-    actions
+    actions,
+    mutations
 })

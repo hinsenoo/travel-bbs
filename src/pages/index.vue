@@ -188,7 +188,7 @@
                                             {{goodCount}}
                                         </span>
                                     </div>
-                                    <div class="time">注册时长: {{registerTime}} 年</div>
+                                    <div class="time">注册了: {{registerTime}} 年</div>
                                 </div>
                             </a>
                         </div>

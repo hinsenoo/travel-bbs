@@ -26,5 +26,11 @@ export default {
         // 一个与 store 实例具有相同方法和属性的 context
         // 传递给 mutations
         context.commit('saveCollectList',collectList);
-    }
+    },
+    // 登录模态框
+    saveLoginModal(context,loginModal){
+        // 一个与 store 实例具有相同方法和属性的 context
+        // 传递给 mutations
+        context.commit('saveLoginModal',loginModal);
+    },
 }

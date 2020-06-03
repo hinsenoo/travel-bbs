@@ -229,7 +229,7 @@
                     this.authorAvator = userMessage.userAvatar;
                     this.collectCount = userMessage.collect.length;
                     this.goodCount = userMessage.goodCount || 0;
-                    this.readCount = userMessage.articleCount;
+                    this.readCount = userMessage.articleReadCount;
                     this.articleCount = userMessage.articleCount;
                     this.focus = userMessage.focus.length;
                     this.focusList = userMessage.focus;

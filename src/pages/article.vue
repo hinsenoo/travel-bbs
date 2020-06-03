@@ -38,13 +38,13 @@
                         
                     </div>
                     <div class="article-userAgain">
-                        <div class="message">
+                        <a class="message" href="javascript:;" @click="$router.push(`/personal/${authorId}`)">
                             <el-avatar size="large" :src="userAvatar"></el-avatar>
                             <div class="box">
                                 <div class="user-name">{{nickName}}</div>
                                 <div class="create-time">发布了 {{userArticleCount}} 篇文章 · 获得点赞 {{userGoodCount}} · 获得阅读 {{userReadCount}}</div>
                             </div>
-                        </div>
+                        </a>
                         <el-button v-if="!isSelf && !focusStatusList[authorId]" @click="focusClick(authorId)" type="success" plain size="small">+ 关注</el-button>
                         <el-button v-if="!isSelf && focusStatusList[authorId]" @click="focusClick(authorId)" type="success" size="small">已关注</el-button>
                         <el-button v-if="isSelf" @click="$router.push(`/setting/${userId}`)" type="primary" size="small" plain>编辑</el-button>
@@ -54,25 +54,25 @@
                     <div class="title">评论</div>
                     <div class="comment">
                         <div class="commentInput">
-                            <el-avatar :size="40" :src="userAvatar"></el-avatar>
+                            <el-avatar :size="40" :src="loginAvatar"></el-avatar>
                             <el-input v-model="commentInput" 
                             type="textarea"
                             :rows="2"
                             placeholder="输入评论..."
-                            @focus="$refs.commentButton.style.height = '40px'"></el-input>
+                            @focus="commentFocus"></el-input>
                         </div>
                         <div ref="commentButton" class="commentButton">
-                            <el-button size="small" type="primary" round>发布</el-button>
+                            <el-button size="small" type="primary" round @click="postComment('first')">发布</el-button>
                             <el-button @click="$refs.commentButton.style.height = '0'" size="small" round>取消</el-button>
                         </div>
                     </div>
                     <!-- 一级评论 -->
                     <div class="commentBox" v-for="(item,index) in comment" :key="index">
-                        <a href="javascript:;">
+                        <a href="javascript:;" @click="$router.push(`/personal/${item.userId}`)">
                             <el-avatar :size="40" :src="item.commentAvatar"></el-avatar>
                         </a>
                         <div class="commentMessage">
-                            <a href="javascript:;" @click="$router.push(`/personal/${item.commentId}`)">{{item.commentName}}</a>
+                            <a href="javascript:;" @click="$router.push(`/personal/${item.userId}`)">{{item.commentName}}</a>
                             <p>{{item.commentContent}}</p>
                             <div class="date">
                                 <span class="time">{{toTime(item.commentTime)}}</span>
@@ -82,20 +82,20 @@
                             <!-- 一级评论内回复框 -->
                             <div class="reply" ref="reply">
                                 <div class="reply-comment">
-                                    <el-input v-model="commentInput" 
+                                    <el-input v-model="replyInput" 
                                     type="textarea"
                                     :rows="2"
                                     placeholder="输入评论..."
                                     ></el-input>
                                 </div>
                                 <div class="reply-button">
-                                    <el-button size="small" type="primary" round>发布</el-button>
+                                    <el-button size="small" type="primary" round @click="postComment('second',item.commentId,item.commentName,item.userId,1)">发布</el-button>
                                     <el-button @click="showReplyBox('reply',index,false)" size="small" round>取消</el-button>
                                 </div>
                             </div>
                             <!-- 二级评论 -->
                             <div class="commentBox inside"  v-for="(replyItem,replyIndex) in item.reply" :key="replyIndex">
-                                <a href="javascript:;">
+                                <a href="javascript:;" @click="$router.push(`/personal/${replyItem.replyId}`)">
                                     <el-avatar :size="40" :src="replyItem.replyAvatar"></el-avatar>
                                 </a>
                                 <div class="commentMessage">
@@ -112,14 +112,14 @@
                                     <!-- 评论内回复框 -->
                                     <div class="reply" :ref="'replyInside' + index + replyIndex">
                                         <div class="reply-comment">
-                                            <el-input v-model="commentInput" 
+                                            <el-input v-model="replyInsideInput" 
                                             type="textarea"
                                             :rows="2"
                                             placeholder="输入评论..."
                                             ></el-input>
                                         </div>
                                         <div class="reply-button">
-                                            <el-button size="small" type="primary" round>发布</el-button>
+                                            <el-button size="small" type="primary" round @click="postComment('second',item.commentId,replyItem.replyName,replyItem.replyId,2)">发布</el-button>
                                             <el-button @click="showReplyBox('replyInside',index+''+replyIndex,false)" size="small" round>取消</el-button>
                                         </div>
                                     </div>
@@ -202,7 +202,7 @@
                     </a>
                 </div>
                 <div class="icon">
-                    <a class="icon-comment" href="#comment">
+                    <a class="icon-comment" href="javascript:;" @click="returnCom">
                         <span>{{comment.length || 0}}</span>
                     </a>
                 </div>
@@ -226,8 +226,11 @@
                 goodStatus: false,
                 // 收藏状态
                 collectStatus: false,
-                // 评论框
+                // 评论框内容
                 commentInput: '',
+                // 回复框内容
+                replyInput: '',
+                replyInsideInput: '',
                 // 用户信息
                 userId: 0,
                 nickName: '',
@@ -256,12 +259,22 @@
         computed:{
             focusStatusList(){
                 return this.$store.state.focusStatusList;
+            },
+            loginStatus(){
+                return this.$store.state.loginStatus;
+            },
+            loginAvatar(){
+                if(!this.$store.state.userMessage.userAvatar){
+                    return 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png';
+                }else{
+                    return this.$store.state.userMessage.userAvatar;
+                }
             }
         },
         mounted(){
             this.articleId = Number(this.$route.params.id);
-            this.userId = this.$Base64.decode(this.$cookie.get('userId'));
-            this.axios.get(`http://mock-api.com/9n6qEdgV.mock/article/${this.articleId}`)
+            this.userId = Number(this.$Base64.decode(this.$cookie.get('userId')));
+            this.axios.get(`/api/article/${this.articleId}`)
             .then((res)=>{
                 if(res.status == 0){
                     let data = res.data;
@@ -279,7 +292,7 @@
                         }
                     }else{
                         // 获取用户数据
-                        this.axios.get(`http://mock-api.com/9n6qEdgV.mock/user/${this.authorId}`)
+                        this.axios.get(`/api/user/${this.authorId}`)
                         .then((res)=>{
                             if(Object.hasOwnProperty.call(res,'status') && res.status == 0){
                                 // 渲染用户数据
@@ -305,19 +318,7 @@
                     this.articleGood = data.good;
 
                     // 评论拼接
-                    data.comment.forEach(item => {
-                        this.axios.post('http://mock-api.com/9n6qEdgV.mock/article/queryReply',{
-                            userId: 19,
-                            commentId: 1
-                        })
-                        .then((res)=>{
-                            if(res.status == 0){
-                                item['reply'] = res.data;
-                                
-                            }
-                            this.comment = data.comment;
-                        })
-                    });
+                    this.addComment(data.comment);
 
 
                     // 匹配用户是否收藏
@@ -329,8 +330,7 @@
 
                     // 匹配用户是否点赞
                     if(this.$store.state.loginStatus){
-                        console.log(this.articleGood);
-                        if(this.articleGood.indexOf(this.articleId) > -1){
+                        if(this.articleGood.indexOf(this.userId) > -1){
                             this.goodStatus = true;
                         }
                     }
@@ -340,6 +340,7 @@
             })
         },
         methods:{
+            // 渲染用户数据
             messageShow(data){
                 // 渲染用户数据
                 this.nickName = data.nickName;
@@ -351,10 +352,21 @@
                 this.userArticleCount = data.articleCount;
             },
             toTime(timestamp) {
-                console.log(timestamp);
                 return timestampToTime(timestamp);
             },
+            // 评论跳转
+            returnCom(){
+                const returnEle = document.querySelector("#comment");
+                if(returnEle){
+                    returnEle.scrollIntoView();
+                }
+            },
+            // 二级评论框
             showReplyBox(id,index,show){
+                // 登录校验
+                if(!this.checkLogin()){
+                    return;
+                }
                 if(id == 'reply'){
                     // 一级回复显示
                     if(show){
@@ -364,7 +376,7 @@
                     }
                 }else{
                     if(show){
-                        this.$refs['replyInside' + index][0].style.height = '110px';
+                        this.$refs['replyInside' + index][0].style.height = '100px';
                     }else{
                         this.$refs['replyInside' + index][0].style.height = '0';
                     }
@@ -400,9 +412,8 @@
             },
             // 收藏事件
             collectClick(){
-                // 检测是否登录
-                if(!this.userId){
-                    this.$message.warning('请先登录');
+                // 登录校验
+                if(!this.checkLogin()){
                     return;
                 }
                 let collect = this.$store.state.userMessage.collect;
@@ -428,10 +439,10 @@
                     this.$store.dispatch('saveCollectList',collect);
                 })
             },
+            // 点赞事件
             goodClick(){
-                // 检测是否登录
-                if(!this.userId){
-                    this.$message.warning('请先登录');
+                // 登录校验
+                if(!this.checkLogin()){
                     return;
                 }
                 this.axios.post('/api/util/good', {
@@ -441,11 +452,11 @@
                 .then((res)=>{
                     if(res.status == 0){
                         // this.$message.success('点赞成功');
-                        this.articleGood.push(this.articleId);
+                        this.articleGood.push(this.userId);
                         this.goodStatus = true;
                     }else if(res.status == 1){
                         // this.$message.success('取消点赞成功');
-                        let index = this.articleGood.indexOf(this.articleId); 
+                        let index = this.articleGood.indexOf(this.userId); 
                         if (index > -1) { 
                             this.articleGood.splice(index, 1); 
                         } 
@@ -454,6 +465,100 @@
                         this.$message.error('网络异常');
                     }
                 })
+            },
+            // 评论聚焦
+            commentFocus(){
+                if(this.checkLogin()){
+                    this.$refs.commentButton.style.height = '40px';
+                }
+            },
+            // 无登录则弹框
+            checkLogin(){
+                if(!this.loginStatus){
+                    console.log(111);
+                    this.$store.dispatch('saveLoginModal', 1);
+                    return false;
+                }
+                return true;
+            },
+            postComment(level,commentId,toName,toId,index){
+                let commentName = this.$store.state.userMessage.nickName;
+                if(level == 'first'){
+                    this.axios.post('/api/util/comment',{
+                        level: 'first',
+                        articleId: this.articleId,
+                        commentName: commentName,
+                        userId: this.userId,
+                        commentAvatar: this.loginAvatar,
+                        commentContent: this.commentInput,
+                        replyStatus: false,
+                        commentTime: new Date().getTime()
+                    })
+                    .then((res)=>{
+                        if(res.status == 0){
+                            this.$message.success(res.msg);
+                            this.axios.get(`/api/article/${this.articleId}`)
+                            .then((res)=>{
+                                this.addComment(res.data.comment);
+                                this.commentInput = '';
+                                this.$refs.commentButton.style.height = '0px';
+                            })
+                        }else{
+                            this.$message.error(res.msg);
+                        }
+                    })
+                }else{
+                    let replyContent;
+                    if(index == 2){
+                        replyContent = this.replyInsideInput
+                    }else{
+                        replyContent = this.replyInput;
+                    }
+                    // 二级评论上传
+                    this.axios.post('/api/util/comment',{
+                        level: 'second',
+                        commentId: commentId,
+                        replyId: this.userId,
+                        replyName: commentName,
+                        replyAvatar: this.loginAvatar,
+                        replyContent: replyContent,
+                        toName: toName, 
+                        toId: toId,
+                        replyTime: new Date().getTime()
+                    })
+                    .then((res)=>{
+                        if(res.status == 0){
+                            this.$message.success(res.msg);
+                            this.axios.get(`/api/article/${this.articleId}`)
+                            .then((res)=>{
+                                console.log(res.data.comment);
+                                this.addComment(res.data.comment);
+                                this.replyInput = '';
+                                this.replyInsideInput = '';
+                            })
+                        }else{
+                            this.$message.error(res.msg);
+                        }
+                    })
+                }
+            },
+            // 评论拼接
+            addComment(comment){
+                // 评论拼接
+                comment.forEach((item,index) => {
+                    // 若存在二级评论，则拼接
+                    if(item.replyStatus != '0'){
+                        this.axios.get(`/api/article/queryReply/${item.commentId}`)
+                        .then((res)=>{
+                            if(res.status == 0){
+                                item['reply'] = res.data;
+                            }
+                            // 响应式
+                            this.$set(this.comment, index, item);
+                        })
+                    }
+                });
+                this.comment = comment;
             }
         }
     }
@@ -683,7 +788,7 @@
                                     }
                                     .date{
                                         margin: 0;
-                                        // margin-bottom: 10px;
+                                        margin-bottom: 10px;
                                     }
                                 }
                             }

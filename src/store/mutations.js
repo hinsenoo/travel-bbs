@@ -21,5 +21,9 @@ export default {
         // 改变状态，state 中的数据
         state.focusStatusList.collect = collectList;
     },
+    saveLoginModal(state,loginModal){
+        // 改变状态，state 中的数据
+        state.loginModal = loginModal;
+    },
 
 }
