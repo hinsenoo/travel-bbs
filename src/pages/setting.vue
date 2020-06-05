@@ -2,7 +2,7 @@
     <div class="setting">
         <div class="container">
             <div class="content">
-                <el-tabs v-model="activeName" @tab-click="handleClick">
+                <el-tabs v-model="activeName">
                     <el-tab-pane label="个人资料" name="first">
                         <div class="box">
                             <ul>
@@ -114,11 +114,7 @@
             }
         },
         methods: {
-            handleClick(tab, event) {
-                console.log(tab, event);
-            },
             handleAvatarSuccess(res, file) {
-                console.log(res, file);
                 this.imageUrl = window.URL.createObjectURL(file.raw);
             },
             uploadPhoto(){

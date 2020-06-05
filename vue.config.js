@@ -20,5 +20,11 @@ module.exports = {
                 },
             }
         }
+    },
+    // 设置 false 加速生产环境构建，压缩 js 代码提高安全性。
+    productionSourceMap: false,
+    // 删除预加载
+    chainWebpack: (config) => {
+        config.plugins.delete('prefetch');
     }
 }

@@ -134,7 +134,6 @@ import editor from '../components/Editor'
         mounted(){
             // 若无登录 则跳转到首页
             if(!this.$store.state.loginStatus){
-                console.log(11);
                 this.$router.push(`/`);
             }
             this.pageType = this.$route.params.id;
@@ -208,12 +207,14 @@ import editor from '../components/Editor'
                     errMsg = '请上传标题图片';
                 }else if(!this.category){
                     errMsg = '请选择文章分类';
+                }else if(!this.place){
+                    errMsg = '请输入游玩位置';
                 }else if(!this.articleHTML){
                     errMsg = '请输入文章内容';
                 }
                 if(errMsg){
                     this.$message.error(errMsg);
-                    // return;
+                    return;
                 }
                 // let str = `<p data-v-59a318e4="" data-v-e18b6dc6="">今天我休息，爱好户外的人经常休而不息。望着窗外黑黢黢的天空，听着空中呼呼作响的风声，心中忐忑不定，预定的计划还能成行吗?真是“山雨欲来风满楼”。&nbsp;</p><p data-v-59a318e4="" data-v-e18b6dc6=""><img src="http://image1.8264.com/wen/public/20200527/1590559216549jpg" style="max-width: 100%;"></p><p data-v-59a318e4="" data-v-e18b6dc6="">&nbsp;想起阿杰兄弟，跑马拉松的，挑战自我，成绩一年比一年提高，42公里用时3小时40分钟。难道说我二个轮子比不过二条腿吗?说滚就滚，启动百公里骑行北太湖的行程，出发。<br></p><p data-v-59a318e4="" data-v-e18b6dc6=""><img src="http://image1.8264.com/wen/public/20200527/1590559218226jpg" style="max-width:100%;"><br></p><p data-v-59a318e4="" data-v-e18b6dc6="">说起这条线路，小伙伴们一定不会陌生:炎炎烈日下，我们一行6人冒着35度的高温，从沙墩港大桥开始徒步，到苏州湿地公园终止，用双脚丈量了北太湖大道30公里。当时，道路正在修缮中，路边是裸露的土地，大型机械正在隆隆施工。这么些年过去了，旧地重游，究竟发生了哪些变化呢?&nbsp;</p><p data-v-59a318e4="" data-v-e18b6dc6=""><img src="http://image1.8264.com/wen/public/20200527/1590559219793jpg" style="max-width: 100%;">&nbsp;<br></p>`;
 

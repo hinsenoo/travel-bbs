@@ -21,34 +21,43 @@
                     <el-tabs v-model="messageName" @tab-click="handleClick">
                         <el-tab-pane label="文章" name="news">
                             <div class="content-list">
-                                <div class="content-listNews">
+                                <div class="content-listNews"  v-for="(item, index) in articleList" :key="index">
                                     <div>
                                         <ul class="meta">
-                                            <li class="categroy"><a href="javascript:;">游记</a></li>
-                                            <li class="author"><a href="javascript:;">不爱拍照的_腊肉</a></li>
-                                            <li>1000人浏览</li>
-                                            <li class="area">西藏</li>
+                                            <li class="categroy"><a href="javascript:;">{{item.category}}</a></li>
+                                            <li class="author"><a href="javascript:;" @click="$router.push(`/personal/${item.userId}`)">{{item.nickName}}</a></li>
+                                            <li>{{item.articleRead}}人阅读</li>
+                                            <li class="area">{{item.place}}</li>
                                         </ul>
                                     </div>
                                     <!-- 主体内容 -->
                                     <div class="news">
                                         <div class="word">
                                             <div class="title">
-                                                <a href="javascript:;">人生恰似一场永不停止的远足——珠峰东坡大环线</a>
+                                                <a href="javascript:;" @click="toArticle(item.articleId)">{{item.title}}</a>
                                             </div>
                                             <div class="fragment">
-                                                原本2019年计划先墨脱雨林徒步再走珠峰东坡，因为十一这个黄金期要参加闺蜜的婚礼，所以就只能完成其中一个了，刚好看到6月徒步珠峰东坡的贴还蛮多的（刚好看杜鹃花的时候），通过8264，还有qq找了几个同伴......
+                                                {{item.articleHTML}}
                                             </div>
                                         </div>
                                         <div class="photo">
-                                            <img src="/imgs/demo/3.jpg" alt="">
+                                            <img :src="item.titleImgUrl" alt="">
                                         </div>
                                     </div>
                                     <div class="other">
-                                        <div><a href="javascript:;"><img src="/imgs/icons/good2.png" alt="点赞">3</a></div>
-                                        <div><a href="javascript:;"><img src="/imgs/icons/remark2.png" alt="评论">6</a></div>
+                                        <div><a href="javascript:;"><img src="/imgs/icons/good2.png" alt="点赞">{{ (item.good instanceof Array) ? item.good.length : 0}}</a></div>
+                                        <div><a href="javascript:;"><img src="/imgs/icons/remark2.png" alt="评论">{{(item.comment instanceof Array) ? item.good.length : 0 }}</a></div>
                                     </div>
                                 </div>
+                                <!-- 3. 滚动加载
+                                <div class="scroll-more"
+                                    v-infinite-scroll="scrollMore"
+                                    infinite-scroll-disabled="busy"
+                                    infinite-scroll-distance="120"
+                                >
+                                    <img src="/loading/loading-spinning-bubbles.svg" alt="" v-if="showScroll">
+                                    <p v-if="showData">没有更多了</p>
+                                </div> -->
                             </div>
                         </el-tab-pane>
                         <el-tab-pane label="关注" name="focusList">
@@ -107,8 +116,8 @@
                                         </div>
                                     </div>
                                     <div class="other">
-                                        <div><a href="javascript:;"><img src="/imgs/icons/good2.png" alt="点赞">{{item.good.length}}</a></div>
-                                        <div><a href="javascript:;"><img src="/imgs/icons/remark2.png" alt="评论">{{item.comment.length}}</a></div>
+                                        <div><a href="javascript:;"><img src="/imgs/icons/good2.png" alt="点赞">{{ (item.good instanceof Array) ? item.good.length : 0}}</a></div>
+                                        <div><a href="javascript:;"><img src="/imgs/icons/remark2.png" alt="评论">{{(item.comment instanceof Array) ? item.good.length : 0 }}</a></div>
                                     </div>
                                 </div>
                             </div>
@@ -162,6 +171,8 @@
                 goodCount: 0,
                 readCount: 0,
                 articleCount: 0,
+                articleIdList: [], // 文章id列表
+                articleList: [], // 文章列表
                 focus: 0,
                 follower: 0,
                 creatTime: 0,
@@ -181,7 +192,6 @@
             }
         },
         mounted(){
-            console.log(this.$route);
             this.$nextTick(()=>{
                 this.userId = this.$Base64.decode(this.$cookie.get('userId'));
                 this.authorId = Number(this.$route.params.id);
@@ -189,20 +199,15 @@
                 if(this.authorId == this.userId){
                     // 是则为可编辑
                     this.isSelf = true;
-                    if(Object.hasOwnProperty.call(this.$store.state.userMessage,'collect')){
-                        this.dataShow(this.$store.state.userMessage);
-                    }else{
-                        this.messageRequest(this.authorId);
-                    }
-                }else{
-                    this.messageRequest(this.authorId);
                 }
+                this.messageRequest(this.authorId);
                 if(this.$route.query.type == 'collect'){
                     this.toCollect();
                 }else if(this.$route.query.type == 'focus'){
                     this.messageName='focusList';
                     this.focusName='focus';
                 }
+                
             })
         },
         methods:{
@@ -213,7 +218,6 @@
             },
             // 选项卡切换触发
             handleClick(tab) {
-                console.log(111);
                 // 收藏夹拉取
                 if(tab.index == 2){
                     this.toCollect();
@@ -230,13 +234,30 @@
                     this.collectCount = userMessage.collect.length;
                     this.goodCount = userMessage.goodCount || 0;
                     this.readCount = userMessage.articleReadCount;
-                    this.articleCount = userMessage.articleCount;
+                    this.articleCount = userMessage.articleCount.length;
+                    this.articleIdList = userMessage.articleCount;
                     this.focus = userMessage.focus.length;
                     this.focusList = userMessage.focus;
                     this.followerList = userMessage.follower;
                     this.collectList = userMessage.collect;
                     this.follower = userMessage.follower.length;
                     this.creatTime = formatDayTime(userMessage.createTime).second;
+
+                    // 获取文章
+                    if(this.articleIdList.length != 0){
+                        this.articleIdList.forEach((item) => {
+                            this.axios.get(`/api/article/${item}`)
+                            .then((res)=>{
+                                if(res.status == 0){
+                                    let p = this.$Base64.decode(res.data.articleHTML);
+                                    res.data.articleHTML = getPText(p);
+                                    this.articleList.push(res.data);
+                                }else{
+                                    this.$message.error('网络异常');
+                                }
+                            })
+                        })
+                    }
                 }else{
                     this.$message.error('获取用户数据失败');
                     return;
@@ -305,23 +326,23 @@
                     }, 1000)
                     return;
                 }
-                this.collectList.forEach((item)=>{
-                    this.axios.get(`/api/article/${item}`)
-                    .then((res)=>{
-                        if(res.status == 0){
-                            let p = this.$Base64.decode(res.data.articleHTML);
-                            // 匹配第一个 p 标签的内容，转换为 HTML 。使用 innerText 提取文字内容。并截取省略
-                            res.data.articleHTML = getPText(p);
-                            this.collect.push(res.data);
-                            this.collectLoading = false;
-                        }else{
-                            this.$message.error('网络异常');
-                        }
+
+                // 获取收藏列表
+                if(this.collectList.length != 0){
+                    this.collectList.forEach((item) => {
+                        this.axios.get(`/api/article/${item}`)
+                        .then((res)=>{
+                            if(res.status == 0){
+                                let p = this.$Base64.decode(res.data.articleHTML);
+                                res.data.articleHTML = getPText(p);
+                                this.collect.push(res.data);
+                                this.collectLoading = false;
+                            }else{
+                                this.$message.error('网络异常');
+                            }
+                        })
                     })
-                    .catch(()=>{
-                        this.$message.error('网络异常');
-                    })
-                })
+                }
             },
             toArticle(id){
                 this.$emit('index',0);
@@ -440,7 +461,7 @@
                                     width: 95%;
                                     display: flex;
                                     justify-content: space-between;
-                                    margin-bottom: 20px;
+                                    margin-bottom: 10px;
                                     .word{
                                         flex: 2;
                                         margin-right: 20px;

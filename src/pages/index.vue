@@ -7,7 +7,7 @@
                 <div class="slideshow">
                     <el-carousel height="300px">
                         <el-carousel-item v-for="(item,index) in slideshowList" :key="index">
-                            <img v-lazy="item" alt="slideshow">
+                            <img :src="item" alt="slideshow">
                         </el-carousel-item>
                     </el-carousel>
                 </div>
@@ -15,7 +15,8 @@
                 <div class="content">
                     <el-tabs v-model="activeName" @tab-click="handleClick">
                         <el-tab-pane label="热门" name="hot">
-                            <div class="content-list">
+                            <div class="content-list" 
+                            >
                                 <div class="content-listNews"  v-for="(item, index) in hotList" :key="index">
                                     <div>
                                         <ul class="meta">
@@ -40,129 +41,60 @@
                                         </div>
                                     </div>
                                     <div class="other">
-                                        <div><a href="javascript:;"><img src="/imgs/icons/good2.png" alt="点赞">{{item.good.length}}</a></div>
-                                        <div><a href="javascript:;"><img src="/imgs/icons/remark2.png" alt="评论">{{item.comment.length}}</a></div>
+                                        <div><a href="javascript:;"><img src="/imgs/icons/good2.png" alt="点赞">{{ (item.good instanceof Array) ? item.good.length : 0}}</a></div>
+                                        <div><a href="javascript:;"><img src="/imgs/icons/remark2.png" alt="评论">{{(item.comment instanceof Array) ? item.good.length : 0 }}</a></div>
                                     </div>
                                 </div>
-                            </div>
-                        </el-tab-pane>
-                        <el-tab-pane label="关注" name="focus">
-                            <div class="content-list">
-                                <div class="content-listNews">
-                                    <div>
-                                        <ul class="meta">
-                                            <li class="categroy"><a href="javascript:;">游记</a></li>
-                                            <li class="author"><a href="javascript:;">不爱拍照的_腊肉</a></li>
-                                            <li>1000人浏览</li>
-                                            <li class="area">西藏</li>
-                                        </ul>
-                                    </div>
-                                    <!-- 主体内容 -->
-                                    <div class="news">
-                                        <div class="word">
-                                            <div class="title">
-                                                <a href="javascript:;">人生恰似一场永不停止的远足——珠峰东坡大环线</a>
-                                            </div>
-                                            <div class="fragment">
-                                                原本2019年计划先墨脱雨林徒步再走珠峰东坡，因为十一这个黄金期要参加闺蜜的婚礼，所以就只能完成其中一个了，刚好看到6月徒步珠峰东坡的贴还蛮多的（刚好看杜鹃花的时候），通过8264，还有qq找了几个同伴......
-                                            </div>
-                                        </div>
-                                        <div class="photo">
-                                            <img src="/imgs/demo/3.jpg" alt="">
-                                        </div>
-                                    </div>
-                                    <div class="other">
-                                        <div><a href="javascript:;"><img src="/imgs/icons/good.png" alt="点赞">3</a></div>
-                                        <div><a href="javascript:;"><img src="/imgs/icons/remark.png" alt="评论">6</a></div>
-                                    </div>
-                                </div>
-                                <div class="content-listNews">
-                                    <div>
-                                        <ul class="meta">
-                                            <li class="categroy"><a href="javascript:;">游记</a></li>
-                                            <li class="author"><a href="javascript:;">不爱拍照的_腊肉</a></li>
-                                            <li>1000人浏览</li>
-                                            <li class="area">西藏</li>
-                                        </ul>
-                                    </div>
-                                    <!-- 主体内容 -->
-                                    <div class="news">
-                                        <div class="word">
-                                            <div class="title">
-                                                <a href="javascript:;">人生恰似一场永不停止的远足——珠峰东坡大环线</a>
-                                            </div>
-                                            <div class="fragment">
-                                                原本2019年计划先墨脱雨林徒步再走珠峰东坡，因为十一这个黄金期要参加闺蜜的婚礼，所以就只能完成其中一个了，刚好看到6月徒步珠峰东坡的贴还蛮多的（刚好看杜鹃花的时候），通过8264，还有qq找了几个同伴......
-                                            </div>
-                                        </div>
-                                        <div class="photo">
-                                            <img src="/imgs/demo/3.jpg" alt="">
-                                        </div>
-                                    </div>
-                                    <div class="other">
-                                        <div><a href="javascript:;"><img src="/imgs/icons/good.png" alt="点赞">3</a></div>
-                                        <div><a href="javascript:;"><img src="/imgs/icons/remark.png" alt="评论">6</a></div>
-                                    </div>
+                                <!-- 3. 滚动加载 -->
+                                <div class="scroll-more"
+                                    v-infinite-scroll="scrollMore"
+                                    infinite-scroll-disabled="busy"
+                                    infinite-scroll-distance="120"
+                                >
+                                    <img src="/loading/loading-spinning-bubbles.svg" alt="" v-if="showScroll">
+                                    <p v-if="showData">没有更多了</p>
                                 </div>
                             </div>
                         </el-tab-pane>
                         <el-tab-pane label="最新" name="newest">
-                            <div class="content-list">
-                                <div class="content-listNews">
+                            <div class="content-list" 
+                            >
+                                <div class="content-listNews"  v-for="(item, index) in newList" :key="index">
                                     <div>
                                         <ul class="meta">
-                                            <li class="categroy"><a href="javascript:;">游记</a></li>
-                                            <li class="author"><a href="javascript:;">不爱拍照的_腊肉</a></li>
-                                            <li>1000人浏览</li>
-                                            <li class="area">西藏</li>
+                                            <li class="categroy"><a href="javascript:;">{{item.category}}</a></li>
+                                            <li class="author"><a href="javascript:;" @click="$router.push(`/personal/${item.userId}`)">{{item.nickName}}</a></li>
+                                            <li>{{item.articleRead}}人阅读</li>
+                                            <li class="area">{{item.place}}</li>
                                         </ul>
                                     </div>
                                     <!-- 主体内容 -->
                                     <div class="news">
                                         <div class="word">
                                             <div class="title">
-                                                <a href="javascript:;">人生恰似一场永不停止的远足——珠峰东坡大环线</a>
+                                                <a href="javascript:;" @click="toArticle(item.articleId)">{{item.title}}</a>
                                             </div>
                                             <div class="fragment">
-                                                原本2019年计划先墨脱雨林徒步再走珠峰东坡，因为十一这个黄金期要参加闺蜜的婚礼，所以就只能完成其中一个了，刚好看到6月徒步珠峰东坡的贴还蛮多的（刚好看杜鹃花的时候），通过8264，还有qq找了几个同伴......
+                                                {{item.articleHTML}}
                                             </div>
                                         </div>
                                         <div class="photo">
-                                            <img src="/imgs/demo/3.jpg" alt="">
+                                            <img v-lazy="item.titleImgUrl" alt="">
                                         </div>
                                     </div>
                                     <div class="other">
-                                        <div><a href="javascript:;"><img src="/imgs/icons/good.png" alt="点赞">3</a></div>
-                                        <div><a href="javascript:;"><img src="/imgs/icons/remark.png" alt="评论">6</a></div>
+                                        <div><a href="javascript:;"><img src="/imgs/icons/good2.png" alt="点赞">{{ (item.good instanceof Array) ? item.good.length : 0}}</a></div>
+                                        <div><a href="javascript:;"><img src="/imgs/icons/remark2.png" alt="评论">{{(item.comment instanceof Array) ? item.good.length : 0 }}</a></div>
                                     </div>
                                 </div>
-                                <div class="content-listNews">
-                                    <div>
-                                        <ul class="meta">
-                                            <li class="categroy"><a href="javascript:;">游记</a></li>
-                                            <li class="author"><a href="javascript:;">不爱拍照的_腊肉</a></li>
-                                            <li>1000人浏览</li>
-                                            <li class="area">西藏</li>
-                                        </ul>
-                                    </div>
-                                    <!-- 主体内容 -->
-                                    <div class="news">
-                                        <div class="word">
-                                            <div class="title">
-                                                <a href="javascript:;">人生恰似一场永不停止的远足——珠峰东坡大环线</a>
-                                            </div>
-                                            <div class="fragment">
-                                                原本2019年计划先墨脱雨林徒步再走珠峰东坡，因为十一这个黄金期要参加闺蜜的婚礼，所以就只能完成其中一个了，刚好看到6月徒步珠峰东坡的贴还蛮多的（刚好看杜鹃花的时候），通过8264，还有qq找了几个同伴......
-                                            </div>
-                                        </div>
-                                        <div class="photo">
-                                            <img src="/imgs/demo/3.jpg" alt="">
-                                        </div>
-                                    </div>
-                                    <div class="other">
-                                        <div><a href="javascript:;"><img src="/imgs/icons/good.png" alt="点赞">3</a></div>
-                                        <div><a href="javascript:;"><img src="/imgs/icons/remark.png" alt="评论">6</a></div>
-                                    </div>
+                                <!-- 3. 滚动加载 -->
+                                <div class="scroll-more"
+                                    v-infinite-scroll="newScrollMore"
+                                    infinite-scroll-disabled="newBusy"
+                                    infinite-scroll-distance="120"
+                                >
+                                    <img src="/loading/loading-spinning-bubbles.svg" alt="" v-if="showScroll">
+                                    <p v-if="showData">没有更多了</p>
                                 </div>
                             </div>
                         </el-tab-pane>
@@ -171,10 +103,6 @@
             </div>
             <!-- 右侧内容 -->
             <div class="right">
-                <div class="right-app">
-                    <div class="appCode"><img src="/imgs/QRCode.jpg" alt=""></div>
-                    <div class="word">扫码下载车车互联App<i class="el-icon-download"></i><div>最好的旅行方式是和一群志同道合的人。</div></div>
-                </div>
                 <div class="user" v-if="loginStatus">
                     <div class="message">
                         <div class="avator">
@@ -202,42 +130,23 @@
                     </div>
                 </div>
                 <div class="right-recommend">
-                    <h3>推荐文章</h3>
-                    <a href="javascript:;" class="recommend">
-                        <div class="title">人生恰似一场永不停止的远足——珠峰东坡大环线</div>
+                    <h3><img src="/imgs/icons/prize.png" alt="">热度排行</h3>
+                    <a href="javascript:;" @click="$router.push(`/article/${item.articleId}`)" class="recommend" v-for="(item,index) in hotPrize" :key="index">
+                        <div class="iconTitle">
+                            <div class="iconPhoto">
+                                <img :src="'/imgs/icons/Prize'+ (index + 1) +'.png'" alt="">
+                            </div>
+                            <div class="title">{{item.title}}</div>
+                        </div>
                         <div class="icon">
-                            <span><img src="/imgs/icons/good-article.png" alt="">32</span>
-                            <span><img class="comment" src="/imgs/icons/comment-article.png" alt="">11</span>
+                            <span><img src="/imgs/icons/good-article.png" alt="">{{(item.good instanceof Array) ? item.good.length : 0}}</span>
+                            <span><img class="comment" src="/imgs/icons/comment-article.png" alt="">{{(item.comment instanceof Array) ? item.comment.length : 0}}</span>
                         </div>
                     </a>
-                    <a href="javascript:;" class="recommend">
-                        <div class="title">人生恰似一场永不停止的远足——珠峰东坡大环线</div>
-                        <div class="icon">
-                            <span><img src="/imgs/icons/good-article.png" alt="">32</span>
-                            <span><img class="comment" src="/imgs/icons/comment-article.png" alt="">11</span>
-                        </div>
-                    </a>
-                    <a href="javascript:;" class="recommend">
-                        <div class="title">人生恰似一场永不停止的远足——珠峰东坡大环线</div>
-                        <div class="icon">
-                            <span><img src="/imgs/icons/good-article.png" alt="">32</span>
-                            <span><img class="comment" src="/imgs/icons/comment-article.png" alt="">11</span>
-                        </div>
-                    </a>
-                    <a href="javascript:;" class="recommend">
-                        <div class="title">人生恰似一场永不停止的远足——珠峰东坡大环线</div>
-                        <div class="icon">
-                            <span><img src="/imgs/icons/good-article.png" alt="">32</span>
-                            <span><img class="comment" src="/imgs/icons/comment-article.png" alt="">11</span>
-                        </div>
-                    </a>
-                    <a href="javascript:;" class="recommend">
-                        <div class="title">人生恰似一场永不停止的远足——珠峰东坡大环线</div>
-                        <div class="icon">
-                            <span><img src="/imgs/icons/good-article.png" alt="">32</span>
-                            <span><img class="comment" src="/imgs/icons/comment-article.png" alt="">11</span>
-                        </div>
-                    </a>
+                </div>
+                <div class="right-app">
+                    <div class="appCode"><img src="/imgs/QRCode.jpg" alt=""></div>
+                    <div class="word">扫码下载车车互联App<i class="el-icon-download"></i><div>最好的旅行方式是和一群志同道合的人。</div></div>
                 </div>
             </div>
         </div>
@@ -260,7 +169,14 @@
                                 '/imgs/slideshow/7.jpg',],
                 photoUrl: '/imgs/demo/3.jpg', // 文章图片
                 hotList: [],    // 热门文章列表
-                userId: 0
+                newList: [],    // 最新文章列表
+                userId: 0,
+                pageSize: 5, // 每页数量
+                start: 0,       // 开始数据索引 从0 每次加5
+                busy: false,    // 滚动加载，是否触发 true —— 禁用 false —— 触发
+                newBusy: true, // 最新列表滚动加载。
+                showScroll: true, // 滚动加载图案显示
+                showData: false
             }
         },
         computed: {
@@ -278,7 +194,7 @@
             },
             // 文章数
             articleCount(){
-                return this.$store.state.userMessage.articleCount || 0;
+                return this.$store.state.userMessage.articleCount.length || 0;
             },
             // 收藏数
             collectCount(){
@@ -295,6 +211,9 @@
             loginStatus(){
                 return this.$store.state.loginStatus;
             },
+            hotPrize(){
+                return this.hotList.slice(0,5);
+            }
             // cartCount(){
             //     return this.$store.state.cartCount;
             // }, 
@@ -303,26 +222,38 @@
         mounted(){
             this.userId = this.$Base64.decode(this.$cookie.get('userId'));
             this.$emit('index',1);
-            // 拉取热门文章，暂时用获取文章接口
-            this.axios.get(`/api/article/123`)
-            .then((res)=>{
-                if(res.status == 0){
-                    let p = this.$Base64.decode(res.data.articleHTML);
-                    // 匹配第一个 p 标签的内容，转换为 HTML 。使用 innerText 提取文字内容。并截取省略
-                    res.data.articleHTML = getPText(p);
-                    this.hotList.push(res.data);
-                }else{
-                    this.$message.error('网络异常');
-                }
-            })
-            .catch(()=>{
-                this.$message.error('网络异常');
-            })
+            // // 拉取热门文章，暂时用获取文章接口
+            // this.axios.post(`/api/article/allArticle`,{
+            //     type: 'articleRead',
+            //     start: 0,
+            //     size: 5
+            // })
+            // .then((res)=>{
+            //     if(res.status == 0){
+            //         res.data.forEach((item,index)=>{
+
+            //             let p = this.$Base64.decode(item.articleHTML);
+            //             // 匹配第一个 p 标签的内容，转换为 HTML 。使用 innerText 提取文字内容。并截取省略
+            //             item.articleHTML = getPText(p);
+            //             this.$set(this.hotList,index,item);
+            //         })
+            //     }else{
+            //         this.$message.error('网络异常');
+            //     }
+            // })
+            // .catch(()=>{
+            //     this.$message.error('网络异常');
+            // })
         },
         methods: {
             // 文章导航栏
             handleClick(tab, event) {
-                console.log(tab, event);
+                if(tab.index == 1){
+                    this.busy = true;
+                    this.newBusy = false;
+                    this.start = 0;
+                    this.showData = false;
+                }
             },
             // 跳转到个人主页
             toPersonal(){
@@ -332,6 +263,88 @@
             toArticle(id){
                 this.$emit('index',0);
                 this.$router.push(`/article/${id}`);
+            },
+            scrollMore(){
+                // 显示滚动图标
+                this.showScroll = true;
+                // 禁用滚动加载
+                this.busy = true;
+                setTimeout(()=>{
+                    this.postArticle('articleRead');
+                },500);
+            },
+            // 最新列表 滚动
+            newScrollMore(){
+                // 显示滚动图标
+                this.showScroll = true;
+                // 禁用滚动加载
+                this.newBusy = true;
+                setTimeout(()=>{
+                    this.postArticle('createTime');
+                },500);
+            },
+            // 拉取文章
+            postArticle(type){
+                // 拉取热门文章，暂时用获取文章接口type
+                this.axios.post(`/api/article/allArticle`,{
+                    type: type,
+                    // 指定数据起始
+                    start: this.start,
+                    size: 5
+                })
+                .then((res)=>{
+                    if(res.status == 0){
+                        res.data.forEach((item,index)=>{
+                            let p = this.$Base64.decode(item.articleHTML);
+                            // 匹配第一个 p 标签的内容，转换为 HTML 。使用 innerText 提取文字内容。并截取省略
+                            item.articleHTML = getPText(p);
+                            this.axios.get(`/api/article/${item.articleId}`)
+                            .then(res=>{
+                                if(res.status == 0){
+                                    // console.log(item);
+                                    item.nickName = res.data.nickName;
+                                    item.good = res.data.good;
+                                    item.comment = res.data.comment;
+                                    // this.$set(item,)
+                                }else{
+                                    this.$message.error('网络异常');
+                                }
+                            })
+                            // this.hotList.push(item);
+                            index = this.start + index;
+                            if(type == 'articleRead'){
+                                this.$set(this.hotList,index,item);
+                            }else{
+                                this.$set(this.newList,index,item);
+                            }
+                        })
+                        this.start += 5;
+                    }else{
+                        this.$message.error('网络异常');
+                    }
+                    // 关闭 loading
+                    this.showScroll = false;
+                    // 判断是否还有数据
+                    if(res.data.length == 0){
+                        // 若无则禁用滚动加载
+                        if(type == 'articleRead'){
+                            this.busy = true;
+                            this.showData = true;
+                        }else{
+                            this.newBusy = true;
+                            this.showData = true;
+                        }
+                    }else{
+                        if(type == 'articleRead'){
+                            this.busy = false;
+                        }else{
+                            this.newBusy = false;
+                        }
+                    }
+                })
+                .catch(()=>{
+                    this.$message.error('网络异常');
+                })
             }
         },
     }
@@ -344,7 +357,7 @@
             display: flex;
             .left{
                 flex: 2.5;
-                margin-bottom: 100px;
+                margin-bottom: 20px;
                 .slideshow{
                     width: 100%;
                     height: 300px;
@@ -424,7 +437,7 @@
                                             margin-bottom: 5px;
                                             a{
                                                 font-size: 18px;
-                                                color: black;
+                                                color: #333;
                                                 font-weight: bold;
                                                 &:hover{
                                                     text-decoration: underline;
@@ -599,18 +612,36 @@
                     background: white;
                     margin-bottom: 20px;
                     h3{
-                        font-size: 14px;
+                        display: flex;
+                        align-items: center;
+                        font-size: 16px;
                         padding: 12px 15px;
                         font-weight: 500;
                         border-bottom: 1px solid hsla(0,0%,58.8%,.1);
+                        vertical-align: middle;
+                        img{
+                            height: 20px;
+                            margin-right: 10px;
+                        }
                     }
                     .recommend{
                         display: block;
                         font-size: 14px;
                         padding: 12px 15px;
                         color: black;
-                        .title{
+                        .iconTitle{
+                            display: flex;
+                            align-items: center;
                             margin-bottom: 10px;
+                            .iconPhoto{
+                                margin-right: 10px;
+                                display: flex;
+                                align-items: center;
+                                img{
+                                    width: 20px;
+                                    height: 20px;
+                                }
+                            }
                         }
                         .icon{
                             span{
@@ -634,6 +665,18 @@
                         }
                     }
                 }
+            }
+        }
+        .scroll-more{
+            text-align:center;
+            img{
+                margin-top: 20px;
+                height: 100px;
+            }
+            p{
+                margin: 10px 0 10px 0;
+                font-size: 14px;
+                color: #5e6d82;
             }
         }
     }

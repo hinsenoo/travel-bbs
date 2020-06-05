@@ -3,7 +3,10 @@
         <div class="container">
             <!-- 页面 Logo -->
             <div class="header-logo">
-                <a href="/index"></a>
+                <a href="/index">
+                    <img class="logo" src="/imgs/icons/bbs-logo.png" alt="">
+                    <img class="text" src="/imgs/icons/travel1.png" alt="">
+                </a>
             </div>
             <!-- 页面导航栏 -->
             <div class="header-menu">
@@ -212,6 +215,8 @@
                         // 保存到 Vuex 里面
                         this.$store.dispatch('saveUserMessage', res.data);
                         this.$store.dispatch('saveLoginStatus', true);
+                        this.username = '';
+                        this.password = 0;
                     }else if(res.status == 1){
                         this.$message.error(res.msg);
                         this.waitRequest = false;
@@ -300,20 +305,19 @@
             display: inline-block;
             flex: 2;
             a{
-                display: inline-block;
-                width: 60px;
+                // display: inline-block;
+                width: 100%;
                 height: 40px;
-                background: url('/imgs/icons/bbs-logo.png') no-repeat center;
-                background-size: contain;
-                &:after{
-                    // 置空，占位
-                    line-height: 40px;
-                    padding-left: 60px;
-                    content: 'BBS';
-                    color: $colorA;
-                    font-size: 38px;
-                    font-family: "Arial";
+                display: flex;
+                .logo{
+                    width: 40px;
+                    height: 40px;
                 }
+                .text{
+                    width: 100px;
+                    height: 40px;
+                }
+                
             }
         }
         .header-menu{

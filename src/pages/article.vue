@@ -24,12 +24,8 @@
                     </div>
                     <div class="article-good">
                         <div class="good">
-                            <div class="icon"><img src="/imgs/icons/good-article.png" alt=""></div>
+                            <div class="icon icon-good"><img src="/imgs/icons/good-bottom.png" alt=""></div>
                             <span>{{articleGood.length}} 人点赞</span>
-                        </div>
-                        <div class="good">
-                            <div class="icon"><img src="/imgs/icons/collect-article.png" alt=""></div>
-                            <span>收藏</span>
                         </div>
                         <div class="good">
                             <div class="icon"><img src="/imgs/icons/gps.png" alt=""></div>
@@ -50,6 +46,7 @@
                         <el-button v-if="isSelf" @click="$router.push(`/setting/${userId}`)" type="primary" size="small" plain>编辑</el-button>
                     </div>
                 </div>
+                <!-- 评论 -->
                 <div class="article-comment" id="comment">
                     <div class="title">评论</div>
                     <div class="comment">
@@ -149,40 +146,12 @@
                 </div>
                 <!-- 推荐文章 -->
                 <div class="right-recommend">
-                    <h3>推荐文章</h3>
-                    <a href="javascript:;" class="recommend">
-                        <div class="title">人生恰似一场永不停止的远足——珠峰东坡大环线</div>
+                    <h3><img src="/imgs/icons/articleLogo.png">作者文章</h3>
+                    <a href="javascript:;" @click="$router.push(`/article/${item.articleId}`)"  class="recommend" v-for="(item,index) in userArticleList" :key="index">
+                        <div class="title">{{item.title}}</div>
                         <div class="icon">
-                            <span><img src="/imgs/icons/good-article.png" alt="">32</span>
-                            <span><img class="comment" src="/imgs/icons/comment-article.png" alt="">11</span>
-                        </div>
-                    </a>
-                    <a href="javascript:;" class="recommend">
-                        <div class="title">人生恰似一场永不停止的远足——珠峰东坡大环线</div>
-                        <div class="icon">
-                            <span><img src="/imgs/icons/good-article.png" alt="">32</span>
-                            <span><img class="comment" src="/imgs/icons/comment-article.png" alt="">11</span>
-                        </div>
-                    </a>
-                    <a href="javascript:;" class="recommend">
-                        <div class="title">人生恰似一场永不停止的远足——珠峰东坡大环线</div>
-                        <div class="icon">
-                            <span><img src="/imgs/icons/good-article.png" alt="">32</span>
-                            <span><img class="comment" src="/imgs/icons/comment-article.png" alt="">11</span>
-                        </div>
-                    </a>
-                    <a href="javascript:;" class="recommend">
-                        <div class="title">人生恰似一场永不停止的远足——珠峰东坡大环线</div>
-                        <div class="icon">
-                            <span><img src="/imgs/icons/good-article.png" alt="">32</span>
-                            <span><img class="comment" src="/imgs/icons/comment-article.png" alt="">11</span>
-                        </div>
-                    </a>
-                    <a href="javascript:;" class="recommend">
-                        <div class="title">人生恰似一场永不停止的远足——珠峰东坡大环线</div>
-                        <div class="icon">
-                            <span><img src="/imgs/icons/good-article.png" alt="">32</span>
-                            <span><img class="comment" src="/imgs/icons/comment-article.png" alt="">11</span>
+                            <span><img src="/imgs/icons/good-article.png" alt="">{{(item.good instanceof Array) ? item.good.length : 0}}</span>
+                            <span><img class="comment" src="/imgs/icons/comment-article.png" alt="">{{(item.comment instanceof Array) ? item.comment.length : 0}}</span>
                         </div>
                     </a>
                 </div>
@@ -232,7 +201,6 @@
                 replyInput: '',
                 replyInsideInput: '',
                 // 用户信息
-                userId: 0,
                 nickName: '',
                 userWork: '',
                 userAvatar: '',
@@ -250,6 +218,8 @@
                 articleCreateTime: 0,
                 editTime: 0,
                 articleReadCount: 0,
+                userArticle: 0,
+                userArticleList: [],
                 articleGood: 0,
                 comment: [],
                 // 是否为本人
@@ -269,11 +239,13 @@
                 }else{
                     return this.$store.state.userMessage.userAvatar;
                 }
+            },
+            userId(){
+                return this.$store.state.userMessage.userId;
             }
         },
         mounted(){
             this.articleId = Number(this.$route.params.id);
-            this.userId = Number(this.$Base64.decode(this.$cookie.get('userId')));
             this.axios.get(`/api/article/${this.articleId}`)
             .then((res)=>{
                 if(res.status == 0){
@@ -349,7 +321,35 @@
                 this.userGoodCount = data.goodCount || 0;
                 this.userReadCount = data.articleReadCount;
                 // this.userCreateTime = formatDayTime(res.data.createTime).first;
-                this.userArticleCount = data.articleCount;
+                this.userArticleCount = data.articleCount.length;
+                this.userArticle = data.articleCount;
+
+                if(this.userArticle.length != 0){
+                    this.userArticle.slice(0,5).forEach((item) => {
+                        this.axios.get(`/api/article/${item}`)
+                        .then((res)=>{
+                            if(res.status == 0){
+                                this.userArticleList.push(res.data);
+                            }else{
+                                this.$message.error('网络异常');
+                            }
+                        })
+                    })
+                    // this.axios.post('/api/article/collect',{ ids: this.userArticle })
+                    // .then((res)=>{
+                    //     if(res.status == 0){
+                    //         res.data.forEach((item)=>{
+                    //             let p = this.$Base64.decode(item.articleHTML);
+                    //             // 匹配第一个 p 标签的内容，转换为 HTML 。使用 innerText 提取文字内容。并截取省略
+                    //             item.articleHTML = getPText(p);
+                    //             this.userArticle.push(item);
+                    //             // this.$set(this.hotList,index,item);
+                    //         })
+                    //     }else{
+                    //         this.$message.error('网络异常');
+                    //     }
+                    // })
+                }
             },
             toTime(timestamp) {
                 return timestampToTime(timestamp);
@@ -475,7 +475,6 @@
             // 无登录则弹框
             checkLogin(){
                 if(!this.loginStatus){
-                    console.log(111);
                     this.$store.dispatch('saveLoginModal', 1);
                     return false;
                 }
@@ -531,7 +530,6 @@
                             this.$message.success(res.msg);
                             this.axios.get(`/api/article/${this.articleId}`)
                             .then((res)=>{
-                                console.log(res.data.comment);
                                 this.addComment(res.data.comment);
                                 this.replyInput = '';
                                 this.replyInsideInput = '';
@@ -630,6 +628,7 @@
                         justify-content: center;
                         text-align: center;
                         padding-bottom: 20px;
+                        margin-top: 20px;
                         margin-bottom: 20px;
                         .good{
                             margin-right: 30px;
@@ -642,8 +641,17 @@
                                 border-radius: 30px;
                                 cursor: pointer;
                                 margin-bottom: 5px;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
                                 &:hover{
                                     background: #F5F5F5;
+                                }
+                            }
+                            .icon-good{
+                                img{
+                                    width: 17px;
+                                    height: 17px;
                                 }
                             }
                             span{
@@ -896,6 +904,13 @@
                         padding: 12px 15px;
                         font-weight: 500;
                         border-bottom: 1px solid hsla(0,0%,58.8%,.1);
+                        img{
+                            width: 16px;
+                            height: 16px;
+                            margin-right: 5px;
+                            position: relative;
+                            top: 3px;
+                        }
                     }
                     .recommend{
                         display: block;

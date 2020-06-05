@@ -10,7 +10,11 @@
 export default {
   name: 'App',
   created(){
-    let userId = Number(this.$Base64.decode(this.$cookie.get('userId')));
+    let userId
+    if(this.$cookie.get('userId')){
+
+      userId = Number(this.$Base64.decode(this.$cookie.get('userId')));
+    }
     if(userId){
       this.axios.get(`/api/user/${ userId }`)
       .then((res)=>{
