@@ -15,8 +15,7 @@
                 <div class="content">
                     <el-tabs v-model="activeName" @tab-click="handleClick">
                         <el-tab-pane label="热门" name="hot">
-                            <div class="content-list" 
-                            >
+                            <div class="content-list">
                                 <div class="content-listNews"  v-for="(item, index) in hotList" :key="index">
                                     <div>
                                         <ul class="meta">
@@ -27,7 +26,7 @@
                                         </ul>
                                     </div>
                                     <!-- 主体内容 -->
-                                    <div class="news">
+                                    <div class="news" @click="toArticle(item.articleId)">
                                         <div class="word">
                                             <div class="title">
                                                 <a href="javascript:;" @click="toArticle(item.articleId)">{{item.title}}</a>
@@ -69,7 +68,7 @@
                                         </ul>
                                     </div>
                                     <!-- 主体内容 -->
-                                    <div class="news">
+                                    <div class="news" @click="toArticle(item.articleId)">
                                         <div class="word">
                                             <div class="title">
                                                 <a href="javascript:;" @click="toArticle(item.articleId)">{{item.title}}</a>
@@ -163,7 +162,7 @@
                 // 轮播图
                 slideshowList: ['/imgs/slideshow/1.jpg',
                                 '/imgs/slideshow/2.jpg',
-                                '/imgs/slideshow/3.jpg',
+                                '/imgs/slideshow/3.png',
                                 '/imgs/slideshow/5.jpg',
                                 '/imgs/slideshow/6.jpg',
                                 '/imgs/slideshow/7.jpg',],
@@ -247,7 +246,7 @@
         },
         methods: {
             // 文章导航栏
-            handleClick(tab, event) {
+            handleClick(tab) {
                 if(tab.index == 1){
                     this.busy = true;
                     this.newBusy = false;
@@ -429,6 +428,11 @@
                                     display: flex;
                                     justify-content: space-between;
                                     margin-bottom: 20px;
+                                    cursor: pointer;
+                                    transition: all 0.5s;
+                                    &:hover{
+                                        opacity: 0.8;
+                                    }
                                     .word{
                                         flex: 2;
                                         margin-right: 20px;

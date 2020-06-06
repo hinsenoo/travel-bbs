@@ -31,7 +31,7 @@
                                         </ul>
                                     </div>
                                     <!-- 主体内容 -->
-                                    <div class="news">
+                                    <div class="news" @click="toArticle(item.articleId)">
                                         <div class="word">
                                             <div class="title">
                                                 <a href="javascript:;" @click="toArticle(item.articleId)">{{item.title}}</a>
@@ -102,7 +102,7 @@
                                         </ul>
                                     </div>
                                     <!-- 主体内容 -->
-                                    <div class="news">
+                                    <div class="news" @click="toArticle(item.articleId)">
                                         <div class="word">
                                             <div class="title">
                                                 <a href="javascript:;" @click="toArticle(item.articleId)">{{item.title}}</a>
@@ -462,6 +462,11 @@
                                     display: flex;
                                     justify-content: space-between;
                                     margin-bottom: 10px;
+                                    cursor: pointer;
+                                    transition: all 0.5s;
+                                    &:hover{
+                                        opacity: 0.8;
+                                    }
                                     .word{
                                         flex: 2;
                                         margin-right: 20px;
