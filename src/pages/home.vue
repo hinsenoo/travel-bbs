@@ -56,3 +56,8 @@
         }
     }
 </script>
+<style lang="scss">
+    .home{
+        overflow-y: scroll;
+    }
+</style>
