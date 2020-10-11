@@ -1,6 +1,9 @@
 # travel-bbs 旅游论坛
 
 - 技术栈：Vue + Vue-router + Vuex + ElementUI + Axios + scss
+
+- ![1602399305247](assets/1602399305247.png)
+
 - 项目地址：[http://bbs.hinsenoo.top](http://bbs.hinsenoo.top/)  
 
 - 项目介绍：基于 Vue 全家桶及 ElementUI 组件库，实现了论坛的基本功能，包括基本用户功能及文章编写、点赞、评论等功能。
@@ -41,4 +44,16 @@ npm run build
 ```
 npm run lint
 ```
+
+
+
+### 项目截图
+
+![1602399296672](assets/1602399296672.png)
+
+![1602399285711](assets/1602399285711.png)
+
+![1602399343271](assets/1602399343271.png)
+
+![1602399335435](assets/1602399335435.png)
 
