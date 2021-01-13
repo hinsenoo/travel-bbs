@@ -9,10 +9,12 @@ function formatDuring(mss){
         minutes
     }
 }
-// x.x 年
-function formatYear(oldTime){
+// 经过时间
+function formatLastTime(oldTime){
     let time = new Date().getTime();
-    return (formatDuring(time - oldTime).days / 365).toFixed(2);
+    let computedTime = new Date(oldTime).getTime();
+    console.log(time, computedTime);
+    return formatDuring(time - computedTime);
 }
 // xxxx-xx-xx
 function formatDayTime(val) {
@@ -94,4 +96,4 @@ function getPText(p){
     return div.innerText;
 }
 
-export {formatDuring,formatYear,formatDayTime,timestampToTime,htmlEncode,htmlDecode,getPText}
+export {formatDuring,formatLastTime,formatDayTime,timestampToTime,htmlEncode,htmlDecode,getPText}

@@ -266,12 +266,14 @@
             // 请求用户信息
             messageRequest(userId){
                 this.axios.get(`/api/user/${userId}`)
+                // this.$http(this.$api.getUserInfo)
                 .then((res)=>{
-                    if(Object.hasOwnProperty.call(res,'status') && res.status == 0){
-                        this.dataShow(res.data);
-                    }else{
-                        this.$message.error('网络异常');
-                    }
+                    console.log(res);
+                    // if(Object.hasOwnProperty.call(res,'status') && res.status == 0){
+                    //     this.dataShow(res.data);
+                    // }else{
+                    //     this.$message.error('网络异常');
+                    // }
                 })
             },
             // 查询是否已关注

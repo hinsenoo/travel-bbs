@@ -234,10 +234,10 @@
                 return this.$store.state.loginStatus;
             },
             loginAvatar(){
-                if(!this.$store.state.userMessage.userAvatar){
+                if(!this.$store.state.userMessage.avatar_url){
                     return 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png';
                 }else{
-                    return this.$store.state.userMessage.userAvatar;
+                    return this.$store.state.userMessage.avatar_url;
                 }
             },
             userId(){
@@ -481,7 +481,7 @@
                 return true;
             },
             postComment(level,commentId,toName,toId,index){
-                let commentName = this.$store.state.userMessage.nickName;
+                let commentName = this.$store.state.userMessage.nick_name;
                 if(level == 'first'){
                     this.axios.post('/api/util/comment',{
                         level: 'first',

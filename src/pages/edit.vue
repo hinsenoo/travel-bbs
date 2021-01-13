@@ -159,7 +159,7 @@ import editor from '../components/Editor'
         computed: {
             // 用户头像
             userAvatar(){
-                return this.$store.state.userMessage.userAvatar;
+                return this.$store.state.userMessage.avatar_url;
             },
         },
         methods:{

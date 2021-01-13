@@ -115,7 +115,7 @@
                                             {{goodCount}}
                                         </span>
                                     </div>
-                                    <div class="time">注册了: {{registerTime}} 年</div>
+                                    <div class="time">注册了: {{registerTime}}</div>
                                 </div>
                             </a>
                         </div>
@@ -152,7 +152,7 @@
     </div>
 </template>
 <script>
-    import {formatYear,getPText} from '../util/index'
+    import {formatLastTime,getPText} from '../util/index'
     export default {
         // 组件名称
         name: 'index',
@@ -181,30 +181,43 @@
         computed: {
             // 用户头像
             userAvatar(){
-                return this.$store.state.userMessage.userAvatar;
+                return this.$store.state.userMessage.avatar_url;
             },
             // 昵称
             nickName(){
-                return this.$store.state.userMessage.nickName;
+                return this.$store.state.userMessage.nick_name;
             },
             // 点赞数
             goodCount(){
-                return this.$store.state.userMessage.goodCount || 0;
+                // return this.$store.state.userMessage.goodCount || 0;
+                return 0;
             },
             // 文章数
             articleCount(){
-                return this.$store.state.userMessage.articleCount.length || 0;
+                // return this.$store.state.userMessage.articleCount.length || 0;
+                return 0;
             },
             // 收藏数
             collectCount(){
-                return this.$store.state.userMessage.collect.length || 0;
+                // return this.$store.state.userMessage.collect.length || 0;
+                return 0;
             },
             // 关注数
             focusCount(){
-                return this.$store.state.userMessage.focus.length || 0;
+                // return this.$store.state.userMessage.focus.length || 0;
+                return 0;
             },
+            // 注册时长
             registerTime(){
-                return formatYear(this.$store.state.userMessage.createTime);
+                let date = formatLastTime(this.$store.state.userMessage.createdAt);
+                if (date.days < 365) {
+                    if(date.days === 0) {
+                        return date.hours + ' 小时';
+                    }
+                    return date.days + ' 天';
+                }else {
+                    return (date.days / 365).toFixed(2) + ' 年';
+                }
             },
             // 登录状态
             loginStatus(){
@@ -268,9 +281,9 @@
                 this.showScroll = true;
                 // 禁用滚动加载
                 this.busy = true;
-                setTimeout(()=>{
-                    this.postArticle('articleRead');
-                },500);
+                // setTimeout(()=>{
+                //     this.postArticle('articleRead');
+                // },500);
             },
             // 最新列表 滚动
             newScrollMore(){

@@ -1,50 +1,23 @@
 import Vue from 'vue';
 import VueLazyLoad from 'vue-lazyload';
-import axios from 'axios';
-import VueAxios from 'vue-axios'
 import md5 from 'js-md5'
 import VueCookie from 'vue-cookie'
-import { Menu,MenuItem,Button,Input,Avatar,Dropdown,DropdownItem,DropdownMenu,Carousel,CarouselItem,Tabs,TabPane,Message,Upload,Select,Option,Backtop,Progress,Loading  } from 'element-ui';
+import api from './util/api/index'
+import axios from './util/plugins/axios/index'
+import './util/plugins/element/element'
 import infiniteScroll from 'vue-infinite-scroll'
-// 确保引入样式
-import 'element-ui/lib/theme-chalk/index.css';
 import store from './store'
 import router from './router';
 import App from './App.vue';
 
 // 对html标签进行转码
 let Base64 = require('js-base64').Base64;
-Vue.prototype.$Base64 = Base64;
 
-// 按需引入 element 组件
-Vue.use(Menu);
-Vue.use(MenuItem);
-Vue.use(Button);
-Vue.use(Input);
-Vue.use(Avatar);
-Vue.use(Dropdown);
-Vue.use(DropdownItem);
-Vue.use(DropdownMenu);
-Vue.use(Carousel);
-Vue.use(CarouselItem);
-Vue.use(Tabs);
-Vue.use(TabPane);
-Vue.use(Upload);
-Vue.use(Select);
-Vue.use(Option);
-Vue.use(Backtop);
-Vue.use(Progress);
-Vue.use(Loading);
-Vue.use(infiniteScroll);
-Vue.component(Message.name, Message);
-// 挂载的 vue 实例的原型
-Vue.prototype.$message = Message;
-// 挂载 md5
+
+Vue.prototype.$Base64 = Base64;
 Vue.prototype.$md5 = md5;
-// 挂载 axios
-Vue.use(VueAxios,axios);
-// 加载 Cookie
-Vue.use(VueCookie);
+Vue.prototype.$axios = axios;
+Vue.prototype.$api = api;
 
 
 // 懒加载插件
@@ -52,29 +25,31 @@ Vue.use(VueLazyLoad,{
   loading: '/loading/loading-bubbles.svg',
   error: 'https://cube.elemecdn.com/e/fd/0fc7d20532fdaf769a25683617711png.png'
 });
+Vue.use(infiniteScroll);
+Vue.use(VueCookie);
 
-// 超时设置 8s
-axios.defaults.timeout = 8000;
-// 根据环境变量获取不同的请求地址
-// axios.defaults.baseURL = env.baseURL;
-// 接口错误拦截
-axios.interceptors.response.use(function (response){
-  // 直接取得响应的 data
-  let res = response.data;
-  // 业务错误拦截
-  if(response.status == 200){
-    return res;
-  }else{
-    // 抛出异常
-    Message.warning(res.msg);
-    return Promise.reject(res);
-  }
-},(error)=>{
-  // 请求错误拦截 http 状态码
-  let res = error.response;
-  Message.error(res.data.message);
-  return Promise.reject(error);
-});
+// // 超时设置 8s
+// axios.defaults.timeout = 8000;
+// // 根据环境变量获取不同的请求地址
+// // axios.defaults.baseURL = env.baseURL;
+// // 接口错误拦截
+// axios.interceptors.response.use(function (response){
+//   // 直接取得响应的 data
+//   let res = response.data;
+//   // 业务错误拦截
+//   if(response.status == 200){
+//     return res;
+//   }else{
+//     // 抛出异常
+//     Message.warning(res.msg);
+//     return Promise.reject(res);
+//   }
+// },(error)=>{
+//   // 请求错误拦截 http 状态码
+//   let res = error.response;
+//   Message.error(res.data.message);
+//   return Promise.reject(error);
+// });
 
 // 生产环境提示
 Vue.config.productionTip = false

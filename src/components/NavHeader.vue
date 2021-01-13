@@ -106,7 +106,7 @@
         computed: {
             // 用户头像
             userAvatar(){
-                return this.$store.state.userMessage.userAvatar;
+                return this.$store.state.userMessage.avatar_url;
             },
             // 登录状态
             loginStatus(){
@@ -200,31 +200,32 @@
                     return;
                 }
                 let params = {
-                    username: this.username,
+                    name: this.username,
                     password: this.$md5(this.password)
                 }
                 // 等待请求完成，才能点击按钮
+                // this.$message.error('登录成功');
                 this.waitRequest = true;
-                this.axios.post('/api/user/login',params)
-                .then((res)=>{
-                    if(res.status == 0){
-                        this.$message.success('登录成功');
-                        // 存储用户 id 到 cookie，会话级别 
-                        this.userId = res.data.userId;
-                        this.$cookie.set('userId',this.$Base64.encode(res.data.userId),{expires: 'Session'});
-                        // 保存到 Vuex 里面
-                        this.$store.dispatch('saveUserMessage', res.data);
-                        this.$store.dispatch('saveLoginStatus', true);
-                        this.username = '';
-                        this.password = 0;
-                    }else if(res.status == 1){
-                        this.$message.error(res.msg);
+                this.$axios.post(this.$api.login.url, params)
+                    .then((res)=>{
+                        if(res.status == 0){
+                            this.$message.success('登录成功');
+                            // 存储用户 id 到 cookie，会话级别 
+                            this.userId = res.data._id;
+                            this.$cookie.set('userId',this.$Base64.encode(res.data._id),{expires: 'Session'});
+                            // 保存到 Vuex 里面
+                            this.$store.dispatch('saveUserMessage', res.data);
+                            this.$store.dispatch('saveLoginStatus', true);
+                            this.username = '';
+                            this.password = 0;
+                        }else{
+                            this.$message.error(res.msg);
+                            this.waitRequest = false;
+                            return;
+                        }
                         this.waitRequest = false;
-                        return;
-                    }
-                    this.waitRequest = false;
-                    this.closeModal();
-                });
+                        this.closeModal();
+                    });
             },
             // 注册
             register(){
@@ -244,22 +245,28 @@
                     return;
                 }
                 let params = {
-                    username: this.registerName,
+                    name: this.registerName,
                     password: this.$md5(this.registerPw),
                     email: this.registerEmail
                 }
                 // 等待请求完成
                 this.waitRequest = true;
-                this.axios.post('/api/user/register',params)
-                .then((res)=>{
-                    if(res.status == 0){
-                        this.$message.success('注册成功，请登录');
-                        this.$store.dispatch('saveLoginModal', 1);
-                    }else if(res.status == 1){
-                        this.$message.error(res.msg);
-                    }
-                    this.waitRequest = false;
-                });
+                this.$axios.post(this.$api.register.url, params)
+                    .then((res)=>{
+                        if(res.status == 0){
+                            this.$store.dispatch('saveLoginModal', 1);
+                            this.$message.success('注册成功，请登录');
+                            // 清空
+                            this.registerName = '';
+                            this.registerEmail = '';
+                            this.registerPw = '';
+                            this.registerPw2 = '';
+                        }else if(res.status === 409) {
+                            // console.log('res', res);
+                            this.$message.error(res.msg);
+                        }
+                        this.waitRequest = false;
+                    })
             },
             // 显示弹框
             modalShow(type){
