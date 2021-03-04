@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import { Menu,MenuItem,Button,Input,Avatar,Dropdown,DropdownItem,DropdownMenu,Carousel,CarouselItem,Tabs,TabPane,Message,Upload,Select,Option,Backtop,Progress,Loading  } from 'element-ui';
+import { Menu,MenuItem,Button,Input,Avatar,Dropdown,DropdownItem,DropdownMenu,Carousel,CarouselItem,Tabs,TabPane,Message,Upload,Select,Option,Backtop,Progress,Loading,Radio  } from 'element-ui';
 // 确保引入样式
 import 'element-ui/lib/theme-chalk/index.css';
 // // 动画效果
@@ -28,6 +28,7 @@ Vue.use(Select);
 Vue.use(Option);
 Vue.use(Backtop);
 Vue.use(Progress);
+Vue.use(Radio);
 Vue.use(Loading);
 
 

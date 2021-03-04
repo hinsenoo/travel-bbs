@@ -1,11 +1,10 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Home from './pages/home'
-import Index from './pages/index'
+import Home from '../pages/home'
+import Index from '../pages/index'
 
 Vue.use(Router);
-
-export default new Router({
+const router = new Router({
     mode: "history",
     routes: [
         {
@@ -32,19 +31,19 @@ export default new Router({
                     // 1.
                     // component: resolve => require(['./pages/product.vue'],resolve),
                     // 2.
-                    component: () => import('./pages/personal.vue')
+                    component: () => import('../pages/User/Personal/Personal.vue')
                 },
                 {
-                    // 个人页面
+                    // 个人设置页面
                     path: '/setting/:id',
                     name: 'setting',
-                    component: () => import('./pages/setting.vue')
+                    component: () => import('../pages/User/Setting/Setting.vue')
                 },
                 {
                     // 文章页面
                     path: '/article/:id',
                     name: 'user-article',
-                    component: () => import('./pages/article.vue')
+                    component: () => import('../pages/Article/Article.vue')
                 }
             ]
         },
@@ -52,7 +51,12 @@ export default new Router({
             // 编辑页面
             path: '/edit/:id',
             name: 'edit',
-            component: () => import('./pages/edit.vue')
+            component: () => import('../pages/Edit/Edit.vue')
         }
-    ]
-});
+    ],
+})
+router.beforeEach((to, from, next) => {
+    console.log(to, from);
+    next();
+})
+export default router;

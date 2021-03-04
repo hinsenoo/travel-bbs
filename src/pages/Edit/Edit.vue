@@ -83,7 +83,7 @@
 </template>
 
 <script>
-import editor from '../components/Editor'
+import editor from '../../components/Editor'
     export default {
         name: 'write',
         data(){
@@ -131,29 +131,17 @@ import editor from '../components/Editor'
         components: {
             editor
         },
-        mounted(){
+        async mounted(){
+            await this.getUserInfo();
             // 若无登录 则跳转到首页
             if(!this.$store.state.loginStatus){
+                console.log(222);
                 this.$router.push(`/`);
             }
             this.pageType = this.$route.params.id;
+            // 判断是否为编辑状态
             if(this.pageType !== 'write'){
-                // 拉取文章信息渲染
-                this.axios.get(`/api/article/${Number(this.pageType)}`)
-                .then((res)=>{
-                    if(res.status == 0){
-                        this.title = res.data.title;
-                        this.titleImgUrl = res.data.titleImgUrl;
-                        this.uploadImgShow = true;
-                        this.$refs.photo.style = "height: auto";
-                        this.category = res.data.category;
-                        this.place = res.data.place;
-                        this.content = this.$Base64.decode(res.data.articleHTML);
-                    }else{
-                        this.$message.error('获取文章内容失败');
-                    }
-                })
-
+                this.getArticle(this.pageType);
             }
         },
         computed: {
@@ -163,6 +151,26 @@ import editor from '../components/Editor'
             },
         },
         methods:{
+            // 获取文章信息
+            getArticle(articleId) {
+                // 拉取文章信息渲染
+                this.$axios.get(`${this.$api.getArticleInfo.url}/${articleId}`)
+                .then((res)=>{
+                    if(res.status == 0){
+                        this.title = res.data.title;
+                        this.titleImgUrl = res.data.titleImgUrl;
+                        this.uploadImgShow = true;
+                        this.$refs.photo.style = "height: auto";
+                        this.category = res.data.category;
+                        this.place = res.data.place;
+                        this.content = res.data.articleHTML;
+                        this.articleHTML = res.data.articleHTML;
+                    }else{
+                        this.$message.error('获取文章内容失败');
+                    }
+                })
+
+            },
             uploadPhoto(){
                 this.$refs.uploadImg.click();
             },
@@ -182,9 +190,9 @@ import editor from '../components/Editor'
                 let config = {
                     headers:{'Content-Type':'multipart/form-data'}
                 };
-                this.axios.post("http://47.106.215.69:8080/tourism/user/upload/", data, config).then(res => {
+                this.$axios.post(this.$api.uploadImg.url, data, config).then(res => {
                     if(res.status == 0){
-                        this.titleImgUrl = res.data;
+                        this.titleImgUrl = res.url;
                         this.uploadImgShow = true;
                         this.$refs.photo.style = "height: auto";
                         this.$message.success('图片上传成功');
@@ -228,26 +236,27 @@ import editor from '../components/Editor'
                 //     editTime: new Date().getTime()
                 // }
                 let data = {
-                    userId: Number(this.$Base64.decode(this.$cookie.get('userId'))),
+                    // userId: Number(this.$Base64.decode(this.$cookie.get('userId'))),
                     title: this.title,
                     titleImgUrl: this.titleImgUrl,
                     category: this.category,
                     place: this.place,
-                    articleHTML: this.$Base64.encode(this.articleHTML),
-                    editTime: new Date().getTime()
+                    articleHTML: this.articleHTML,
+                    // editTime: new Date().getTime()
                 }
 
                 // 发布文章
                 if(this.pageType == 'write'){
                     this.fullscreenLoading = true;
-                    this.axios.post('/api/article/upload',data)
+                    this.$axios.post(this.$api.createArticle.url,data)
                     .then((res)=>{
+                        console.log(res);
                         if(res.status == 0){
                             this.fullscreenLoading = false;
                             this.$message.success('文章上传成功');
                             // TODO: 跳转到文章展示页面
                             // 等待页面
-                            this.$router.push(`/article/${res.data}`);
+                            this.$router.push(`/article/${res.data._id}`);
                         }else{
                             this.fullscreenLoading = false;
                             this.$message.error('文章上传失败，请重试');
@@ -256,16 +265,7 @@ import editor from '../components/Editor'
                 }else{
                     this.fullscreenLoading = true;
                     // 编辑文章
-                    this.axios.post('/api/article/edit',{
-                        articleId: this.pageType,
-                        title: this.title,
-                        titleImgUrl: this.titleImgUrl,
-                        category: this.category,
-                        place: this.place,
-                        articleHTML: this.$Base64.encode(this.articleHTML),
-                        editTime: new Date().getTime()
-                        // editTime: new Date().getTime()
-                    })
+                    this.$axios.patch(`${this.$api.updateArticleInfo.url}/${this.pageType}`,data)
                     .then((res)=>{
                         if(res.status == 0){
                             this.fullscreenLoading = false;
@@ -296,6 +296,22 @@ import editor from '../components/Editor'
                         break;
                 }
                 this.$emit('index',0);
+            },
+            // 初始化用户数据
+            async getUserInfo() {
+                this.userId = this.$storage.getItem('userId');
+                if(this.userId !== '' && !this.$store.state.loginStatus) {
+                    await this.$axios.get(`${this.$api.getUserInfo.url}/${this.userId}`)
+                    .then( (res)=>{
+                        if(Object.hasOwnProperty.call(res,'status') && res.status == 0){
+                            this.$store.dispatch('saveUserMessage', res.data);
+                            this.$store.dispatch('saveLoginStatus', true);
+                            // this.dataShow(res.data);
+                        }else{
+                            this.$message.error('获取用户数据失败');
+                        }
+                    })
+                }
             }
         }
 
@@ -303,7 +319,7 @@ import editor from '../components/Editor'
 </script>
 
 <style lang="scss" scoped>
-@import '../assets/scss/config.scss';
+@import '../../assets/scss/config.scss';
     .write{
         background: white;
         width: 100%;

@@ -1,6 +1,7 @@
 /**
  * 用户信息
  */
+import storage from '../util/storage'
 // 读取
 export default {
     saveUserMessage(state,userMessage){
@@ -10,6 +11,13 @@ export default {
     saveLoginStatus(state,loginStatus){
         // 改变状态，state 中的数据
         state.loginStatus = loginStatus;
+    },
+    saveLogoutStatus(state){
+        storage.clear('userId');
+        storage.clear('token');
+        // 改变状态，state 中的数据
+        state.loginStatus = false;
+        state.userMessage = {};
     },
     saveFocusStatusList(state,focusStatusList){
         // 可以创建一个新的对象，把原来对象的属性，和要添加的属性加到新的对象里

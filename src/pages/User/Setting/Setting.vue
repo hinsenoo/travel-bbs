@@ -23,11 +23,20 @@
                                 </li>
                                 <li>
                                     <span>用户名</span>
+                                    
                                     <el-input type="text" v-model="nickName" placeholder="填写你的用户名"></el-input>
                                 </li>
                                 <li>
+                                    <span>性别</span>
+                                    <div class="li__box">
+                                        <el-radio v-model="gender" label="male">男</el-radio>
+                                        <el-radio v-model="gender" label="famale">女</el-radio>
+                                    </div>
+                                    <!-- <el-input type="text" v-model="gender" placeholder="填写你的个人介绍"></el-input> -->
+                                </li>
+                                <li>
                                     <span>职业</span>
-                                    <el-input type="text" v-model="userWork" placeholder="填写你的职业"></el-input>
+                                    <el-input type="text" v-model="employment" placeholder="填写你的职业"></el-input>
                                 </li>
                                 <li>
                                     <span>个人介绍</span>
@@ -83,11 +92,13 @@
         data() {
             return {
                 activeName: 'first',
+                userId: '',     // 用户 ID
                 imageUrl: '',
                 upLoadUrl: '',
                 nickName: '',
-                userWork: '',
+                employment: '',
                 userIntroduce: '',
+                gender: 'male',
                 userEmail: '',
                 oldPassword: '',
                 newPassword: '',
@@ -99,21 +110,44 @@
             };
         },
         mounted(){
-            let userId = Number(this.$Base64.decode(this.$cookie.get('userId')));
-            if(userId && userId == this.$route.params.id){
-                // 请求用户信息
-                this.axios.get(`/api/user/${userId}`)
-                .then((res)=>{
-                    this.articleImgUrl = res.data.userAvatar;
-                    this.nickName = res.data.nickName;
-                    this.userWork = res.data.userWork;
-                    this.userIntroduce = res.data.userIntroduce;
-                })
-            }else{
-                this.$router.push('/');
-            }
+            this.isOneself();
+            this.getUserData();
         },
         methods: {
+            // 验证是否为用户本人
+            isOneself() {
+                this.userId = this.$storage.getItem('userId');
+                if(!this.userId || this.userId != this.$route.params.id){
+                    this.$router.push('/');
+                }
+            },
+            // 获取用户数据
+            getUserData() {
+                if(JSON.stringify(this.$store.state.userMessage) == '{}'){
+                    this.getUserInfo(this.userId);
+                }else {
+                    this.showData(this.$store.state.userMessage);
+                }
+            },
+            // 渲染数据
+            showData(data) {
+                this.articleImgUrl = data.avatar_url;
+                this.nickName = data.nick_name;
+                this.employment = data.employment;
+                this.userIntroduce = data.headline || '无';
+                this.gender = data.gender;
+            },
+            // 获取用户数据
+            getUserInfo(id){
+                this.$axios.get(`${this.$api.getUserInfo.url}/${id}`)
+                .then((res)=>{
+                    if(Object.hasOwnProperty.call(res,'status') && res.status == 0){
+                        this.showData(res.data);
+                    }else{
+                        this.$message.error('获取用户数据失败');
+                    }
+                })
+            },
             handleAvatarSuccess(res, file) {
                 this.imageUrl = window.URL.createObjectURL(file.raw);
             },
@@ -123,6 +157,7 @@
             // 选取图片文件后触发
             onUpload(){
                 let file = this.$refs.uploadImg.files[0];
+                // console.log(file);
                 let data = new FormData();
                 data.append('file', file);
                 // 图片上传前验证大小
@@ -131,23 +166,27 @@
                     this.$message.error('上传头像图片大小不能超过 5MB!');
                     return
                 }
+                console.log(this.$api.uploadImg);
                 // 发送图片上传请求
                 let config = {
                     headers:{'Content-Type':'multipart/form-data'}
                 };
-                this.axios.post("http://47.106.215.69:8080//tourism/user/upload/", data, config).then(res => {
-                    this.articleImgUrl = res.data;
-                    this.uploadImgShow = true;
+                this.$axios.post(this.$api.uploadImg.url, data, config).then(res => {
+                    // console.log(res);
+                    if(res.status === 0) {
+                        this.articleImgUrl = res.url;
+                        this.uploadImgShow = true;
+                    }
                 })
             },
             // 信息上传
             messageUpload(){
                 let params = {
-                    userId: Number(this.$Base64.decode(this.$cookie.get('userId'))),
-                    userAvatar: this.articleImgUrl,
-                    nickName: this.nickName,
-                    userWork: this.userWork,
-                    userIntroduce: this.userIntroduce,
+                    avatar_url: this.articleImgUrl,
+                    nick_name: this.nickName,
+                    employment: this.employment,
+                    headline: this.userIntroduce,
+                    gender: this.gender,
                 }
                 for (let key in params) {
                     if (!params[key]) {
@@ -155,15 +194,25 @@
                         return;
                     }
                 }
-                this.axios.post('/api/user/update',params)
+                // console.log(params);
+                this.$axios.patch(`${this.$api.updateUserInfo.url}/${this.userId}`,params)
                 .then((res)=>{
+                    console.log(res);
                     if(Object.hasOwnProperty.call(res,'status') && res.status == 0){
-                        this.axios.get(`/api/user/${Number(this.$Base64.decode(this.$cookie.get('userId')))}`)
-                        .then((res)=>{
-                            this.$store.dispatch('saveUserMessage', res.data);
-                            this.$message.success('修改信息成功！');
-                        })
-                    }else{
+                        this.$store.dispatch('saveUserMessage', res.data);
+                        this.$message.success('修改信息成功！');
+                    }else if(res.status === 401){
+                        // type: 1——登录过期
+                        if(res.type) { 
+                            this.$message.error(res.msg);
+                        }else {
+                            this.$router.replace({
+                                path: '/',
+                            });
+                            this.$message.error('无操作权限，请先登录');
+                        }
+                        this.$store.dispatch('saveLoginModal', 1); 
+                    }else {
                         this.$message.error('网络异常');
                     }
                 })
@@ -184,18 +233,16 @@
                     return;
                 }
 
-                let data = new FormData();
-                data.append('userId', Number(this.$Base64.decode(this.$cookie.get('userId'))));
-                data.append('oldPassword', this.$md5(this.oldPassword));
-                data.append('newPassword', this.$md5(this.newPassword));
-
-                let config = {
-                    headers:{'Content-Type': 'application/x-www-form-urlencoded'}
-                };
-                this.axios.post('/api/user/password',data,{config}).then((res)=>{
+                let data = {
+                    oldPassword: this.$md5(this.oldPassword),
+                    newPassword: this.$md5(this.newPassword)
+                }
+                
+                this.$axios.patch(`${this.$api.updateUserInfo.url}/${this.userId}/password`,data).then((res)=>{
+                    console.log(res);
                     if(Object.hasOwnProperty.call(res,'status') && res.status == 0){
-                        this.$message.success(res.msg);
-                    }else if(res.status == 1){
+                        this.$message.success('修改成功');
+                    }else{
                         this.$message.error(res.msg);
                     }
                 })
@@ -237,7 +284,7 @@
                 box-sizing: border-box;
                 background-color: white;
                 width: 80%;
-                height: 600px;
+                height: 650px;
                 .el-tab-pane{
                     .box{
                         ul{
@@ -338,6 +385,9 @@
                                             // z-index: 2;
                                         }
                                     }
+                                }
+                                .li__box {
+                                    flex: 5;
                                 }
                             }
                             .sureButton{

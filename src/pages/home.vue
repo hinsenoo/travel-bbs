@@ -40,6 +40,9 @@
                 activeIndex: '0',
             }
         },
+        mounted() {
+            this.getUserInfo();
+        },
         methods: {
             modalShow(type){
                 this.changeModal.modalType = type;
@@ -52,12 +55,29 @@
             // 设置导航栏活动索引
             index(type){
                 this.activeIndex = type + '';
+            },
+            // 初始化用户数据
+            getUserInfo() {
+                console.log('初始化数据');
+                this.userId = this.$storage.getItem('userId');
+                if(this.userId !== '' && !this.$store.state.loginStatus) {
+                    this.$axios.get(`${this.$api.getUserInfo.url}/${this.userId}`)
+                    .then((res)=>{
+                        if(Object.hasOwnProperty.call(res,'status') && res.status == 0){
+                            this.$store.dispatch('saveUserMessage', res.data);
+                            this.$store.dispatch('saveLoginStatus', true);
+                            // this.dataShow(res.data);
+                        }else{
+                            this.$message.error('获取用户数据失败');
+                        }
+                    })
+                }
             }
         }
     }
 </script>
 <style lang="scss">
-    .home{
-        overflow-y: scroll;
-    }
+    // .home{
+    //     overflow-y: scroll;
+    // }
 </style>

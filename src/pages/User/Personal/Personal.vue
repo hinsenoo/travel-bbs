@@ -8,33 +8,33 @@
                     </div>
                     <div class="message">
                         <h1>{{authorName}}</h1>
-                        <p><i class="el-icon-user"></i>{{authorWork}}</p>
+                        <p><i class="el-icon-user"></i>{{authorEmployment}}</p>
                         <p><i class="el-icon-edit"></i>{{authorIntroduce}}</p> 
                     </div>
                     <div class="other">
                         <el-button v-if="isSelf" @click="toSetting" type="primary" plain>编辑个人资料</el-button>
-                        <el-button v-if="!isSelf && !focusStatusList[authorId]" @click="focusClick(authorId)" type="success" plain>+ 关注</el-button>
-                        <el-button v-if="!isSelf && focusStatusList[authorId]" @click="focusClick(authorId)" type="success" size="small">已关注</el-button>
+                        <el-button v-if="!isSelf && !followingStatus" @click="focusClick(authorId)" type="success" plain size="medium" :loading="followLoading">+ 关注</el-button>
+                        <el-button v-if="!isSelf && followingStatus" @click="focusClick(authorId)" type="success" size="medium" :loading="followLoading">已关注</el-button>
                     </div>
                 </div>
                 <div class="content">
                     <el-tabs v-model="messageName" @tab-click="handleClick">
-                        <el-tab-pane label="文章" name="news">
+                        <el-tab-pane label="文章" name="news" v-loading="articlesLoading">
                             <div class="content-list">
                                 <div class="content-listNews"  v-for="(item, index) in articleList" :key="index">
                                     <div>
                                         <ul class="meta">
                                             <li class="categroy"><a href="javascript:;">{{item.category}}</a></li>
-                                            <li class="author"><a href="javascript:;" @click="$router.push(`/personal/${item.userId}`)">{{item.nickName}}</a></li>
-                                            <li>{{item.articleRead}}人阅读</li>
+                                            <li class="author">{{item.nickName}}</li>
+                                            <li>{{item.pageViews}}人阅读</li>
                                             <li class="area">{{item.place}}</li>
                                         </ul>
                                     </div>
                                     <!-- 主体内容 -->
-                                    <div class="news" @click="toArticle(item.articleId)">
+                                    <div class="news" @click="toArticle(item._id)">
                                         <div class="word">
                                             <div class="title">
-                                                <a href="javascript:;" @click="toArticle(item.articleId)">{{item.title}}</a>
+                                                <a href="javascript:;" @click="toArticle(item._id)">{{item.title}}</a>
                                             </div>
                                             <div class="fragment">
                                                 {{item.articleHTML}}
@@ -64,7 +64,7 @@
                             <el-tabs v-model="focusName" tab-position="left" style="min-height: 200px;">
                                 <el-tab-pane label="关注了" name="focus">
                                     <div class="focusMessage" v-for="(item,index) in focusList" :key="index">
-                                        <a href="javascript:;" @click="$router.push(`/personal/${item.userId}`)" class="message">
+                                        <a href="javascript:;"   class="message">
                                             <el-avatar :size="40" :src="item.userAvatar"></el-avatar>
                                             <div class="box">
                                                 <div class="user-name">{{item.nickName}}</div>
@@ -77,7 +77,7 @@
                                 </el-tab-pane>
                                 <el-tab-pane label="关注者" name="follower">
                                     <div class="focusMessage" v-for="(item,index) in followerList" :key="index">
-                                        <a href="javascript:;" @click="$router.push(`/personal/${item.userId}`)" class="message">
+                                        <a href="javascript:;"   class="message">
                                             <el-avatar :size="40" :src="item.userAvatar"></el-avatar>
                                             <div class="box">
                                                 <div class="user-name">{{item.nickName}}</div>
@@ -96,8 +96,8 @@
                                     <div>
                                         <ul class="meta">
                                             <li class="categroy"><a href="javascript:;">{{item.category}}</a></li>
-                                            <li class="author"><a href="javascript:;" @click="$router.push(`/personal/${item.userId}`)">{{item.nickName}}</a></li>
-                                            <li>{{item.articleRead}}人阅读</li>
+                                            <li class="author"><a href="javascript:;"  >{{item.nickName}}</a></li>
+                                            <li>{{item.pageViews}}人阅读</li>
                                             <li class="area">{{item.place}}</li>
                                         </ul>
                                     </div>
@@ -154,7 +154,7 @@
 </template>
 
 <script>
-    import {formatDayTime,getPText} from '../util';
+    import {formatDayTime,getPText} from '../../../util';
     export default {
         name: 'personal',
         data() {
@@ -164,7 +164,7 @@
                 isSelf: false, // 是否为用户本人
                 authorId: 0, // 访问的作者
                 authorName: '',
-                authorWork: '',
+                authorEmployment: '',
                 authorIntroduce: '',
                 authorAvator: '',
                 collectCount: 0,
@@ -181,26 +181,46 @@
                 collectList: [],  // 收藏列表
                 collect: [],
                 collectLoading: false,
+                articlesLoading: false, // 文章加载状态
                 focusStatus: true, // 关注状态
                 userId: 0,
-                
+                followLoading: false,   // 按钮加载
+                followingStatus: false, // 关注状态
             }
         },
         computed:{
-            focusStatusList(){
-                return this.$store.state.focusStatusList;
+            // focusStatusList(){
+            //     return this.$store.state.focusStatusList;
+            // },
+            followingList() {
+                return this.$store.state.userMessage.following;
             }
+        },
+        watch: {
+            followingList: {
+                handler: function (newVal) { 
+                    // 关注者 id 列表
+                    this.focusStatusList = [];
+                    newVal.forEach((item) => this.focusStatusList.push(item._id));
+                    this.followingStatus = this.focusStatusList.indexOf(this.authorId) === -1 ? false : true;
+                    console.log("🚀 ~ file: Personal.vue ~ line 205 ~ followingList ~ this.authorId", this.authorId)
+                    console.log("🚀 ~ file: Personal.vue ~ line 205 ~ followingList ~ this.focusStatusList", this.focusStatusList)
+                 },
+                // immediate: true
+            },
         },
         mounted(){
             this.$nextTick(()=>{
-                this.userId = this.$Base64.decode(this.$cookie.get('userId'));
-                this.authorId = Number(this.$route.params.id);
+                this.userId = this.$storage.getItem('userId');
+                // console.log(this.$storage.getItem('userId'));
+                this.authorId = this.$route.params.id;
+                this.getUserInfo(this.authorId);
+                this.getUserArticle(this.authorId);
                 // 确定是否为用户本人
                 if(this.authorId == this.userId){
                     // 是则为可编辑
                     this.isSelf = true;
                 }
-                this.messageRequest(this.authorId);
                 if(this.$route.query.type == 'collect'){
                     this.toCollect();
                 }else if(this.$route.query.type == 'focus'){
@@ -214,6 +234,7 @@
             // 编辑资料
             toSetting(){
                 this.$emit('index',0);
+                console.log(111);
                 this.$router.push(`/setting/${this.userId}`);
             },
             // 选项卡切换触发
@@ -225,56 +246,69 @@
             },
             // 数据渲染
             dataShow(userMessage){
-                // 是否存在数据，否则报错
-                if(Object.hasOwnProperty.call(userMessage,'collect')){
-                    this.authorName = userMessage.nickName;
-                    this.authorWork = userMessage.userWork;
-                    this.authorIntroduce = userMessage.userIntroduce;
-                    this.authorAvator = userMessage.userAvatar;
-                    this.collectCount = userMessage.collect.length;
-                    this.goodCount = userMessage.goodCount || 0;
-                    this.readCount = userMessage.articleReadCount;
-                    this.articleCount = userMessage.articleCount.length;
-                    this.articleIdList = userMessage.articleCount;
-                    this.focus = userMessage.focus.length;
-                    this.focusList = userMessage.focus;
-                    this.followerList = userMessage.follower;
-                    this.collectList = userMessage.collect;
-                    this.follower = userMessage.follower.length;
-                    this.creatTime = formatDayTime(userMessage.createTime).second;
+                // TODO: 是否存在数据，否则报错
+                // if(Object.hasOwnProperty.call(userMessage,'collect')){
+                    this.authorName = userMessage.nick_name;
+                    this.authorEmployment = userMessage.employment;
+                    this.authorIntroduce = userMessage.headline || '无';
+                    this.authorAvator = userMessage.avatar_url;
+                    // this.collectCount = userMessage.collect.length;
+                    // this.goodCount = userMessage.goodCount || 0;
+                    // this.readCount = userMessage.articleReadCount;
+                    this.articleCount = userMessage.articleCount;
+                    // this.articleIdList = userMessage.articleCount;
+                    // this.focus = userMessage.focus.length;
+                    // this.focusList = userMessage.focus;
+                    // this.followerList = userMessage.follower;
+                    // this.collectList = userMessage.collect;
+                    // this.follower = userMessage.follower.length;
+                    this.creatTime = formatDayTime(userMessage.createdAt).second;
 
-                    // 获取文章
-                    if(this.articleIdList.length != 0){
-                        this.articleIdList.forEach((item) => {
-                            this.axios.get(`/api/article/${item}`)
-                            .then((res)=>{
-                                if(res.status == 0){
-                                    let p = this.$Base64.decode(res.data.articleHTML);
-                                    res.data.articleHTML = getPText(p);
-                                    this.articleList.push(res.data);
-                                }else{
-                                    this.$message.error('网络异常');
-                                }
-                            })
-                        })
-                    }
-                }else{
-                    this.$message.error('获取用户数据失败');
-                    return;
-                }
+                    
+                // }else{
+                //     this.$message.error('获取用户数据失败');
+                //     return;
+                // }
             },
             // 请求用户信息
-            messageRequest(userId){
-                this.axios.get(`/api/user/${userId}`)
-                // this.$http(this.$api.getUserInfo)
+            getUserInfo(id){
+                this.$axios.get(`${this.$api.getUserInfo.url}/${id}`)
                 .then((res)=>{
-                    console.log(res);
-                    // if(Object.hasOwnProperty.call(res,'status') && res.status == 0){
-                    //     this.dataShow(res.data);
-                    // }else{
-                    //     this.$message.error('网络异常');
-                    // }
+                    if(Object.hasOwnProperty.call(res,'status') && res.status == 0){
+                        this.dataShow(res.data);
+                    }else{
+                        this.$message.error('获取用户数据失败');
+                    }
                 })
+            },
+            // 获取用户文章信息
+            getUserArticle(id) {
+                // 获取文章
+                // this.articleIdList.forEach((item) => {
+                this.articlesLoading = true;
+                this.$axios.get(`/users/${id}/articles`)
+                        .then((res)=>{
+                            // console.log(res);
+                            this.articlesLoading = false;
+                            if(res.status == 0){
+                                let list = res.data;
+                                if(list.length > 0) {
+                                    list.forEach((item) => {
+                                        // console.log(item.articleHTML);
+                                        // item.userId = item.writer._id;
+                                        item.nickName = item.writer.nick_name;
+                                        item.articleHTML = getPText(item.articleHTML);
+                                        this.articleList.push(item);
+                                    })
+                                }
+                            //     let p = this.$Base64.decode(res.data.articleHTML);
+                            //     res.data.articleHTML = getPText(p);
+                            //     this.articleList.push(res.data);
+                            }else{
+                                this.$message.error('网络异常');
+                            }
+                        })
+                    // })
             },
             // 查询是否已关注
             // checkFocus(personId,focusList){
@@ -293,27 +327,48 @@
                 // 检测是否登录
                 if(!this.userId){
                     this.$message.warning('请先登录');
+                    this.$store.dispatch('saveLoginModal', true);
                     return;
                 }
-                this.axios.post('/api/util/focus/', {
-                    uid: this.userId,
-                    fuid: focusId
-                })
-                .then((res)=>{
+                this.followLoading = true;
+                // 已关注则取关
+                if(this.followingStatus) {
                     // 取关
-                    let focusObj = this.focusStatusList;
-                    if(res.status == 1){
-                        this.$message.success('取关成功');
-                        delete focusObj[focusId];
-                        this.$store.dispatch('saveFocusStatusList', focusObj);
-                    }else if(res.status == 0){
-                        this.$message.success('关注成功');
-                        focusObj[focusId] = true;
-                        this.$store.dispatch('saveFocusStatusList', focusObj);
-                    }else{
-                        this.$message.error('网络异常');
-                    }
-                })
+                    this.$axios.delete(`/users/following/${focusId}`)
+                    .then((res)=>{
+                            if(res.status === 0) {
+                                this.followingStatus = false;
+                                this.$message.success('取关成功');
+                            }else {
+                                this.$message.warning(res.msg);
+                            }
+                            this.followLoading = false;
+                    })
+                }else {
+                    this.$axios.put(`/users/following/${focusId}`)
+                    .then((res)=>{
+                            if(res.status === 0) {
+                                this.followingStatus = true;
+                                this.$message.success('关注成功');
+                            }else {
+                                this.$message.warning(res.msg);
+                            }
+                            this.followLoading = false;
+                        // // 取关
+                        // let focusObj = this.focusStatusList;
+                        // if(res.status == 1){
+                        //     this.$message.success('取关成功');
+                        //     delete focusObj[focusId];
+                        //     this.$store.dispatch('saveFocusStatusList', focusObj);
+                        // }else if(res.status == 0){
+                        //     this.$message.success('关注成功');
+                        //     focusObj[focusId] = true;
+                        //     this.$store.dispatch('saveFocusStatusList', focusObj);
+                        // }else{
+                        //     this.$message.error('网络异常');
+                        // }
+                    })
+                }
 
             },
             // 收藏夹跳转
@@ -348,6 +403,7 @@
             },
             toArticle(id){
                 this.$emit('index',0);
+                console.log(id);
                 this.$router.push(`/article/${id}`);
             }
         }

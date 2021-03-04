@@ -5,10 +5,12 @@ import VueCookie from 'vue-cookie'
 import api from './util/api/index'
 import axios from './util/plugins/axios/index'
 import './util/plugins/element/element'
-import infiniteScroll from 'vue-infinite-scroll'
+// import infiniteScroll from 'vue-infinite-scroll'
+import InfiniteLoading from 'vue-infinite-loading';
 import store from './store'
-import router from './router';
+import router from './router/router';
 import App from './App.vue';
+import storage from './util/storage'
 
 // 对html标签进行转码
 let Base64 = require('js-base64').Base64;
@@ -18,6 +20,7 @@ Vue.prototype.$Base64 = Base64;
 Vue.prototype.$md5 = md5;
 Vue.prototype.$axios = axios;
 Vue.prototype.$api = api;
+Vue.prototype.$storage = storage;
 
 
 // 懒加载插件
@@ -25,7 +28,7 @@ Vue.use(VueLazyLoad,{
   loading: '/loading/loading-bubbles.svg',
   error: 'https://cube.elemecdn.com/e/fd/0fc7d20532fdaf769a25683617711png.png'
 });
-Vue.use(infiniteScroll);
+Vue.use(InfiniteLoading);
 Vue.use(VueCookie);
 
 // // 超时设置 8s

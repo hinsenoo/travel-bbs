@@ -13,13 +13,13 @@ function formatDuring(mss){
 function formatLastTime(oldTime){
     let time = new Date().getTime();
     let computedTime = new Date(oldTime).getTime();
-    console.log(time, computedTime);
     return formatDuring(time - computedTime);
 }
 // xxxx-xx-xx
 function formatDayTime(val) {
+    console.log('日期',val);
     if(val) {
-        val = Number(val);
+        // val = Number(val);
         let date = new Date(val)
         let Y = date.getFullYear();
         let M = date.getMonth() + 1;
@@ -86,8 +86,9 @@ function htmlDecode(text){
 
 // 匹配第一个 p 标签的内容，转换为 HTML 。使用 innerText 提取文字内容。并截取省略
 function getPText(p){
-    var reg = /<p[^>]*>(?:(?!<\/p>)[\s\S])*<\/p>/;
-    var str = p.match(reg);
+    // var reg = /<p[^>]*>(?:(?!<\/p>)[\s\S])*<\/p>/;
+    // var str = p.match(reg);
+    var str = p
     var div = document.createElement('div');
     div.innerHTML = str;
     if (div && div.innerText.length > 90) {
@@ -96,4 +97,30 @@ function getPText(p){
     return div.innerText;
 }
 
-export {formatDuring,formatLastTime,formatDayTime,timestampToTime,htmlEncode,htmlDecode,getPText}
+/**
+ * 函数节流
+ */
+function throttle(fn,delay){
+    var lastTime;
+    var timer;
+    delay = delay || 200;
+    return function() {
+      var args = arguments;
+      // 记录当前函数触发的时间
+      var nowTime = Date.now();
+      if (lastTime && nowTime - lastTime > delay) {
+        clearTimeout(timer);
+        timer = setTimeout(function () {
+          // 记录上一次函数触发的时间
+          lastTime = nowTime;
+          // 修正this指向问题
+          fn.apply(this, args);
+        }, delay);
+      }else{
+        lastTime = nowTime;
+        fn.apply(this, args);
+      }
+    }
+  } 
+
+export {formatDuring,formatLastTime,formatDayTime,timestampToTime,htmlEncode,htmlDecode,getPText,throttle}

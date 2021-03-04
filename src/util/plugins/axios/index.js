@@ -1,8 +1,9 @@
 /* eslint-disable */
 import axios from 'axios';
+import storage from '../../storage'
 // import qs from 'qs';
-// import store from '@/store';
-// import router from '@/router';
+import store from '../../../store/index';
+import router from '../../../router/router';
 // import { Message } from 'element-ui'
 // import {
 //   setCookie,
@@ -23,13 +24,21 @@ axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded
 
 // 请求拦截器
 axios.interceptors.request.use((config) => {
-  // 发起请求时，取消掉当前正在进行的相同请求
-  if (config.url.indexOf('system') === -1 && promiseArr[config.url]) {
-    promiseArr[config.url]('操作取消');
-    promiseArr[config.url] = cancel;
-  } else {
-    promiseArr[config.url] = cancel;
+  // 附带 token 请求头
+  if(config.method !== 'get') {
+    const token = storage.getItem('token');
+    if (token) {
+      config.headers.Authorization = 'Bearer ' + token;
+    }
+    console.log(config);
   }
+  // 发起请求时，取消掉当前正在进行的相同请求
+  // if (promiseArr[config.url]) {
+  //   promiseArr[config.url]('操作取消');
+  //   promiseArr[config.url] = cancel;
+  // } else {
+  //   promiseArr[config.url] = cancel;
+  // }
 //   let token = store.getters.token;
 //   for (let i = 0; i < 5; i++) {
 //     if (document.cookie.indexOf('token') > -1) {
@@ -62,7 +71,15 @@ axios.interceptors.response.use(response => {
         // break;
         return false;
       case 401:
-        error.message = { status: error.response.data.status, msg: error.response.data.message }
+        // type: 1——登录过期
+        if(error.response.data.originalError) {
+          store.commit('saveLogoutStatus');
+          error.message = { status: error.response.data.status, msg: '登录过期，请重新登录', type: 1 }
+          store.dispatch('saveLoginModal', 1);
+        }else {
+          error.message = { status: error.response.data.status, msg: error.response.data.message }
+        }
+        // if(error.response.data.originalError)
         break;
         // error.message = '未授权，请重新登录';
         // break;

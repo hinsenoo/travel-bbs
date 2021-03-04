@@ -8,11 +8,11 @@
                             <el-avatar :size="40" :src="userAvatar"></el-avatar>
                             <div class="box">
                                 <div class="user-name">{{nickName}}</div>
-                                <div class="create-time">{{articleCreateTime}} <span>阅读 {{articleReadCount}}</span></div>
+                                <div class="create-time">{{articleCreateTime}}  <span>阅读 {{articleReadCount}}</span></div>
                             </div>
                         </a>
-                        <el-button v-if="!isSelf && !focusStatusList[authorId]" @click="focusClick(authorId)" type="success" plain size="medium">+ 关注</el-button>
-                        <el-button v-if="!isSelf && focusStatusList[authorId]" @click="focusClick(authorId)" type="success" size="medium">已关注</el-button>
+                        <el-button v-if="!isSelf && !followingStatus" @click="focusClick(authorId)" type="success" plain size="medium" :loading="followLoading">+ 关注</el-button>
+                        <el-button v-if="!isSelf && followingStatus" @click="focusClick(authorId)" type="success" size="medium" :loading="followLoading">已关注</el-button>
                         <el-button v-if="isSelf" @click="$router.push(`/edit/${articleId}`)"  type="primary" size="medium" plain>编辑</el-button>
                     </div>
                     <div class="article-title">
@@ -41,8 +41,8 @@
                                 <div class="create-time">发布了 {{userArticleCount}} 篇文章 · 获得点赞 {{userGoodCount}} · 获得阅读 {{userReadCount}}</div>
                             </div>
                         </a>
-                        <el-button v-if="!isSelf && !focusStatusList[authorId]" @click="focusClick(authorId)" type="success" plain size="small">+ 关注</el-button>
-                        <el-button v-if="!isSelf && focusStatusList[authorId]" @click="focusClick(authorId)" type="success" size="small">已关注</el-button>
+                        <el-button v-if="!isSelf && !followingStatus" @click="focusClick(authorId)" type="success" plain size="small" :loading="followLoading">+ 关注</el-button>
+                        <el-button v-if="!isSelf && followingStatus" @click="focusClick(authorId)" type="success" size="small" :loading="followLoading">已关注</el-button>
                         <el-button v-if="isSelf" @click="$router.push(`/setting/${userId}`)" type="primary" size="small" plain>编辑</el-button>
                     </div>
                 </div>
@@ -134,7 +134,7 @@
                         <el-avatar :size="50" :src="userAvatar"></el-avatar>
                         <div class="box">
                             <div class="user-name">{{nickName}}</div>
-                            {{userWork}}
+                            {{employment}}
                         </div>
                     </a>
                     <div class="honor">
@@ -185,7 +185,7 @@
 </template>
 
 <script>
-    import {formatDayTime,timestampToTime} from '../util';
+    import {formatDayTime,timestampToTime} from '../../util';
     export default {
         name: 'user-article',
         data(){
@@ -202,7 +202,7 @@
                 replyInsideInput: '',
                 // 用户信息
                 nickName: '',
-                userWork: '',
+                employment: '',
                 userAvatar: '',
                 userGoodCount: 0,
                 userReadCount: 0,
@@ -224,12 +224,15 @@
                 comment: [],
                 // 是否为本人
                 isSelf: false,
+                focusStatusList: [],    // 关注id列表
+                followingStatus: false, // 关注状态
+                followLoading: false,   // 按钮加载
             }
         },
         computed:{
-            focusStatusList(){
-                return this.$store.state.focusStatusList;
-            },
+            // focusStatusList(){
+            //     return this.$store.state.focusStatusList;
+            // },
             loginStatus(){
                 return this.$store.state.loginStatus;
             },
@@ -241,72 +244,80 @@
                 }
             },
             userId(){
-                return this.$store.state.userMessage.userId;
+                return this.$store.state.userMessage._id;
+            },
+            followingList() {
+                return this.$store.state.userMessage.following;
+            }
+        },
+        watch: {
+            followingList(newVal) {
+                // 关注者 id 列表
+                this.focusStatusList = [];
+                newVal.forEach((item) => this.focusStatusList.push(item._id));
+                console.log(this.focusStatusList);
+                // console.log('查询',this.focusStatusList.indexOf(this.authorId),this.focusStatusList, this.authorId);
+                this.followingStatus = this.focusStatusList.indexOf(this.authorId) === -1 ? false : true;
+            },
+            authorId(newVal) {
+                if(newVal !== 0) {
+                    console.log(newVal);
+                    this.followingStatus = this.focusStatusList.indexOf(newVal) === -1 ? false : true;
+                }
             }
         },
         mounted(){
-            this.articleId = Number(this.$route.params.id);
-            this.axios.get(`/api/article/${this.articleId}`)
+            this.articleId = this.$route.params.id;
+            this.$axios.get(`${this.$api.getArticleInfo.url}/${this.articleId}`)
             .then((res)=>{
                 if(res.status == 0){
-                    let data = res.data;
-                    this.authorId = Number(data.userId);
-
+                    let data = JSON.parse(JSON.stringify(res.data));
+                    this.authorId = data.writer._id;
                     // TODO : 若为本人则可编辑
                     // 确定是否为用户本人
+                    console.log(this.userId);
                     if(this.authorId == this.userId){
                         // 是则为可编辑
                         this.isSelf = true;
-                        if(Object.hasOwnProperty.call(this.$store.state.userMessage,'collect')){
-                            this.messageShow(this.$store.state.userMessage);
-                        }else{
-                            this.$message.error('网络异常');
-                        }
+                        this.messageShow(this.$store.state.userMessage);
                     }else{
-                        // 获取用户数据
-                        this.axios.get(`/api/user/${this.authorId}`)
-                        .then((res)=>{
-                            if(Object.hasOwnProperty.call(res,'status') && res.status == 0){
-                                // 渲染用户数据
-                                this.messageShow(res.data);
-                            }else{
-                                this.$message.error('网络异常');
-                            }
-                        })
+                        this.messageShow(res.data.writer);
                     }
                 
-
+                    // return;
                     // 渲染文章数据
+                    console.log("文章数据", data);
                     this.title = data.title;
                     this.titleImgUrl = data.titleImgUrl;
                     this.category = data.category;
                     this.place = data.place;
-                    this.articleHTML = this.$Base64.decode(data.articleHTML);
+                    this.articleHTML = data.articleHTML;
                     // 修改html内容
                     // this.$refs.content.innerHTML = this.articleHTML;
-                    this.articleCreateTime = formatDayTime(data.editTime).first;
-                    this.editTime = formatDayTime(data.editTime).first;
-                    this.articleReadCount = data.articleRead;
-                    this.articleGood = data.good;
+                    this.articleCreateTime = formatDayTime(data.createdAt).first;
+                    // this.editTime = formatDayTime(data.updatedAt).first;
+                    this.articleReadCount = data.pageViews;
+                    this.articleGood = data.good || 0;
 
-                    // 评论拼接
-                    this.addComment(data.comment);
+                    // // 评论拼接
+                    // this.addComment(data.comment);
 
 
-                    // 匹配用户是否收藏
-                    if(this.$store.state.loginStatus){
-                        if(this.$store.state.userMessage.collect.indexOf(this.articleId) > -1){
-                            this.collectStatus = true;
-                        }
-                    }
+                    // // 匹配用户是否收藏
+                    // if(this.$store.state.loginStatus){
+                    //     if(this.$store.state.userMessage.collect.indexOf(this.articleId) > -1){
+                    //         this.collectStatus = true;
+                    //     }
+                    // }
 
-                    // 匹配用户是否点赞
-                    if(this.$store.state.loginStatus){
-                        if(this.articleGood.indexOf(this.userId) > -1){
-                            this.goodStatus = true;
-                        }
-                    }
+                    // // 匹配用户是否点赞
+                    // if(this.$store.state.loginStatus){
+                    //     if(this.articleGood.indexOf(this.userId) > -1){
+                    //         this.goodStatus = true;
+                    //     }
+                    // }
                 }else{
+                    this.$router.push('/');
                     this.$message.error('文章获取失败，请重试');
                 }
             })
@@ -314,27 +325,28 @@
         methods:{
             // 渲染用户数据
             messageShow(data){
+                console.log(data);
                 // 渲染用户数据
-                this.nickName = data.nickName;
-                this.userWork = data.userWork;
-                this.userAvatar = data.userAvatar;
+                this.nickName = data.nick_name;
+                this.employment = data.employment;
+                this.userAvatar = data.avatar_url;
                 this.userGoodCount = data.goodCount || 0;
-                this.userReadCount = data.articleReadCount;
+                this.userReadCount = data.articleReadCount || 0;
                 // this.userCreateTime = formatDayTime(res.data.createTime).first;
-                this.userArticleCount = data.articleCount.length;
-                this.userArticle = data.articleCount;
+                // this.userArticleCount = data.articleCount.length;
+                // this.userArticle = data.articleCount;
 
-                if(this.userArticle.length != 0){
-                    this.userArticle.slice(0,5).forEach((item) => {
-                        this.axios.get(`/api/article/${item}`)
-                        .then((res)=>{
-                            if(res.status == 0){
-                                this.userArticleList.push(res.data);
-                            }else{
-                                this.$message.error('网络异常');
-                            }
-                        })
-                    })
+                // if(this.userArticle.length != 0){
+                //     this.userArticle.slice(0,5).forEach((item) => {
+                //         this.axios.get(`/api/article/${item}`)
+                //         .then((res)=>{
+                //             if(res.status == 0){
+                //                 this.userArticleList.push(res.data);
+                //             }else{
+                //                 this.$message.error('网络异常');
+                //             }
+                //         })
+                //     })
                     // this.axios.post('/api/article/collect',{ ids: this.userArticle })
                     // .then((res)=>{
                     //     if(res.status == 0){
@@ -349,7 +361,7 @@
                     //         this.$message.error('网络异常');
                     //     }
                     // })
-                }
+                // }
             },
             toTime(timestamp) {
                 return timestampToTime(timestamp);
@@ -387,27 +399,48 @@
                 // 检测是否登录
                 if(!this.userId){
                     this.$message.warning('请先登录');
+                    this.$store.dispatch('saveLoginModal', true);
                     return;
                 }
-                this.axios.post('/api/util/focus', {
-                    uid: this.userId,
-                    fuid: focusId
-                })
-                .then((res)=>{
+                this.followLoading = true;
+                // 已关注则取关
+                if(this.followingStatus) {
                     // 取关
-                    let focusObj = this.focusStatusList;
-                    if(res.status == 1){
-                        this.$message.success('取关成功');
-                        delete focusObj[focusId];
-                        this.$store.dispatch('saveFocusStatusList', focusObj);
-                    }else if(res.status == 0){
-                        this.$message.success('关注成功');
-                        focusObj[focusId] = true;
-                        this.$store.dispatch('saveFocusStatusList', focusObj);
-                    }else{
-                        this.$message.error('网络异常');
-                    }
-                })
+                    this.$axios.delete(`/users/following/${focusId}`)
+                    .then((res)=>{
+                            if(res.status === 0) {
+                                this.followingStatus = false;
+                                this.$message.success('取关成功');
+                            }else {
+                                this.$message.warning(res.msg);
+                            }
+                            this.followLoading = false;
+                    })
+                }else {
+                    this.$axios.put(`/users/following/${focusId}`)
+                    .then((res)=>{
+                            if(res.status === 0) {
+                                this.followingStatus = true;
+                                this.$message.success('关注成功');
+                            }else {
+                                this.$message.warning(res.msg);
+                            }
+                            this.followLoading = false;
+                        // // 取关
+                        // let focusObj = this.focusStatusList;
+                        // if(res.status == 1){
+                        //     this.$message.success('取关成功');
+                        //     delete focusObj[focusId];
+                        //     this.$store.dispatch('saveFocusStatusList', focusObj);
+                        // }else if(res.status == 0){
+                        //     this.$message.success('关注成功');
+                        //     focusObj[focusId] = true;
+                        //     this.$store.dispatch('saveFocusStatusList', focusObj);
+                        // }else{
+                        //     this.$message.error('网络异常');
+                        // }
+                    })
+                }
 
             },
             // 收藏事件
@@ -593,7 +626,8 @@
                                     font-weight: 700;
                                     color: #333;
                                     font-size: 18px;
-                                    font-weight: 700;
+                                    font-weight: 600;
+                                    margin-bottom: 5px;
                                 }
                                 .create-time{
                                     font-size: 14px;
@@ -945,9 +979,7 @@
             }
             .fixed{
                 position: fixed;
-                top: 50%;
-                left: calc((100% - 960px)/2 - 66px);
-                transform: translateY(-50%);
+                transform: translate(-180%, 100%);
                 height: 150px;
                 .icon{
                     // width: 36px;

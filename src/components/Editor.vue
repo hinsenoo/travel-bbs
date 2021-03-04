@@ -39,7 +39,7 @@
             this.editor.customConfig.zIndex = 3;
 
             // 图片上传接口
-            this.editor.customConfig.uploadImgServer = 'http://47.106.215.69:8080/tourism/user/upload/';
+            this.editor.customConfig.uploadImgServer = '/api/upload';
             this.editor.customConfig.uploadFileName = 'file'
             // 配置菜单
             this.editor.customConfig.menus = [
@@ -86,7 +86,7 @@
                     // insertImg 是插入图片的函数，editor 是编辑器对象，result 是服务器端返回的结果
 
                     // 举例：假如上传图片成功后，服务器端返回的是 {url:'....'} 这种格式，即可这样插入图片：
-                    var url = result.data;
+                    var url = result.url;
                     // 插入图片
                     insertImg(url);
 
