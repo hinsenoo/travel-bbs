@@ -402,7 +402,6 @@ export default {
     },
     // 初始化用户数据
     getUserInfo() {
-      // console.log('初始化数据');
       this.userId = this.$storage.getItem("userId");
       if (this.userId !== "" && !this.$store.state.loginStatus) {
         this.$axios

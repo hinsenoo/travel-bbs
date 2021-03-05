@@ -13,8 +13,8 @@
                     </div>
                     <div class="other">
                         <el-button v-if="isSelf" @click="toSetting" type="primary" plain>编辑个人资料</el-button>
-                        <el-button v-if="!isSelf && !followingStatus" @click="focusClick(authorId)" type="success" plain size="medium" :loading="followLoading">+ 关注</el-button>
-                        <el-button v-if="!isSelf && followingStatus" @click="focusClick(authorId)" type="success" size="medium" :loading="followLoading">已关注</el-button>
+                        <el-button v-if="!isSelf && !followingIdList[authorId]" @click="focusClick(authorId)" type="success" plain size="medium" :loading="followLoading">+ 关注</el-button>
+                        <el-button v-if="!isSelf && followingIdList[authorId]" @click="focusClick(authorId)" type="success" size="medium" :loading="followLoading">已关注</el-button>
                     </div>
                 </div>
                 <div class="content">
@@ -64,28 +64,28 @@
                             <el-tabs v-model="focusName" tab-position="left" style="min-height: 200px;">
                                 <el-tab-pane label="关注了" name="focus">
                                     <div class="focusMessage" v-for="(item,index) in focusList" :key="index">
-                                        <a href="javascript:;"   class="message">
-                                            <el-avatar :size="40" :src="item.userAvatar"></el-avatar>
+                                        <a href="javascript:;" @click="toPersonal(item._id)"  class="message">
+                                            <el-avatar :size="40" :src="item.avatar_url"></el-avatar>
                                             <div class="box">
-                                                <div class="user-name">{{item.nickName}}</div>
-                                                <p><i class="el-icon-user"></i>{{item.userWork}}</p>
+                                                <div class="user-name">{{item.nick_name}}</div>
+                                                <p><i class="el-icon-user"></i>{{item.employment}}</p>
                                             </div>
                                         </a>
-                                        <el-button v-if="focusStatusList[item.userId] && userId != item.userId" type="success" size="small" @click="focusClick(item.userId)">已关注</el-button>
-                                        <el-button v-if="!focusStatusList[item.userId] && userId != item.userId" type="success" size="small" @click="focusClick(item.userId)" plain>+ 关注</el-button>
+                                        <el-button v-if="followingIdList[item._id] && userId != item._id" type="success" size="small" @click="focusClick(item._id)">已关注</el-button>
+                                        <el-button v-if="!followingIdList[item._id] && userId != item._id" type="success" size="small" @click="focusClick(item._id)" plain>+ 关注</el-button>
                                     </div>
                                 </el-tab-pane>
                                 <el-tab-pane label="关注者" name="follower">
                                     <div class="focusMessage" v-for="(item,index) in followerList" :key="index">
-                                        <a href="javascript:;"   class="message">
-                                            <el-avatar :size="40" :src="item.userAvatar"></el-avatar>
+                                        <a href="javascript:;"  @click="toPersonal(item._id)"  class="message">
+                                            <el-avatar :size="40" :src="item.avatar_url"></el-avatar>
                                             <div class="box">
-                                                <div class="user-name">{{item.nickName}}</div>
-                                                <p><i class="el-icon-user"></i>{{item.userWork}}</p>
+                                                <div class="user-name">{{item.nick_name}}</div>
+                                                <p><i class="el-icon-user"></i>{{item.employment}}</p>
                                             </div>
                                         </a>
-                                        <el-button v-if="focusStatusList[item.userId] && userId != item.userId " type="success" size="small" @click="focusClick(item.userId)" >已关注</el-button>
-                                        <el-button v-if="!focusStatusList[item.userId] && userId != item.userId" type="success" size="small" @click="focusClick(item.userId)" plain>+ 关注</el-button>
+                                        <el-button v-if="followingIdList[item._id] && userId != item._id " type="success" size="small" @click="focusClick(item._id)" >已关注</el-button>
+                                        <el-button v-if="!followingIdList[item._id] && userId != item._id" type="success" size="small" @click="focusClick(item._id)" plain>+ 关注</el-button>
                                     </div>
                                 </el-tab-pane>
                             </el-tabs>
@@ -137,11 +137,11 @@
                 <div class="focus">
                     <div class="first" @click="messageName='focusList';focusName='focus';">
                         关注了
-                        <span>{{focus}}</span>
+                        <span>{{focusList.length}}</span>
                     </div>
                     <div @click="messageName='focusList';focusName='follower';">
                         关注者
-                        <span>{{follower}}</span>
+                        <span>{{followerList.length}}</span>
                     </div>
                 </div>
                 <ul>
@@ -189,30 +189,41 @@
             }
         },
         computed:{
-            // focusStatusList(){
-            //     return this.$store.state.focusStatusList;
-            // },
+            followingIdList(){
+                return this.$store.state.followingIdList;
+            },
             followingList() {
                 return this.$store.state.userMessage.following;
             }
         },
         watch: {
-            followingList: {
-                handler: function (newVal) { 
-                    // 关注者 id 列表
-                    this.focusStatusList = [];
-                    newVal.forEach((item) => this.focusStatusList.push(item._id));
-                    this.followingStatus = this.focusStatusList.indexOf(this.authorId) === -1 ? false : true;
-                    console.log("🚀 ~ file: Personal.vue ~ line 205 ~ followingList ~ this.authorId", this.authorId)
-                    console.log("🚀 ~ file: Personal.vue ~ line 205 ~ followingList ~ this.focusStatusList", this.focusStatusList)
-                 },
-                // immediate: true
-            },
+            $route(newVal) {
+            console.log("🚀 ~ file: Personal.vue ~ line 201 ~ $route ~ newVal", newVal)
+                if(newVal.query.type === 'collect') {
+                    this.toCollect();
+                }else if(newVal.query.type === 'collect') {
+                    this.messageName='focusList';
+                    this.focusName='focus';
+                }
+            }
+            // followingList: {
+            //     handler: function (newVal) { 
+            //         // 关注者 id 列表
+            //         // this.focusStatusList = [];
+            //         // if(newVal) {
+            //         //     newVal.forEach((item) => this.focusStatusList.push(item._id));
+            //         //     this.authorId = this.$route.params.id;
+            //         //     this.followingStatus = this.focusStatusList.indexOf(this.authorId) === -1 ? false : true;
+            //         // }
+            //         console.log("🚀 ~ file: Personal.vue ~ line 205 ~ followingList ~ this.authorId", this.authorId)
+            //         console.log("🚀 ~ file: Personal.vue ~ line 205 ~ followingList ~ this.focusStatusList", this.focusStatusList)
+            //     },
+            //     immediate: true
+            // },
         },
         mounted(){
             this.$nextTick(()=>{
                 this.userId = this.$storage.getItem('userId');
-                // console.log(this.$storage.getItem('userId'));
                 this.authorId = this.$route.params.id;
                 this.getUserInfo(this.authorId);
                 this.getUserArticle(this.authorId);
@@ -257,9 +268,9 @@
                     // this.readCount = userMessage.articleReadCount;
                     this.articleCount = userMessage.articleCount;
                     // this.articleIdList = userMessage.articleCount;
+                    this.focusList = userMessage.following;
                     // this.focus = userMessage.focus.length;
-                    // this.focusList = userMessage.focus;
-                    // this.followerList = userMessage.follower;
+                    this.followerList = userMessage.followers;
                     // this.collectList = userMessage.collect;
                     // this.follower = userMessage.follower.length;
                     this.creatTime = formatDayTime(userMessage.createdAt).second;
@@ -332,13 +343,20 @@
                 }
                 this.followLoading = true;
                 // 已关注则取关
-                if(this.followingStatus) {
+                let followingIdList = this.followingIdList;
+                if(this.followingIdList[focusId]) {
                     // 取关
                     this.$axios.delete(`/users/following/${focusId}`)
                     .then((res)=>{
                             if(res.status === 0) {
-                                this.followingStatus = false;
+                                delete followingIdList[focusId];
+                                this.$store.dispatch('saveFollowingIdList', followingIdList);
                                 this.$message.success('取关成功');
+                                if(focusId === this.authorId) {
+                                    let delIndex;
+                                    this.followerList.forEach((item,index) => item._id === this.userId ? delIndex = index : '');
+                                    this.followerList.splice(delIndex, 1);
+                                }
                             }else {
                                 this.$message.warning(res.msg);
                             }
@@ -348,8 +366,13 @@
                     this.$axios.put(`/users/following/${focusId}`)
                     .then((res)=>{
                             if(res.status === 0) {
-                                this.followingStatus = true;
                                 this.$message.success('关注成功');
+                                followingIdList[focusId] = true;
+                                this.$store.dispatch('saveFollowingIdList', followingIdList);
+                                this.$message.success('关注成功');
+                                if(focusId === this.authorId) {
+                                    this.followerList.push(this.$store.state.userMessage);
+                                }
                             }else {
                                 this.$message.warning(res.msg);
                             }
@@ -359,11 +382,11 @@
                         // if(res.status == 1){
                         //     this.$message.success('取关成功');
                         //     delete focusObj[focusId];
-                        //     this.$store.dispatch('saveFocusStatusList', focusObj);
+                        //     this.$store.dispatch('saveFollowingIdList', focusObj);
                         // }else if(res.status == 0){
                         //     this.$message.success('关注成功');
                         //     focusObj[focusId] = true;
-                        //     this.$store.dispatch('saveFocusStatusList', focusObj);
+                        //     this.$store.dispatch('saveFollowingIdList', focusObj);
                         // }else{
                         //     this.$message.error('网络异常');
                         // }
@@ -405,6 +428,12 @@
                 this.$emit('index',0);
                 console.log(id);
                 this.$router.push(`/article/${id}`);
+            },
+            toPersonal(id){
+                this.$emit('index',0);
+                if(id !== this.$route.params.id) {
+                    this.$router.push(`/personal/${id}`);
+                }
             }
         }
     }

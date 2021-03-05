@@ -16,10 +16,10 @@ export default {
         context.commit('saveLoginStatus',loginStatus);
     },
     // 关注状态
-    saveFocusStatusList(context,focusStatusList){
+    saveFollowingIdList(context,followingIdList){
         // 一个与 store 实例具有相同方法和属性的 context
         // 传递给 mutations
-        context.commit('saveFocusStatusList',focusStatusList);
+        context.commit('saveFollowingIdList',followingIdList);
     },
     // 更新收藏状态
     saveCollectList(context,collectList){

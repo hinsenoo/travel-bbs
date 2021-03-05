@@ -5,6 +5,11 @@ import storage from '../util/storage'
 // 读取
 export default {
     saveUserMessage(state,userMessage){
+        let followingIdList = {};
+        if(userMessage.following.length >0 ) {
+            userMessage.following.forEach((item) => followingIdList[item._id]=true);
+        }
+        state.followingIdList = followingIdList;
         // 改变状态，state 中的数据
         state.userMessage = userMessage;
     },
@@ -19,11 +24,11 @@ export default {
         state.loginStatus = false;
         state.userMessage = {};
     },
-    saveFocusStatusList(state,focusStatusList){
+    saveFollowingIdList(state,followingIdList){
         // 可以创建一个新的对象，把原来对象的属性，和要添加的属性加到新的对象里
-        let newObject = Object.assign({}, focusStatusList);
+        let newObject = Object.assign({}, followingIdList);
         // 改变状态，state 中的数据
-        state.focusStatusList = newObject;
+        state.followingIdList = newObject;
     },
     saveCollectList(state,collectList){
         // 改变状态，state 中的数据

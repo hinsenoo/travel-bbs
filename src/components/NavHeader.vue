@@ -137,14 +137,15 @@
             // }
         },
         watch: {
-            $route(to, from) {
-                // 对路由变化作出响应...
-                if(to.name == from.name){
-                    this.$router.go(0);
-                }
-            }
+
         },
         methods: {
+            toPersonal(id){
+                this.$emit('index',0);
+                if(id !== this.$route.params.id) {
+                    this.$router.push(`/personal/${id}`);
+                }
+            },
             // 导航栏触发事件
             handleSelect(key) {
                 if(key == 1){
@@ -159,11 +160,10 @@
                 switch (command) {
                     case 'personal':
                         // this.$router.push(`/personal/${this.$Base64.decode(this.$cookie.get('userId'))}`).catch(err => {err})
-                        console.log(this.userId);
-                        this.$router.replace({ name: 'personal', params: { id: this.userId }});
+                        this.toPersonal(this.userId);
                         break;
                     case 'collect':
-                        this.$router.push(`/personal/${this.userId}?type=collect`);
+                        this.$router.replace(`/personal/${this.userId}?type=collect`);
                         break;
                     case 'setting':
                         this.$router.push(`/setting/${this.userId}`);
