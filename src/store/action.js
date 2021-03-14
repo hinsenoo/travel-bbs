@@ -21,11 +21,17 @@ export default {
         // 传递给 mutations
         context.commit('saveFollowingIdList',followingIdList);
     },
-    // 更新收藏状态
-    saveCollectList(context,collectList){
+    // 点赞状态
+    saveLikeArticleIdList(context,likeArticleIdList){
         // 一个与 store 实例具有相同方法和属性的 context
         // 传递给 mutations
-        context.commit('saveCollectList',collectList);
+        context.commit('saveLikeArticleIdList',likeArticleIdList);
+    },
+    // 更新收藏状态
+    saveCollectIdList(context,collectIdList){
+        // 一个与 store 实例具有相同方法和属性的 context
+        // 传递给 mutations
+        context.commit('saveCollectIdList',collectIdList);
     },
     // 登录模态框
     saveLoginModal(context,loginModal){

@@ -224,6 +224,7 @@
                             this.password = '';
                             this.closeModal();
                             this.$message.success('登录成功');
+                            this.$router.go();
                         }else if(res.status == 401) {
                             this.$message.error(res.msg);
                         }

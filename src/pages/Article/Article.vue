@@ -11,12 +11,12 @@
                                 <div class="create-time">{{articleCreateTime}}  <span>阅读 {{articleReadCount}}</span></div>
                             </div>
                         </a>
-                        <el-button v-if="!isSelf && !followingStatus" @click="focusClick(authorId)" type="success" plain size="medium" :loading="followLoading">+ 关注</el-button>
-                        <el-button v-if="!isSelf && followingStatus" @click="focusClick(authorId)" type="success" size="medium" :loading="followLoading">已关注</el-button>
+                        <el-button v-if="!isSelf && !followingIdList[authorId]" @click="focusClick(authorId)" type="success" plain size="medium" :loading="followLoading">+ 关注</el-button>
+                        <el-button v-if="!isSelf && followingIdList[authorId]" @click="focusClick(authorId)" type="success" size="medium" :loading="followLoading">已关注</el-button>
                         <el-button v-if="isSelf" @click="$router.push(`/edit/${articleId}`)"  type="primary" size="medium" plain>编辑</el-button>
                     </div>
                     <div class="article-title">
-                        <img v-lazy="titleImgUrl" alt="">
+                        <img :src="titleImgUrl" alt="">
                         <h1>{{title}}</h1>
                     </div>
                     <div class="article-content" ref="content" v-html="articleHTML">
@@ -25,7 +25,7 @@
                     <div class="article-good">
                         <div class="good">
                             <div class="icon icon-good"><img src="/imgs/icons/good-bottom.png" alt=""></div>
-                            <span>{{articleGood.length}} 人点赞</span>
+                            <span>{{likeCount || 0}} 人点赞</span>
                         </div>
                         <div class="good">
                             <div class="icon"><img src="/imgs/icons/gps.png" alt=""></div>
@@ -41,8 +41,8 @@
                                 <div class="create-time">发布了 {{userArticleCount}} 篇文章 · 获得点赞 {{userGoodCount}} · 获得阅读 {{userReadCount}}</div>
                             </div>
                         </a>
-                        <el-button v-if="!isSelf && !followingStatus" @click="focusClick(authorId)" type="success" plain size="small" :loading="followLoading">+ 关注</el-button>
-                        <el-button v-if="!isSelf && followingStatus" @click="focusClick(authorId)" type="success" size="small" :loading="followLoading">已关注</el-button>
+                        <el-button v-if="!isSelf && !followingIdList[authorId]" @click="focusClick(authorId)" type="success" plain size="small" :loading="followLoading">+ 关注</el-button>
+                        <el-button v-if="!isSelf && followingIdList[authorId]" @click="focusClick(authorId)" type="success" size="small" :loading="followLoading">已关注</el-button>
                         <el-button v-if="isSelf" @click="$router.push(`/setting/${userId}`)" type="primary" size="small" plain>编辑</el-button>
                     </div>
                 </div>
@@ -65,14 +65,14 @@
                     </div>
                     <!-- 一级评论 -->
                     <div class="commentBox" v-for="(item,index) in comment" :key="index">
-                        <a href="javascript:;" @click="$router.push(`/personal/${item.userId}`)">
-                            <el-avatar :size="40" :src="item.commentAvatar"></el-avatar>
+                        <a href="javascript:;" @click="$router.push(`/personal/${item.commentator._id}`)">
+                            <el-avatar :size="40" :src="item.commentator.avatar_url"></el-avatar>
                         </a>
                         <div class="commentMessage">
-                            <a href="javascript:;" @click="$router.push(`/personal/${item.userId}`)">{{item.commentName}}</a>
-                            <p>{{item.commentContent}}</p>
+                            <a href="javascript:;" @click="$router.push(`/personal/${item.commentator._id}`)">{{item.commentator.nick_name}}</a>
+                            <p>{{item.content}}</p>
                             <div class="date">
-                                <span class="time">{{toTime(item.commentTime)}}</span>
+                                <span class="time">{{toTime(item.createdAt)}}</span>
                                 <a href="javascript:;"><img src="/imgs/icons/good-article.png" alt=""> 0</a>
                                 <a href="javascript:;" @click="showReplyBox('reply',index,true)"><img src="/imgs/icons/comment-article.png" alt=""> 回复</a>
                             </div>
@@ -86,23 +86,23 @@
                                     ></el-input>
                                 </div>
                                 <div class="reply-button">
-                                    <el-button size="small" type="primary" round @click="postComment('second',item.commentId,item.commentName,item.userId,1)">发布</el-button>
+                                    <el-button size="small" type="primary" round @click="postComment('second',item._id,item.commentator.nick_name,item.commentator._id,1)">发布</el-button>
                                     <el-button @click="showReplyBox('reply',index,false)" size="small" round>取消</el-button>
                                 </div>
                             </div>
                             <!-- 二级评论 -->
                             <div class="commentBox inside"  v-for="(replyItem,replyIndex) in item.reply" :key="replyIndex">
-                                <a href="javascript:;" @click="$router.push(`/personal/${replyItem.replyId}`)">
-                                    <el-avatar :size="40" :src="replyItem.replyAvatar"></el-avatar>
+                                <a href="javascript:;" @click="$router.push(`/personal/${replyItem.commentator._id}`)">
+                                    <el-avatar :size="40" :src="replyItem.commentator.avatar_url"></el-avatar>
                                 </a>
                                 <div class="commentMessage">
-                                    <a href="javascript:;" @click="$router.push(`/personal/${replyItem.replyId}`)">{{replyItem.replyName}}</a>
+                                    <a href="javascript:;" @click="$router.push(`/personal/${replyItem.commentator._id}`)">{{replyItem.commentator.nick_name}}</a>
                                     <p>
                                         回复 
-                                        <a href="javascript:;"  @click="$router.push(`/personal/${replyItem.toId}`)">{{replyItem.toName}}</a>:
-                                        {{replyItem.replyContent}}</p>
+                                        <a href="javascript:;"  @click="$router.push(`/personal/${replyItem.replyTo._id}`)">{{replyItem.replyTo.nick_name}}</a>:
+                                        {{replyItem.content}}</p>
                                     <div class="date">
-                                        <span class="time">{{toTime(replyItem.replyTime)}}</span>
+                                        <span class="time">{{toTime(replyItem.createdAt)}}</span>
                                         <a href="javascript:;"><img src="/imgs/icons/good-article.png" alt=""> 0</a>
                                         <a href="javascript:;" @click="showReplyBox('replyInside',index+''+replyIndex,true)"><img src="/imgs/icons/comment-article.png" alt=""> 回复</a>
                                     </div>
@@ -116,7 +116,7 @@
                                             ></el-input>
                                         </div>
                                         <div class="reply-button">
-                                            <el-button size="small" type="primary" round @click="postComment('second',item.commentId,replyItem.replyName,replyItem.replyId,2)">发布</el-button>
+                                            <el-button size="small" type="primary" round @click="postComment('second',item._id,replyItem.commentator.nick_name,replyItem.commentator._id,2)">发布</el-button>
                                             <el-button @click="showReplyBox('replyInside',index+''+replyIndex,false)" size="small" round>取消</el-button>
                                         </div>
                                     </div>
@@ -147,10 +147,10 @@
                 <!-- 推荐文章 -->
                 <div class="right-recommend">
                     <h3><img src="/imgs/icons/articleLogo.png">作者文章</h3>
-                    <a href="javascript:;" @click="$router.push(`/article/${item.articleId}`)"  class="recommend" v-for="(item,index) in userArticleList" :key="index">
+                    <a href="javascript:;" @click="$router.push(`/article/${item._id}`)"  class="recommend" v-for="(item,index) in userArticleList" :key="index">
                         <div class="title">{{item.title}}</div>
                         <div class="icon">
-                            <span><img src="/imgs/icons/good-article.png" alt="">{{(item.good instanceof Array) ? item.good.length : 0}}</span>
+                            <span><img src="/imgs/icons/good-article.png" alt="">{{item.likeCount || 0}}</span>
                             <span><img class="comment" src="/imgs/icons/comment-article.png" alt="">{{(item.comment instanceof Array) ? item.comment.length : 0}}</span>
                         </div>
                     </a>
@@ -163,11 +163,11 @@
             <!-- 悬浮按钮 -->
             <div class="fixed">
                 <div class="icon" @click="goodClick">
-                    <a v-show="!goodStatus" class="icon-good" href="javascript:;">
-                        <span>{{articleGood.length}}</span>
+                    <a v-show="!likeArticleIdList[articleId]" class="icon-good" href="javascript:;">
+                        <span>{{likeCount || 0}}</span>
                     </a>
-                    <a v-show="goodStatus" class="icon-goodClick" href="javascript:;">
-                        <span>{{articleGood.length}}</span>
+                    <a v-show="likeArticleIdList[articleId]" class="icon-goodClick" href="javascript:;">
+                        <span>{{likeCount || 0}}</span>
                     </a>
                 </div>
                 <div class="icon">
@@ -176,8 +176,8 @@
                     </a>
                 </div>
                 <div class="icon" @click="collectClick">
-                    <a v-show="!collectStatus" class="icon-collect" href="javascript:;"></a>
-                    <a v-show="collectStatus" class="icon-collectClick" href="javascript:;"></a>
+                    <a v-show="!collectIdList[articleId]" class="icon-collect" href="javascript:;"></a>
+                    <a v-show="collectIdList[articleId]" class="icon-collectClick" href="javascript:;"></a>
                 </div>
             </div>
         </div>
@@ -209,7 +209,7 @@
                 userArticleCount: 0, 
                 // 文章信息
                 authorId: 0,
-                articleId: 0,
+                articleId: 1234,
                 title: '',
                 titleImgUrl: '',
                 category: '',
@@ -220,13 +220,15 @@
                 articleReadCount: 0,
                 userArticle: 0,
                 userArticleList: [],
-                articleGood: 0,
+                likeCount: 0,
                 comment: [],
                 // 是否为本人
                 isSelf: false,
                 focusStatusList: [],    // 关注id列表
                 followingStatus: false, // 关注状态
                 followLoading: false,   // 按钮加载
+                likeLock: false,    // 点赞锁 
+                collectLock: false,    // 收藏锁 
             }
         },
         computed:{
@@ -248,9 +250,31 @@
             },
             followingList() {
                 return this.$store.state.userMessage.following;
-            }
+            },
+            followingIdList(){
+                return this.$store.state.followingIdList;
+            },
+            likeArticleIdList(){
+                return this.$store.state.likeArticleIdList;
+            },
+            collectIdList(){
+                return this.$store.state.collectIdList;
+            },
         },
         watch: {
+            $route() {
+            // console.log("🚀 ~ file: Personal.vue ~ line 201 ~ $route ~ newVal", newVal)
+                this.$router.go();
+            },
+            collectIdList(newVal) {
+                if(newVal[this.articleId]) this.collectStatus = true;
+            },
+            likeArticleIdList(newVal) {
+                if(newVal[this.articleId]) this.goodStatus = true;
+            },
+            userId(newVal) {
+                if(this.authorId == newVal) this.isSelf = true;
+            },
             followingList(newVal) {
                 // 关注者 id 列表
                 this.focusStatusList = [];
@@ -267,15 +291,18 @@
             }
         },
         mounted(){
+            this.$emit("index", 0);
             this.articleId = this.$route.params.id;
             this.$axios.get(`${this.$api.getArticleInfo.url}/${this.articleId}`)
             .then((res)=>{
                 if(res.status == 0){
                     let data = JSON.parse(JSON.stringify(res.data));
                     this.authorId = data.writer._id;
+                    this.getAuthorInfo(this.authorId);
                     // TODO : 若为本人则可编辑
                     // 确定是否为用户本人
                     console.log(this.userId);
+                    console.log(this.authorId == this.userId,'////');
                     if(this.authorId == this.userId){
                         // 是则为可编辑
                         this.isSelf = true;
@@ -297,7 +324,9 @@
                     this.articleCreateTime = formatDayTime(data.createdAt).first;
                     // this.editTime = formatDayTime(data.updatedAt).first;
                     this.articleReadCount = data.pageViews;
-                    this.articleGood = data.good || 0;
+                    this.likeCount = data.likeCount || 0;
+                    if(this.likeArticleIdList[this.articleId]) this.goodStatus = true;
+
 
                     // // 评论拼接
                     // this.addComment(data.comment);
@@ -321,8 +350,33 @@
                     this.$message.error('文章获取失败，请重试');
                 }
             })
+            this.getCommentList();
         },
         methods:{
+            // 获取作者信息
+            getAuthorInfo(id) {
+                // 文章列表
+                this.$axios.get(`/users/${id}/articles`)
+                .then((res) => {
+                    if (res.status == 0) {
+                        this.userArticleList = res.data.slice(0,5);
+                    } else {
+                        this.$message.error("获取作者数据失败");
+                    }
+                });
+                // 个人信息
+                this.$axios.get(`/users/${id}`)
+                .then((res) => {
+                    if (res.status == 0) {
+                        console.log('1222', res.data);
+                        this.userArticleCount = res.data.articleCount;
+                        this.userGoodCount = res.data.likeCount;
+                        this.userReadCount = res.data.articlesReadCount;
+                    } else {
+                        this.$message.error("获取作者数据失败");
+                    }
+                });
+            },
             // 渲染用户数据
             messageShow(data){
                 console.log(data);
@@ -404,12 +458,14 @@
                 }
                 this.followLoading = true;
                 // 已关注则取关
-                if(this.followingStatus) {
+                let followingIdList = this.followingIdList;
+                if(this.followingIdList[focusId]) {
                     // 取关
                     this.$axios.delete(`/users/following/${focusId}`)
                     .then((res)=>{
                             if(res.status === 0) {
-                                this.followingStatus = false;
+                                delete followingIdList[focusId];
+                                this.$store.dispatch('saveFollowingIdList', followingIdList);
                                 this.$message.success('取关成功');
                             }else {
                                 this.$message.warning(res.msg);
@@ -420,7 +476,8 @@
                     this.$axios.put(`/users/following/${focusId}`)
                     .then((res)=>{
                             if(res.status === 0) {
-                                this.followingStatus = true;
+                                followingIdList[focusId] = true;
+                                this.$store.dispatch('saveFollowingIdList', followingIdList);
                                 this.$message.success('关注成功');
                             }else {
                                 this.$message.warning(res.msg);
@@ -445,59 +502,81 @@
             },
             // 收藏事件
             collectClick(){
-                // 登录校验
-                if(!this.checkLogin()){
-                    return;
-                }
-                let collect = this.$store.state.userMessage.collect;
-                this.axios.post('/api/util/collect', {
-                    uid: this.userId,
-                    aid: this.articleId
-                })
-                .then((res)=>{
-                    if(res.status == 0){
-                        // this.$message.success('收藏成功');
-                        collect.push(this.articleId);
-                        this.collectStatus = true;
-                    }else if(res.status == 1){
-                        // this.$message.success('取消收藏成功');
-                        let index = collect.indexOf(this.articleId); 
-                        if (index > -1) { 
-                            collect.splice(index, 1); 
-                        } 
-                        this.collectStatus = false;
-                    }else{
-                        this.$message.error('网络异常');
+                if(!this.collectLock) {
+                    this.collectLock = true;
+                    // 登录校验
+                    if(!this.checkLogin()){
+                        return;
                     }
-                    this.$store.dispatch('saveCollectList',collect);
-                })
+                    let articleId = this.articleId;
+                    let collectIdList = this.collectIdList;
+                    if(this.collectIdList[articleId]) {
+                        this.$axios.delete(`/users/collectingArticles/${articleId}`)
+                        .then((res)=>{
+                            if(res.status == 0){
+                                delete collectIdList[articleId];
+                                this.$store.dispatch('saveCollectIdList', collectIdList);
+                                this.$message.success('取消收藏成功');
+                            }else{
+                                this.$message.error('网络异常');
+                            }
+                            this.collectLock = false;
+                        })
+                    }else {
+                        this.$axios.put(`/users/collectingArticles/${articleId}`)
+                        .then((res)=>{
+                            if(res.status == 0){
+                                collectIdList[articleId] = true;
+                                this.$store.dispatch('saveCollectIdList', collectIdList);
+                                this.$message.success('收藏成功');
+                            }else{
+                                this.$message.error('网络异常');
+                            }
+                            this.collectLock = false;
+                        })
+    
+                    }
+                }
             },
             // 点赞事件
             goodClick(){
-                // 登录校验
-                if(!this.checkLogin()){
-                    return;
-                }
-                this.axios.post('/api/util/good', {
-                    uid: this.userId,
-                    arid: this.articleId
-                })
-                .then((res)=>{
-                    if(res.status == 0){
-                        // this.$message.success('点赞成功');
-                        this.articleGood.push(this.userId);
-                        this.goodStatus = true;
-                    }else if(res.status == 1){
-                        // this.$message.success('取消点赞成功');
-                        let index = this.articleGood.indexOf(this.userId); 
-                        if (index > -1) { 
-                            this.articleGood.splice(index, 1); 
-                        } 
-                        this.goodStatus = false;
-                    }else{
-                        this.$message.error('网络异常');
+                if(!this.likeLock) {
+                    this.likeLock = true;
+                    // 登录校验
+                    if(!this.checkLogin()){
+                        return;
                     }
-                })
+                    let articleId = this.articleId;
+                    let likeArticleIdList = this.likeArticleIdList;
+                    if(this.likeArticleIdList[articleId]) {
+                        this.$axios.delete(`/users/likingArticles/${articleId}`)
+                        .then((res)=>{
+                            if(res.status == 0){
+                                delete likeArticleIdList[articleId];
+                                this.likeCount -= 1;
+                                this.$store.dispatch('saveLikeArticleIdList', likeArticleIdList);
+                                this.$message.success('取消点赞成功');
+                            }else{
+                                this.$message.error('网络异常');
+                            }
+                            this.likeLock = false;
+                        })
+                    }else {
+                        this.$axios.put(`/users/likingArticles/${articleId}`)
+                        .then((res)=>{
+                            if(res.status == 0){
+                                likeArticleIdList[articleId] = true;
+                                this.$store.dispatch('saveLikeArticleIdList', likeArticleIdList);
+                                this.likeCount += 1;
+                                this.$message.success('点赞成功');
+                            }else{
+                                this.$message.error('网络异常');
+                            }
+                            this.likeLock = false;
+                        })
+    
+                    }
+                }
             },
             // 评论聚焦
             commentFocus(){
@@ -513,28 +592,61 @@
                 }
                 return true;
             },
+            getCommentList() {
+                this.comment = [];
+                this.$axios.get(`/articles/${this.articleId}/comments`)
+                .then(res => {
+                    if(res.status === 0) {
+                        let data = res.data;
+                        if(data.length > 0) {
+                            data.forEach((item, index) => {
+                                if(!item.rootCommentId) {
+                                    this.comment.push(item);
+                                    this.getSecondComment(item._id, index, item);
+                                }
+                            })
+                        }
+                    }
+                })
+            },
+            getSecondComment(rootCommentId, index, item){
+                console.log(12312);
+                this.$axios.get(`/articles/${this.articleId}/comments?rootCommentId=${rootCommentId}`)
+                .then(res => {
+                    if(res.status === 0) {
+                        item.reply = res.data;
+                        this.$set(this.comment, index, item);
+                    }
+                })
+            },
             postComment(level,commentId,toName,toId,index){
-                let commentName = this.$store.state.userMessage.nick_name;
+                // 登录校验
+                if(!this.checkLogin()){
+                    return;
+                }
                 if(level == 'first'){
-                    this.axios.post('/api/util/comment',{
-                        level: 'first',
-                        articleId: this.articleId,
-                        commentName: commentName,
-                        userId: this.userId,
-                        commentAvatar: this.loginAvatar,
-                        commentContent: this.commentInput,
-                        replyStatus: false,
-                        commentTime: new Date().getTime()
+                    this.$axios.post(`/articles/${this.articleId}/comments`,{
+                        // level: 'first',
+                        // articleId: this.articleId,
+                        // commentName: commentName,
+                        // userId: this.userId,
+                        // commentAvatar: this.loginAvatar,
+                        // commentContent: this.commentInput,
+                        // replyStatus: false,
+                        // commentTime: new Date().getTime()
+                        content: this.commentInput,
                     })
                     .then((res)=>{
                         if(res.status == 0){
-                            this.$message.success(res.msg);
-                            this.axios.get(`/api/article/${this.articleId}`)
-                            .then((res)=>{
-                                this.addComment(res.data.comment);
-                                this.commentInput = '';
-                                this.$refs.commentButton.style.height = '0px';
-                            })
+                            console.log(res);
+                            this.getCommentList();
+                            this.$message.success('评论成功');
+                            // this.axios.get(`/api/article/${this.articleId}`)
+                            // .then((res)=>{
+                            //     this.addComment(res.data.comment);
+                            //     this.commentInput = '';
+                            //     this.$refs.commentButton.style.height = '0px';
+                            // })
                         }else{
                             this.$message.error(res.msg);
                         }
@@ -547,26 +659,23 @@
                         replyContent = this.replyInput;
                     }
                     // 二级评论上传
-                    this.axios.post('/api/util/comment',{
-                        level: 'second',
-                        commentId: commentId,
-                        replyId: this.userId,
-                        replyName: commentName,
-                        replyAvatar: this.loginAvatar,
-                        replyContent: replyContent,
-                        toName: toName, 
-                        toId: toId,
-                        replyTime: new Date().getTime()
+                    this.$axios.post(`/articles/${this.articleId}/comments`,{
+                        rootCommentId: commentId,
+                        replyTo: toId,
+                        content: replyContent,
                     })
                     .then((res)=>{
                         if(res.status == 0){
-                            this.$message.success(res.msg);
-                            this.axios.get(`/api/article/${this.articleId}`)
-                            .then((res)=>{
-                                this.addComment(res.data.comment);
-                                this.replyInput = '';
-                                this.replyInsideInput = '';
-                            })
+                            console.log(res);
+                            this.getCommentList();
+                            this.$message.success('评论成功');
+                            // this.$message.success(res.msg);
+                            // this.axios.get(`/api/article/${this.articleId}`)
+                            // .then((res)=>{
+                            //     this.addComment(res.data.comment);
+                            //     this.replyInput = '';
+                            //     this.replyInsideInput = '';
+                            // })
                         }else{
                             this.$message.error(res.msg);
                         }
@@ -951,23 +1060,27 @@
                         font-size: 14px;
                         padding: 12px 15px;
                         color: black;
+                        border-bottom: 1px solid rgba(204, 204, 204, 0.212);
                         .title{
                             margin-bottom: 10px;
                         }
                         .icon{
+                            display: flex;
                             span{
-                                display: inline-block;
+                                display: flex;
+                                align-items: flex-start;
                                 color: #bfbfbf;
                                 margin-right: 20px;
                                 img{
-                                    width: 16px;
-                                    height: 16px;
+                                    width: 15px;
+                                    height: 15px;
                                     margin-right: 5px;
                                 }
                                 .comment{
+                                    width: 16px;
+                                    height: 16px;
                                     box-sizing: border-box;
                                     position: relative;
-                                    top: 2px;
                                 }
                             }
                         }

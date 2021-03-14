@@ -11,7 +11,9 @@ const state ={
     userMessage: {},
     loginStatus: false,
     followingIdList: {},
-    loginModal: '0'
+    loginModal: '0',
+    likeArticleIdList: {},
+    collectIdList: {},
 }
 export default new Vuex.Store({
     state,

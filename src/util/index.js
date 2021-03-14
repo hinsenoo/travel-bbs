@@ -43,7 +43,7 @@ function formatDayTime(val) {
 
 // js时间戳转时间（年-月-日 时:分:秒）
 function timestampToTime(timestamp) {
-    timestamp = Number(timestamp);
+    // timestamp = Number(timestamp);
     var date = new Date(timestamp); //时间戳为10位需*1000，时间戳为13位的话不需乘1000
     let Y = date.getFullYear() + '-';
     let M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-';

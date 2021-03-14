@@ -13,8 +13,8 @@
                     </div>
                     <div class="other">
                         <el-button v-if="isSelf" @click="toSetting" type="primary" plain>编辑个人资料</el-button>
-                        <el-button v-if="!isSelf && !followingIdList[authorId]" @click="focusClick(authorId)" type="success" plain size="medium" :loading="followLoading">+ 关注</el-button>
-                        <el-button v-if="!isSelf && followingIdList[authorId]" @click="focusClick(authorId)" type="success" size="medium" :loading="followLoading">已关注</el-button>
+                        <el-button v-if="!isSelf && !followingIdList[authorId]" @click="focusClick(authorInfo)" type="success" plain size="medium" :loading="followLoadingList[authorId]">+ 关注</el-button>
+                        <el-button v-if="!isSelf && followingIdList[authorId]" @click="focusClick(authorInfo)" type="success" size="medium" :loading="followLoadingList[authorId]">已关注</el-button>
                     </div>
                 </div>
                 <div class="content">
@@ -71,8 +71,8 @@
                                                 <p><i class="el-icon-user"></i>{{item.employment}}</p>
                                             </div>
                                         </a>
-                                        <el-button v-if="followingIdList[item._id] && userId != item._id" type="success" size="small" @click="focusClick(item._id)">已关注</el-button>
-                                        <el-button v-if="!followingIdList[item._id] && userId != item._id" type="success" size="small" @click="focusClick(item._id)" plain>+ 关注</el-button>
+                                        <el-button v-if="followingIdList[item._id] && userId != item._id" :loading="followLoadingList[item._id]" type="success" size="small" @click="focusClick(item)">已关注</el-button>
+                                        <el-button v-if="!followingIdList[item._id] && userId != item._id" :loading="followLoadingList[item._id]" type="success" size="small" @click="focusClick(item)" plain>+ 关注</el-button>
                                     </div>
                                 </el-tab-pane>
                                 <el-tab-pane label="关注者" name="follower">
@@ -84,8 +84,8 @@
                                                 <p><i class="el-icon-user"></i>{{item.employment}}</p>
                                             </div>
                                         </a>
-                                        <el-button v-if="followingIdList[item._id] && userId != item._id " type="success" size="small" @click="focusClick(item._id)" >已关注</el-button>
-                                        <el-button v-if="!followingIdList[item._id] && userId != item._id" type="success" size="small" @click="focusClick(item._id)" plain>+ 关注</el-button>
+                                        <el-button v-if="followingIdList[item._id] && userId != item._id " :loading="followLoadingList[item._id]" type="success" size="small" @click="focusClick(item)" >已关注</el-button>
+                                        <el-button v-if="!followingIdList[item._id] && userId != item._id" :loading="followLoadingList[item._id]" type="success" size="small" @click="focusClick(item)" plain>+ 关注</el-button>
                                     </div>
                                 </el-tab-pane>
                             </el-tabs>
@@ -96,16 +96,16 @@
                                     <div>
                                         <ul class="meta">
                                             <li class="categroy"><a href="javascript:;">{{item.category}}</a></li>
-                                            <li class="author"><a href="javascript:;"  >{{item.nickName}}</a></li>
+                                            <li class="author"><a href="javascript:;" @click="toPersonal(item.writer)">{{item.writerInfo.nick_name}}</a></li>
                                             <li>{{item.pageViews}}人阅读</li>
                                             <li class="area">{{item.place}}</li>
                                         </ul>
                                     </div>
                                     <!-- 主体内容 -->
-                                    <div class="news" @click="toArticle(item.articleId)">
+                                    <div class="news" @click="toArticle(item._id)">
                                         <div class="word">
                                             <div class="title">
-                                                <a href="javascript:;" @click="toArticle(item.articleId)">{{item.title}}</a>
+                                                <a href="javascript:;" @click="toArticle(item._id)">{{item.title}}</a>
                                             </div>
                                             <div class="fragment">
                                                 {{item.articleHTML}}
@@ -129,9 +129,33 @@
                 <div class="honor">
                     <h2>个人成就</h2>
                     <div>
-                        <p><i><img src="/imgs/icons/good-blue.png" alt=""></i>获得点赞<span>{{goodCount}}</span></p>
-                        <p><i><img src="/imgs/icons/read.png" alt=""></i>文章被阅读<span>{{readCount}}</span></p>
-                        <p><i><img src="/imgs/icons/write.png" alt=""></i>已写文章<span>{{articleCount}}</span></p>
+                        <p>
+                            <span>
+                                <i>
+                                    <img src="/imgs/icons/good-blue.png" alt="">
+                                </i>
+                                获得点赞
+                            </span>
+                            <span class="honor__number">{{ likeCount }}</span>
+                        </p>
+                        <p>
+                            <span>
+                                <i>
+                                    <img src="/imgs/icons/read.png" alt="">
+                                </i>
+                                文章被阅读
+                            </span>
+                            <span class="honor__number">{{articlesReadCount}}</span>
+                        </p>
+                        <p>
+                            <span>
+                                <i>
+                                    <img src="/imgs/icons/write.png" alt="">
+                                </i>
+                                已写文章
+                            </span>
+                            <span class="honor__number">{{articleCount}}</span>
+                        </p>
                     </div>
                 </div>
                 <div class="focus">
@@ -145,7 +169,7 @@
                     </div>
                 </div>
                 <ul>
-                    <li class="collectLi" @click="toCollect">已收藏<span>{{collectCount}}</span></li>
+                    <li class="collectLi" @click="toCollect">已收藏<span>{{collectList.length || 0 }}</span></li>
                     <li>加入于<span>{{creatTime}}</span></li>
                 </ul>
             </div>
@@ -168,8 +192,8 @@
                 authorIntroduce: '',
                 authorAvator: '',
                 collectCount: 0,
-                goodCount: 0,
-                readCount: 0,
+                likeCount: 0,
+                articlesReadCount: 0,
                 articleCount: 0,
                 articleIdList: [], // 文章id列表
                 articleList: [], // 文章列表
@@ -185,6 +209,7 @@
                 focusStatus: true, // 关注状态
                 userId: 0,
                 followLoading: false,   // 按钮加载
+                followLoadingList: {},
                 followingStatus: false, // 关注状态
             }
         },
@@ -194,17 +219,22 @@
             },
             followingList() {
                 return this.$store.state.userMessage.following;
-            }
+            },
+            collectIdListLength() {
+                return Object.getOwnPropertyNames(this.$store.state.collectIdList).length || 0;
+            },
         },
         watch: {
             $route(newVal) {
-            console.log("🚀 ~ file: Personal.vue ~ line 201 ~ $route ~ newVal", newVal)
+            // console.log("🚀 ~ file: Personal.vue ~ line 201 ~ $route ~ newVal", newVal)
                 if(newVal.query.type === 'collect') {
                     this.toCollect();
-                }else if(newVal.query.type === 'collect') {
+                }else if(newVal.query.type === 'focus') {
                     this.messageName='focusList';
                     this.focusName='focus';
                 }
+                this.$router.go();
+                
             }
             // followingList: {
             //     handler: function (newVal) { 
@@ -264,14 +294,15 @@
                     this.authorIntroduce = userMessage.headline || '无';
                     this.authorAvator = userMessage.avatar_url;
                     // this.collectCount = userMessage.collect.length;
-                    // this.goodCount = userMessage.goodCount || 0;
-                    // this.readCount = userMessage.articleReadCount;
+                    this.likeCount = userMessage.likeCount || 0;
+                    this.articlesReadCount = userMessage.articlesReadCount;
                     this.articleCount = userMessage.articleCount;
                     // this.articleIdList = userMessage.articleCount;
                     this.focusList = userMessage.following;
                     // this.focus = userMessage.focus.length;
                     this.followerList = userMessage.followers;
-                    // this.collectList = userMessage.collect;
+                    this.collectList = userMessage.collectingArticles;
+                    console.log("🚀 ~ file: Personal.vue ~ line 278 ~ dataShow ~ userMessage.collectingArticles", userMessage.collectingArticles)
                     // this.follower = userMessage.follower.length;
                     this.creatTime = formatDayTime(userMessage.createdAt).second;
 
@@ -287,6 +318,7 @@
                 .then((res)=>{
                     if(Object.hasOwnProperty.call(res,'status') && res.status == 0){
                         this.dataShow(res.data);
+                        this.authorInfo = res.data;
                     }else{
                         this.$message.error('获取用户数据失败');
                     }
@@ -334,14 +366,16 @@
             //     return focusStatus;
             // },
             // 关注/取关事件
-            focusClick(focusId){
+            focusClick(focusInfo){
+                let focusId = focusInfo._id;
                 // 检测是否登录
                 if(!this.userId){
                     this.$message.warning('请先登录');
                     this.$store.dispatch('saveLoginModal', true);
                     return;
                 }
-                this.followLoading = true;
+                this.$set(this.followLoadingList, focusId, true);
+                // this.followLoadingList[focusId] = true;
                 // 已关注则取关
                 let followingIdList = this.followingIdList;
                 if(this.followingIdList[focusId]) {
@@ -360,13 +394,13 @@
                             }else {
                                 this.$message.warning(res.msg);
                             }
-                            this.followLoading = false;
+                            // this.followLoadingList[focusId] = false;
+                            this.$set(this.followLoadingList, focusId, false);
                     })
                 }else {
                     this.$axios.put(`/users/following/${focusId}`)
                     .then((res)=>{
                             if(res.status === 0) {
-                                this.$message.success('关注成功');
                                 followingIdList[focusId] = true;
                                 this.$store.dispatch('saveFollowingIdList', followingIdList);
                                 this.$message.success('关注成功');
@@ -376,7 +410,8 @@
                             }else {
                                 this.$message.warning(res.msg);
                             }
-                            this.followLoading = false;
+                            // this.followLoadingList[focusId] = false;
+                            this.$set(this.followLoadingList, focusId, false);
                         // // 取关
                         // let focusObj = this.focusStatusList;
                         // if(res.status == 1){
@@ -400,7 +435,8 @@
                 this.collect = [];
                 this.collectLoading = true;
                 // 收藏夹无内容则直接跳过
-                if(this.collectList.length == 0){
+                console.log('1232131',this.collectList);
+                if(this.collectIdListLength == 0){
                     setTimeout(()=>{
                         this.collectLoading = false;
                     }, 1000)
@@ -408,19 +444,19 @@
                 }
 
                 // 获取收藏列表
-                if(this.collectList.length != 0){
-                    this.collectList.forEach((item) => {
-                        this.axios.get(`/api/article/${item}`)
-                        .then((res)=>{
-                            if(res.status == 0){
-                                let p = this.$Base64.decode(res.data.articleHTML);
-                                res.data.articleHTML = getPText(p);
-                                this.collect.push(res.data);
-                                this.collectLoading = false;
-                            }else{
-                                this.$message.error('网络异常');
-                            }
-                        })
+                if(this.collectIdListLength != 0){
+                    this.$axios.get(`/users/${this.authorId}/collectingArticles`)
+                    .then((res)=>{
+                        if(res.status == 0){
+                            let collectList = res.data;
+                            collectList.forEach(item => {
+                                item.articleHTML = getPText(item.articleHTML);
+                                this.collect.push(item);
+                            })
+                            this.collectLoading = false;
+                        }else{
+                            this.$message.error('网络异常');
+                        }
                     })
                 }
             },
@@ -662,11 +698,12 @@
                         border-bottom: 1px solid #d7d7d781;
                     }
                     div{
-                        padding: 15px 15px;
+                        padding: 15px 15px 15px 0;
                         font-size: 14px;
                         p{
                             display: flex;
                             align-items: center;
+                            justify-content: space-between;
                             margin-bottom: 10px;
                             i{
                                 display: inline-block;
@@ -683,6 +720,15 @@
                             }
                             span{
                                 margin-left: 15px;
+                            }
+                            .honor__number {
+                                display: flex;
+                                padding: 5px;
+                                justify-content: center;
+                                align-items: center;
+                                background-color: #e1efff9a;
+                                border: 1px solid #e1efff;
+                                border-radius: 10px;
                             }
                         }
                     }

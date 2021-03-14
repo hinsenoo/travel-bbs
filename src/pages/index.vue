@@ -195,14 +195,14 @@
                   <a
                     href="javascript:;"
                     @click="$router.push(`/personal/${userId}?type=collect`)"
-                    >我的收藏夹<span>{{ collectCount }}</span></a
+                    >我的收藏夹<span>{{ collectIdList }}</span></a
                   >
                 </li>
                 <li>
                   <a
                     href="javascript:;"
                     @click="$router.push(`/personal/${userId}?type=focus`)"
-                    >我的关注<span>{{ focusCount }}</span></a
+                    >我的关注<span>{{ followingIdList }}</span></a
                   >
                 </li>
               </ul>
@@ -210,7 +210,7 @@
           </div>
         </div>
         <div class="right-recommend">
-          <h3><img src="/imgs/icons/prize.png" alt="" />热度排行</h3>
+          <h3><img src="/imgs/icons/prize.png" alt="" />点赞排行</h3>
           <a
             href="javascript:;"
             @click="$router.push(`/article/${item._id}`)"
@@ -226,9 +226,12 @@
             </div>
             <div class="icon">
               <span
-                ><img src="/imgs/icons/good-article.png" alt="" />{{
-                  item.good instanceof Array ? item.good.length : 0
-                }}</span
+                ><img src="/imgs/icons/good-article.png" alt="" />
+                <span>
+                {{
+                  item.likeCount || 0
+                }}
+                </span></span
               >
               <span
                 ><img
@@ -242,13 +245,13 @@
             </div>
           </a>
         </div>
-        <div class="right-app">
+        <!-- <div class="right-app">
           <div class="appCode"><img src="/imgs/QRCode.jpg" alt="" /></div>
           <div class="word">
             扫码下载车车互联App<i class="el-icon-download"></i>
             <div>最好的旅行方式是和一群志同道合的人。</div>
           </div>
-        </div>
+        </div> -->
       </div>
     </div>
   </div>
@@ -308,17 +311,16 @@ export default {
     },
     // 文章数
     articleCount() {
-      return this.$store.state.userMessage.articleCount;
+      return this.$store.state.userMessage.articleCount || 0;
     },
     // 收藏数
-    collectCount() {
-      // return this.$store.state.userMessage.collect.length || 0;
-      return 0;
+    collectIdList() {
+      return Object.getOwnPropertyNames(this.$store.state.collectIdList).length - 1 || 0;
     },
     // 关注数
-    focusCount() {
-      // return this.$store.state.userMessage.focus.length || 0;
-      return 0;
+    followingIdList() {
+      console.log('11231', Object.getOwnPropertyNames(this.$store.state.followingIdList));
+      return Object.getOwnPropertyNames(this.$store.state.followingIdList).length - 1 || 0;
     },
     // 注册时长
     registerTime() {
@@ -336,9 +338,9 @@ export default {
     loginStatus() {
       return this.$store.state.loginStatus;
     },
-    hotPrize() {
-      return this.hotList.slice(0, 5);
-    },
+    // hotPrize() {
+    //   return this.hotList.slice(0, 5);
+    // },
     // cartCount(){
     //     return this.$store.state.cartCount;
     // },
@@ -351,6 +353,7 @@ export default {
 
     // if (this.$route.path == "/employeeActivity") {
     window.addEventListener("scroll", this.menu);
+    this.getLikeList();
       
     // } else {
     // }
@@ -360,6 +363,21 @@ export default {
     }, 1000)
   },
   methods: {
+    getLikeList() {
+      this.$axios
+        .get(`${this.$api.getArticleList.url}?sort=likeCount&per_page=5&page=1`)
+        .then((res) => {
+          // console.log(res);
+          if (res.status == 0) {
+            let list = res.data;
+            if (list.length > 0) {
+              this.hotPrize = res.data;
+            }
+          }else {
+            this.$message.error('网络异常');
+          }
+        })
+    },
     menu() {
       // 加载中不触发
       if (this.hotLoading || this.newLoading) {
@@ -451,7 +469,7 @@ export default {
       this.hotLoading = false;
       this.newLoading = false;
       this.$axios
-        .get(`${this.$api.getArticleList.url}?sort=${this.tabType}&per_page=2&page=${this.tabType === 'pageViews' ? this.hotStart : this.newStart}`)
+        .get(`${this.$api.getArticleList.url}?sort=${this.tabType}&per_page=5&page=${this.tabType === 'pageViews' ? this.hotStart : this.newStart}`)
         .then((res) => {
           // console.log(res);
           if (res.status == 0) {
@@ -682,6 +700,7 @@ export default {
       }
       .user {
         width: 100%;
+        height: 300px;
         box-sizing: border-box;
         background-color: white;
         // border: 1px solid #d7d7d7;
@@ -738,6 +757,11 @@ export default {
                   color: #959595;
                   font-size: 14px;
                   line-height: 36px;
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  height: 20px;
+                  padding: 10px 0;
                   &:hover {
                     color: #409eff;
                     span {
@@ -745,13 +769,15 @@ export default {
                     }
                   }
                   span {
-                    line-height: 16px;
-                    padding: 0 10px;
-                    display: inline-block;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    padding: 5px;
+                    line-height: 13px;
+                    background-color: #e1efff9a;
+                    border: 1px solid #e1efff;
                     border-radius: 10px;
-                    margin-left: 10px;
-                    color: black;
-                    background-color: #f5f5f5;
+                    color: #666;
                   }
                 }
               }
@@ -781,6 +807,7 @@ export default {
           font-size: 14px;
           padding: 12px 15px;
           color: black;
+          border-bottom: 1px solid rgba(204, 204, 204, 0.212);
           .iconTitle {
             display: flex;
             align-items: center;
@@ -796,19 +823,22 @@ export default {
             }
           }
           .icon {
+            display: flex;
             span {
-              display: inline-block;
+              display: flex;
+              align-items: flex-start;
               color: #bfbfbf;
               margin-right: 20px;
               img {
-                width: 16px;
-                height: 16px;
+                width: 15px;
+                height: 15px;
                 margin-right: 5px;
               }
               .comment {
+                width: 16px;
+                height: 16px;
                 box-sizing: border-box;
                 position: relative;
-                top: 2px;
               }
             }
           }
