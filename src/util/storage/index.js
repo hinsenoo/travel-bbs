@@ -1,6 +1,6 @@
 /* 
  *  Storage 封装
- *  (sessionStorage)
+ *  (localStorage)
  */
 /*  格式：
     Key: mall  
@@ -25,7 +25,7 @@ export default {
         }else{
             let val = this.getStorage();
             val[key] = value;
-            window.sessionStorage.setItem(STORAGE_KEY,JSON.stringify(val))
+            window.localStorage.setItem(STORAGE_KEY,JSON.stringify(val))
         }
     },
     // 获取某一个模块下面的属性 
@@ -41,7 +41,7 @@ export default {
     },
     // 获取整个 Storage 数据
     getStorage(){
-        return JSON.parse(window.sessionStorage.getItem(STORAGE_KEY) || '{}');
+        return JSON.parse(window.localStorage.getItem(STORAGE_KEY) || '{}');
     },
     // 清空某一个值
     clear(key,module_name){
@@ -52,6 +52,6 @@ export default {
         }else {
             delete val[key];
         }
-        window.sessionStorage.setItem(STORAGE_KEY,JSON.stringify(val));
+        window.localStorage.setItem(STORAGE_KEY,JSON.stringify(val));
     }
 }
