@@ -213,7 +213,7 @@
           <h3><img src="/imgs/icons/prize.png" alt="" />点赞排行</h3>
           <a
             href="javascript:;"
-            @click="$router.push(`/article/${item._id}`)"
+            @click="toArticle(item._id)"
             class="recommend"
             v-for="(item, index) in hotPrize"
             :key="index"
@@ -457,11 +457,13 @@ export default {
     // 跳转到个人主页
     toPersonal() {
       this.$emit("index", 0);
-      this.$router.push(`/personal/${this.$storage.getItem("userId")}`);
+      window.open(`${window.location.origin}/personal/${this.$storage.getItem("userId")}`, '_blank');
+      // this.$router.push(`/personal/${this.$storage.getItem("userId")}`);
     },
     toArticle(id) {
       this.$emit("index", 0);
-      this.$router.push(`/article/${id}`);
+      // this.$router.push(`/article/${id}`);
+      window.open(`${window.location.origin}/article/${id}`, '_blank');
     },
     // 拉取文章
     postArticle() {

@@ -21,34 +21,45 @@
                     <el-tabs v-model="messageName" @tab-click="handleClick">
                         <el-tab-pane label="文章" name="news" v-loading="articlesLoading">
                             <div class="content-list">
-                                <div class="content-listNews"  v-for="(item, index) in articleList" :key="index">
-                                    <div>
-                                        <ul class="meta">
-                                            <li class="categroy"><a href="javascript:;">{{item.category}}</a></li>
-                                            <li class="author">{{item.nickName}}</li>
-                                            <li>{{item.pageViews}}人阅读</li>
-                                            <li class="area">{{item.place}}</li>
-                                        </ul>
+                                <el-popover v-for="(item, index) in articleList" :key="index"
+                                    placement="top"
+                                    width="70"
+                                    trigger="hover"
+                                    :disabled="!isSelf"
+                                    >
+                                    <div class="content-button">
+                                        <el-button @click="toEdit(item._id)" type="primary" icon="el-icon-edit" circle></el-button>
+                                        <el-button @click="toDelete(item._id)" type="danger" icon="el-icon-delete" circle></el-button>
                                     </div>
-                                    <!-- 主体内容 -->
-                                    <div class="news" @click="toArticle(item._id)">
-                                        <div class="word">
-                                            <div class="title">
-                                                <a href="javascript:;" @click="toArticle(item._id)">{{item.title}}</a>
+                                    <div class="content-listNews" slot="reference">
+                                        <div>
+                                            <ul class="meta">
+                                                <li class="categroy"><a href="javascript:;">{{item.category}}</a></li>
+                                                <li class="author">{{item.nickName}}</li>
+                                                <li>{{item.pageViews}}人阅读</li>
+                                                <li class="area">{{item.place}}</li>
+                                            </ul>
+                                        </div>
+                                        <!-- 主体内容 -->
+                                        <div class="news" @click="toArticle(item._id)">
+                                            <div class="word">
+                                                <div class="title">
+                                                    <a href="javascript:;" @click="toArticle(item._id)">{{item.title}}</a>
+                                                </div>
+                                                <div class="fragment">
+                                                    {{item.articleHTML}}
+                                                </div>
                                             </div>
-                                            <div class="fragment">
-                                                {{item.articleHTML}}
+                                            <div class="photo">
+                                                <img :src="item.titleImgUrl" alt="">
                                             </div>
                                         </div>
-                                        <div class="photo">
-                                            <img :src="item.titleImgUrl" alt="">
+                                        <div class="other">
+                                            <div><a href="javascript:;"><img src="/imgs/icons/good2.png" alt="点赞">{{ (item.good instanceof Array) ? item.good.length : 0}}</a></div>
+                                            <div><a href="javascript:;"><img src="/imgs/icons/remark2.png" alt="评论">{{(item.comment instanceof Array) ? item.good.length : 0 }}</a></div>
                                         </div>
                                     </div>
-                                    <div class="other">
-                                        <div><a href="javascript:;"><img src="/imgs/icons/good2.png" alt="点赞">{{ (item.good instanceof Array) ? item.good.length : 0}}</a></div>
-                                        <div><a href="javascript:;"><img src="/imgs/icons/remark2.png" alt="评论">{{(item.comment instanceof Array) ? item.good.length : 0 }}</a></div>
-                                    </div>
-                                </div>
+                                </el-popover>
                                 <!-- 3. 滚动加载
                                 <div class="scroll-more"
                                     v-infinite-scroll="scrollMore"
@@ -272,6 +283,32 @@
             })
         },
         methods:{
+            toEdit(id) {
+                window.open(`${window.location.origin}/edit/${id}`, '_blank');
+            },
+            toDelete(id) {
+                console.log(id);
+                this.$confirm('此操作将永久删除该文章, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    this.$axios.delete(`/article/${id}`)
+                    .then((res)=>{
+                        console.log(res);
+                        this.getUserArticle(this.authorId);
+                        this.$message({
+                            type: 'success',
+                            message: '删除成功!'
+                        });
+                    })
+                }).catch(() => {
+                this.$message({
+                    type: 'info',
+                    message: '已取消删除'
+                });          
+                });
+            },
             // 编辑资料
             toSetting(){
                 this.$emit('index',0);
@@ -329,6 +366,7 @@
                 // 获取文章
                 // this.articleIdList.forEach((item) => {
                 this.articlesLoading = true;
+                this.articleList = [];
                 this.$axios.get(`/users/${id}/articles`)
                         .then((res)=>{
                             // console.log(res);
@@ -462,13 +500,12 @@
             },
             toArticle(id){
                 this.$emit('index',0);
-                console.log(id);
-                this.$router.push(`/article/${id}`);
+                window.open(`${window.location.origin}/article/${id}`, '_blank');
             },
             toPersonal(id){
                 this.$emit('index',0);
                 if(id !== this.$route.params.id) {
-                    this.$router.push(`/personal/${id}`);
+                    window.open(`${window.location.origin}/personal/${id}`, '_blank');
                 }
             }
         }
@@ -476,6 +513,10 @@
 </script>
 
 <style lang="scss">
+    .content-button {
+        display: flex;
+        justify-content: space-around;
+    }
     .personal{
         padding-top: 20px;
         background-color: #F5F5F5;

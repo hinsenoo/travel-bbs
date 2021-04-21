@@ -30,7 +30,6 @@ axios.interceptors.request.use((config) => {
     if (token) {
       config.headers.Authorization = 'Bearer ' + token;
     }
-    console.log(config);
   }
   // 发起请求时，取消掉当前正在进行的相同请求
   // if (promiseArr[config.url]) {

@@ -4,7 +4,7 @@
             <div class="left">
                 <div class="content">
                     <div class="article-user">
-                        <a href="javascript:;" @click="$router.push(`/personal/${authorId}`)" class="message">
+                        <a href="javascript:;" @click="toPersonal(authorId)" class="message">
                             <el-avatar :size="40" :src="userAvatar"></el-avatar>
                             <div class="box">
                                 <div class="user-name">{{nickName}}</div>
@@ -34,7 +34,7 @@
                         
                     </div>
                     <div class="article-userAgain">
-                        <a class="message" href="javascript:;" @click="$router.push(`/personal/${authorId}`)">
+                        <a class="message" href="javascript:;" @click="toPersonal(authorId)">
                             <el-avatar size="large" :src="userAvatar"></el-avatar>
                             <div class="box">
                                 <div class="user-name">{{nickName}}</div>
@@ -65,11 +65,11 @@
                     </div>
                     <!-- 一级评论 -->
                     <div class="commentBox" v-for="(item,index) in comment" :key="index">
-                        <a href="javascript:;" @click="$router.push(`/personal/${item.commentator._id}`)">
+                        <a href="javascript:;" @click="toPersonal(item.commentator._id)">
                             <el-avatar :size="40" :src="item.commentator.avatar_url"></el-avatar>
                         </a>
                         <div class="commentMessage">
-                            <a href="javascript:;" @click="$router.push(`/personal/${item.commentator._id}`)">{{item.commentator.nick_name}}</a>
+                            <a href="javascript:;" @click="toPersonal(item.commentator._id)">{{item.commentator.nick_name}}</a>
                             <p>{{item.content}}</p>
                             <div class="date">
                                 <span class="time">{{toTime(item.createdAt)}}</span>
@@ -92,14 +92,14 @@
                             </div>
                             <!-- 二级评论 -->
                             <div class="commentBox inside"  v-for="(replyItem,replyIndex) in item.reply" :key="replyIndex">
-                                <a href="javascript:;" @click="$router.push(`/personal/${replyItem.commentator._id}`)">
+                                <a href="javascript:;" @click="toPersonal(replyItem.commentator._id)">
                                     <el-avatar :size="40" :src="replyItem.commentator.avatar_url"></el-avatar>
                                 </a>
                                 <div class="commentMessage">
-                                    <a href="javascript:;" @click="$router.push(`/personal/${replyItem.commentator._id}`)">{{replyItem.commentator.nick_name}}</a>
+                                    <a href="javascript:;" @click="toPersonal(replyItem.commentator._id)">{{replyItem.commentator.nick_name}}</a>
                                     <p>
                                         回复 
-                                        <a href="javascript:;"  @click="$router.push(`/personal/${replyItem.replyTo._id}`)">{{replyItem.replyTo.nick_name}}</a>:
+                                        <a href="javascript:;"  @click="toPersonal(replyItem.replyTo._id)">{{replyItem.replyTo.nick_name}}</a>:
                                         {{replyItem.content}}</p>
                                     <div class="date">
                                         <span class="time">{{toTime(replyItem.createdAt)}}</span>
@@ -130,7 +130,7 @@
                 <!-- 作者信息 -->
                 <div class="right-user">
                     <span class="span-box">关于作者</span>
-                    <a href="javascript:;" @click="$router.push(`/personal/${authorId}`)" class="user">
+                    <a href="javascript:;" @click="toPersonal(authorId)" class="user">
                         <el-avatar :size="50" :src="userAvatar"></el-avatar>
                         <div class="box">
                             <div class="user-name">{{nickName}}</div>
@@ -147,7 +147,7 @@
                 <!-- 推荐文章 -->
                 <div class="right-recommend">
                     <h3><img src="/imgs/icons/articleLogo.png">作者文章</h3>
-                    <a href="javascript:;" @click="$router.push(`/article/${item._id}`)"  class="recommend" v-for="(item,index) in userArticleList" :key="index">
+                    <a href="javascript:;" @click="toArticle(item._id)"  class="recommend" v-for="(item,index) in userArticleList" :key="index">
                         <div class="title">{{item.title}}</div>
                         <div class="icon">
                             <span><img src="/imgs/icons/good-article.png" alt="">{{item.likeCount || 0}}</span>
@@ -155,10 +155,10 @@
                         </div>
                     </a>
                 </div>
-                <div class="right-app">
+                <!-- <div class="right-app">
                     <div class="appCode"><img src="/imgs/QRCode.jpg" alt=""></div>
                     <div class="word">下载车车互联App<i class="el-icon-download"></i><div>最好的旅行方式是和一群志同道合的人。</div></div>
-                </div>
+                </div> -->
             </div>
             <!-- 悬浮按钮 -->
             <div class="fixed">
@@ -610,7 +610,6 @@
                 })
             },
             getSecondComment(rootCommentId, index, item){
-                console.log(12312);
                 this.$axios.get(`/articles/${this.articleId}/comments?rootCommentId=${rootCommentId}`)
                 .then(res => {
                     if(res.status === 0) {
@@ -641,6 +640,8 @@
                             console.log(res);
                             this.getCommentList();
                             this.$message.success('评论成功');
+                            this.commentInput = '';
+                            this.$refs.commentButton.style.height = '0px';
                             // this.axios.get(`/api/article/${this.articleId}`)
                             // .then((res)=>{
                             //     this.addComment(res.data.comment);
@@ -666,16 +667,10 @@
                     })
                     .then((res)=>{
                         if(res.status == 0){
-                            console.log(res);
                             this.getCommentList();
                             this.$message.success('评论成功');
-                            // this.$message.success(res.msg);
-                            // this.axios.get(`/api/article/${this.articleId}`)
-                            // .then((res)=>{
-                            //     this.addComment(res.data.comment);
-                            //     this.replyInput = '';
-                            //     this.replyInsideInput = '';
-                            // })
+                            this.replyInput = '';
+                            this.replyInsideInput = '';
                         }else{
                             this.$message.error(res.msg);
                         }
@@ -699,7 +694,18 @@
                     }
                 });
                 this.comment = comment;
-            }
+            },
+            // 跳转到个人主页
+            toPersonal(id) {
+                this.$emit("index", 0);
+                window.open(`${window.location.origin}/personal/${id}`, '_blank');
+                // this.$router.push(`/personal/${this.$storage.getItem("userId")}`);
+            },
+            toArticle(id) {
+                this.$emit("index", 0);
+                // this.$router.push(`/article/${id}`);
+                window.open(`${window.location.origin}/article/${id}`, '_blank');
+            },
         }
     }
 </script>

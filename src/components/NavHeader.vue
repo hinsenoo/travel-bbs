@@ -12,15 +12,15 @@
             <div class="header-menu">
                 <el-menu :default-active="activeIndex" mode="horizontal" @select="handleSelect" class="menu"  active-text-color="#409EFF" >
                     <el-menu-item index="1" >首页</el-menu-item>
-                    <el-menu-item index="2">专栏</el-menu-item>
+                    <!-- <el-menu-item index="2">专栏</el-menu-item> -->
                 </el-menu>
             </div>
             <!-- 搜索框 -->
-            <div class="header-search">
+            <!-- <div class="header-search">
                 <el-input placeholder="请输入内容" v-model="input" class="input-with-select" size="mini">
                     <el-button slot="append" icon="el-icon-search"></el-button>
                 </el-input>
-            </div>
+            </div> -->
             <!-- 用户框 -->
             <div class="header-user">
                 <div class="user">
@@ -143,7 +143,8 @@
             toPersonal(id){
                 this.$emit('index',0);
                 if(id !== this.$route.params.id) {
-                    this.$router.push(`/personal/${id}`);
+                    // this.$router.push(`/personal/${id}`);
+                    window.open(`${window.location.origin}/personal/${id}`, '_blank');
                 }
             },
             // 导航栏触发事件
@@ -163,10 +164,12 @@
                         this.toPersonal(this.userId);
                         break;
                     case 'collect':
-                        this.$router.replace(`/personal/${this.userId}?type=collect`);
+                        window.open(`${window.location.origin}/personal/${this.userId}?type=collect`, '_blank');
+                        // this.$router.replace(`/personal/${this.userId}?type=collect`);
                         break;
                     case 'setting':
-                        this.$router.push(`/setting/${this.userId}`);
+                        window.open(`${window.location.origin}/setting/${this.userId}`, '_blank');
+                        // this.$router.push(`/setting/${this.userId}`);
                         break;
                     case 'exit':
                         // 退出登录
