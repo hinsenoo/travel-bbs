@@ -69,6 +69,7 @@
                             <el-avatar :size="40" :src="item.commentator.avatar_url"></el-avatar>
                         </a>
                         <div class="commentMessage">
+                            <el-button @click="toDeleteComment(item._id)" v-if="isSelf || item.commentator._id === userId" size="small" class="commentBox-delete" type="danger" icon="el-icon-delete" circle></el-button>
                             <a href="javascript:;" @click="toPersonal(item.commentator._id)">{{item.commentator.nick_name}}</a>
                             <p>{{item.content}}</p>
                             <div class="date">
@@ -96,6 +97,7 @@
                                     <el-avatar :size="40" :src="replyItem.commentator.avatar_url"></el-avatar>
                                 </a>
                                 <div class="commentMessage">
+                                    <el-button @click="toDeleteComment(replyItem._id)" v-if="isSelf || replyItem.commentator._id === userId" size="small" class="commentBox-delete" type="danger" icon="el-icon-delete" circle></el-button>
                                     <a href="javascript:;" @click="toPersonal(replyItem.commentator._id)">{{replyItem.commentator.nick_name}}</a>
                                     <p>
                                         回复 
@@ -706,6 +708,29 @@
                 // this.$router.push(`/article/${id}`);
                 window.open(`${window.location.origin}/article/${id}`, '_blank');
             },
+            toDeleteComment(id) {
+                console.log(id);
+                this.$confirm('此操作将永久删除该评论, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    this.$axios.delete(`/articles/${this.articleId}/comments/${id}`)
+                    .then((res)=>{
+                        console.log(res);
+                        this.getCommentList();
+                        this.$message({
+                            type: 'success',
+                            message: '删除成功!'
+                        });
+                    })
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消删除'
+                    });          
+                });
+            }
         }
     }
 </script>
@@ -882,6 +907,7 @@
                             }
                         }
                         .commentMessage{
+                            position: relative;
                             width: 100%;
                             font-size: 14px;
                             border-bottom: 1px solid #e5e5e5;
@@ -896,7 +922,7 @@
                                 a{
                                     flex:0.5;
                                     text-align: right;
-                                    margin-right: 20px;
+                                    // margin-right: 20px;
                                     display: flex;
                                     align-items: center;
                                     color: #8a93a0;
@@ -949,7 +975,13 @@
                                     }
                                 }
                             }
+                            .commentBox-delete {
+                                position: absolute;
+                                right: 10px;
+                                top: 0;
+                            }
                         }
+                        
                     }
                 }
             }

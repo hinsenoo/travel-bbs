@@ -306,8 +306,7 @@ export default {
     },
     // 点赞数
     goodCount() {
-      // return this.$store.state.userMessage.goodCount || 0;
-      return 0;
+      return this.$store.state.userMessage.likeCount || 0;
     },
     // 文章数
     articleCount() {

@@ -33,7 +33,7 @@
                     </div>
                     <div class="person" v-if="loginStatus">
                         <el-button type="primary" size="mini" icon="el-icon-edit-outline" @click="$router.push('/edit/write')">发帖子</el-button>
-                        <a href="javascript:;" class="el-icon-message-solid icon"></a>
+                        <!-- <a href="javascript:;" class="el-icon-message-solid icon"></a> -->
                         <el-dropdown class="avatar" trigger="click" @command="handleCommand">
                             <el-avatar size="small" :src="userAvatar"></el-avatar>
                             <el-dropdown-menu slot="dropdown">
@@ -60,13 +60,13 @@
                     </div>
                     <div class="content">
                         <div class="content-login" v-show="modalType=='login'">
-                            <el-input v-model="username" placeholder="请输入用户名"></el-input>
+                            <el-input v-model="username" maxlength="10" placeholder="请输入用户名"></el-input>
                             <el-input placeholder="请输入密码" v-model="password" show-password></el-input>
                             <el-button @click="login" type="primary" :loading="waitRequest">登录</el-button>
                             <div class="other">没有账号？<span @click="$store.dispatch('saveLoginModal', 2);">注册</span></div>
                         </div>
                         <div class="content-login" v-show="modalType=='register'">
-                            <el-input v-model="registerName" placeholder="请输入用户名"></el-input>
+                            <el-input v-model="registerName" maxlength="10" placeholder="请输入用户名"></el-input>
                             <el-input v-model="registerEmail" placeholder="请输入邮箱"></el-input>
                             <el-input placeholder="请输入密码（不少于6位）" v-model="registerPw" show-password></el-input>
                             <el-input placeholder="再次输入密码" v-model="registerPw2" show-password></el-input>
