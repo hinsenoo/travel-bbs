@@ -13,7 +13,7 @@
     "element-ui": "^2.13.1",
     "js-base64": "^2.5.2",
     "js-md5": "^0.7.3",
-    "qs": "^6.9.4",
+    "qs": "^6.9.7",
     "vue-axios": "^2.1.5",
     "vue-cookie": "^1.1.4",
     "vue-infinite-loading": "^2.4.5",
